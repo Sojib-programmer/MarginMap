@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
+import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
@@ -22,9 +24,8 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/_marketing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -36,6 +37,16 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MarketingIndexRoute = MarketingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingMethodologyRoute = MarketingMethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
+  getParentRoute: () => MarketingRoute,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
@@ -84,9 +95,10 @@ const AppVariantIdRoute = AppVariantIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof MarketingIndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -98,8 +110,8 @@ export interface FileRoutesByFullPath {
   '/app/variant/$id': typeof AppVariantIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -107,14 +119,16 @@ export interface FileRoutesByTo {
   '/app/search': typeof AppSearchRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
+  '/': typeof MarketingIndexRoute
   '/app': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_marketing': typeof MarketingRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_marketing/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -122,6 +136,7 @@ export interface FileRoutesById {
   '/app/search': typeof AppSearchRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
+  '/_marketing/': typeof MarketingIndexRoute
   '/app/': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
 }
@@ -131,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/methodology'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -142,8 +158,8 @@ export interface FileRouteTypes {
     | '/app/variant/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/auth'
+    | '/methodology'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -151,13 +167,15 @@ export interface FileRouteTypes {
     | '/app/search'
     | '/app/settings'
     | '/app/watchlists'
+    | '/'
     | '/app'
     | '/app/variant/$id'
   id:
     | '__root__'
-    | '/'
+    | '/_marketing'
     | '/app'
     | '/auth'
+    | '/_marketing/methodology'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -165,23 +183,24 @@ export interface FileRouteTypes {
     | '/app/search'
     | '/app/settings'
     | '/app/watchlists'
+    | '/_marketing/'
     | '/app/'
     | '/app/variant/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  MarketingRoute: typeof MarketingRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_marketing': {
+      id: '/_marketing'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof MarketingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -197,6 +216,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_marketing/': {
+      id: '/_marketing/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof MarketingIndexRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/methodology': {
+      id: '/_marketing/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MarketingMethodologyRouteImport
+      parentRoute: typeof MarketingRoute
     }
     '/app/': {
       id: '/app/'
@@ -264,6 +297,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MarketingRouteChildren {
+  MarketingMethodologyRoute: typeof MarketingMethodologyRoute
+  MarketingIndexRoute: typeof MarketingIndexRoute
+}
+
+const MarketingRouteChildren: MarketingRouteChildren = {
+  MarketingMethodologyRoute: MarketingMethodologyRoute,
+  MarketingIndexRoute: MarketingIndexRoute,
+}
+
+const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
+  MarketingRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAlertsRoute: typeof AppAlertsRoute
   AppCompareRoute: typeof AppCompareRoute
@@ -291,20 +338,10 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  MarketingRoute: MarketingRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
