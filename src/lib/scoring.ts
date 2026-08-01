@@ -96,7 +96,7 @@ export function robustStats(values: number[]) {
     const idx = (sorted.length - 1) * p;
     const lo = Math.floor(idx);
     const hi = Math.ceil(idx);
-    return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+    return sorted[lo]! + (sorted[hi]! - sorted[lo]!) * (idx - lo);
   };
   const q1 = q(0.25);
   const q3 = q(0.75);
@@ -108,8 +108,8 @@ export function robustStats(values: number[]) {
   const base = kept.length ? kept : sorted;
   const mid = Math.floor(base.length / 2);
   const median =
-    base.length % 2 ? base[mid] : (base[mid - 1] + base[mid]) / 2;
-  return { median, low: base[0], high: base[base.length - 1], kept, excluded };
+    base.length % 2 ? base[mid]! : (base[mid - 1]! + base[mid]!) / 2;
+  return { median, low: base[0] ?? 0, high: base[base.length - 1] ?? 0, kept, excluded };
 }
 
 /** Recency-weighted median: comps decay with a ~60 day half-life. */
@@ -127,7 +127,7 @@ export function recencyWeightedMedian(comps: CompLike[]) {
     acc += w.weight;
     if (acc >= total / 2) return w.price;
   }
-  return weighted[weighted.length - 1].price;
+  return weighted[weighted.length - 1]!.price;
 }
 
 export type MarketStats = {
@@ -158,7 +158,7 @@ export function marketStats(comps: CompLike[]): MarketStats {
   const { low, high, excluded } = robustStats(totals);
   const median = recencyWeightedMedian(comps);
   const ages = comps.map((c) => daysSince(c.sold_at)).sort((a, b) => a - b);
-  const medianAgeDays = ages[Math.floor(ages.length / 2)];
+  const medianAgeDays = ages[Math.floor(ages.length / 2)] ?? 0;
   const dispersion = median > 0 ? (high - low) / median : 1;
   const avgMatch =
     comps.reduce((s, c) => s + Number(c.match_confidence), 0) / comps.length;
@@ -339,7 +339,7 @@ export function evaluateDeal(
   liquidity: { activeListings: number; completedSales: number; daysToSell: number },
 ): DealOutput {
   const fees =
-    FEE_SCHEDULES.find((f) => f.marketplace === input.marketplace) ?? FEE_SCHEDULES[0];
+    FEE_SCHEDULES.find((f) => f.marketplace === input.marketplace) ?? FEE_SCHEDULES[0]!;
 
   const conditionFactor = (CONDITION_QUALITY[input.conditionGrade] ?? 0.62) / 0.62;
   const expectedGrossSale = (stats.medianSold || 0) * Math.min(1.12, conditionFactor);
