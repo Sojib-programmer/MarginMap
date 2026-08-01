@@ -15,7 +15,7 @@ import { buyerScore, DEFAULT_DEAL_INPUT, evaluateDeal, landedCost } from "@/lib/
 
 export const Route = createFileRoute("/app/search")({
   validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" ? search.q : "",
+    q: typeof search["q"] === "string" ? (search["q"] as string) : "",
   }),
   component: SearchPage,
 });
