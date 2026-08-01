@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CONDITION_LABEL } from "@/lib/scoring";
+import { CONDITION_LABEL, type Recommendation } from "@/lib/scoring";
 import { freshnessTone, relativeTime } from "@/lib/format";
 
 export function Chip({
