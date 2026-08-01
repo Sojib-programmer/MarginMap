@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
 import { Route as AppEvaluateRouteImport } from './routes/app.evaluate'
+import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
 import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
@@ -49,6 +50,11 @@ const AppEvaluateRoute = AppEvaluateRouteImport.update({
   path: '/evaluate',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPipelineRoute = AppPipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSearchRoute = AppSearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/search': typeof AppSearchRoute
   '/app/watchlists': typeof AppWatchlistsRoute
   '/app/': typeof AppIndexRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/search': typeof AppSearchRoute
   '/app/watchlists': typeof AppWatchlistsRoute
   '/app': typeof AppIndexRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/search': typeof AppSearchRoute
   '/app/watchlists': typeof AppWatchlistsRoute
   '/app/': typeof AppIndexRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/compare'
     | '/app/evaluate'
+    | '/app/pipeline'
     | '/app/search'
     | '/app/watchlists'
     | '/app/'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/compare'
     | '/app/evaluate'
+    | '/app/pipeline'
     | '/app/search'
     | '/app/watchlists'
     | '/app'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/compare'
     | '/app/evaluate'
+    | '/app/pipeline'
     | '/app/search'
     | '/app/watchlists'
     | '/app/'
@@ -183,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEvaluateRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/pipeline': {
+      id: '/app/pipeline'
+      path: '/pipeline'
+      fullPath: '/app/pipeline'
+      preLoaderRoute: typeof AppPipelineRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/search': {
       id: '/app/search'
       path: '/search'
@@ -210,6 +229,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCompareRoute: typeof AppCompareRoute
   AppEvaluateRoute: typeof AppEvaluateRoute
+  AppPipelineRoute: typeof AppPipelineRoute
   AppSearchRoute: typeof AppSearchRoute
   AppWatchlistsRoute: typeof AppWatchlistsRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -219,6 +239,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCompareRoute: AppCompareRoute,
   AppEvaluateRoute: AppEvaluateRoute,
+  AppPipelineRoute: AppPipelineRoute,
   AppSearchRoute: AppSearchRoute,
   AppWatchlistsRoute: AppWatchlistsRoute,
   AppIndexRoute: AppIndexRoute,
