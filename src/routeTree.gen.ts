@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAlertsRouteImport } from './routes/app.alerts'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
 import { Route as AppEvaluateRouteImport } from './routes/app.evaluate'
 import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
@@ -38,6 +39,11 @@ const AuthRoute = AuthRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAlertsRoute = AppAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => AppRoute,
 } as any)
 const AppCompareRoute = AppCompareRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
     | '/app/pipeline'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
     | '/app/pipeline'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
     | '/app/pipeline'
@@ -179,6 +191,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/alerts': {
+      id: '/app/alerts'
+      path: '/alerts'
+      fullPath: '/app/alerts'
+      preLoaderRoute: typeof AppAlertsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/compare': {
@@ -227,6 +246,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAlertsRoute: typeof AppAlertsRoute
   AppCompareRoute: typeof AppCompareRoute
   AppEvaluateRoute: typeof AppEvaluateRoute
   AppPipelineRoute: typeof AppPipelineRoute
@@ -237,6 +257,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAlertsRoute: AppAlertsRoute,
   AppCompareRoute: AppCompareRoute,
   AppEvaluateRoute: AppEvaluateRoute,
   AppPipelineRoute: AppPipelineRoute,
