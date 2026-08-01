@@ -111,7 +111,7 @@ function VariantPage() {
           <Metric label="Comp median" value={money(variant.stats.medianSold)} />
           <Metric
             label="Comp range"
-            value={`${money(variant.stats.low)} – ${money(variant.stats.high)}`}
+            value={`${money(variant.stats.lowSold)} – ${money(variant.stats.highSold)}`}
           />
           <Metric label="Completed sales" value={String(liquidity.completedSales)} />
           <Metric label="Est. days to sell" value={`${liquidity.daysToSell}d`} />
