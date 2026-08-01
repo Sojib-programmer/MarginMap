@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CONDITION_LABEL } from "@/lib/scoring";
+import { CONDITION_LABEL, type Recommendation } from "@/lib/scoring";
 import { freshnessTone, relativeTime } from "@/lib/format";
 
 export function Chip({
@@ -74,3 +74,116 @@ export function Disclaimer({ className }: { className?: string }) {
     </p>
   );
 }
+
+/** Single normalized Buy / Watch / Pass verdict. */
+export function RecommendationBadge({
+  rec,
+  showReason = false,
+  className,
+}: {
+  rec: Recommendation;
+  showReason?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("min-w-0", className)}>
+      <Chip tone={rec.tone} className="uppercase tracking-wide">
+        {rec.action}
+      </Chip>
+      {showReason ? (
+        <p className="mt-1 max-w-[22rem] text-xs leading-snug text-muted-foreground">{rec.reason}</p>
+      ) : (
+        <span className="sr-only">{rec.reason}</span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Renders a value with its provenance state. A missing or estimated number is
+ * always labeled — never rendered as a confident zero.
+ */
+export function ValueCell({
+  value,
+  state = "sourced",
+  note,
+  className,
+}: {
+  value: string;
+  state?: "sourced" | "estimated" | "missing";
+  note?: string;
+  className?: string;
+}) {
+  if (state === "missing") {
+    return (
+      <span className={cn("text-xs text-caution", className)} title={note}>
+        not provided
+      </span>
+    );
+  }
+  return (
+    <span className={cn("num inline-flex items-baseline gap-1", className)} title={note}>
+      {value}
+      {state === "estimated" ? (
+        <abbr
+          title={note ?? "Estimated from completed sales, not a quoted figure"}
+          className="text-[10px] uppercase tracking-wide text-caution no-underline"
+        >
+          est
+        </abbr>
+      ) : null}
+    </span>
+  );
+}
+
+/** Source name, retrieval timestamp and match confidence for a single record. */
+export function ProvenanceCell({
+  source,
+  retrievedAt,
+  matchConfidence,
+  url,
+  className,
+}: {
+  source: string;
+  retrievedAt: string | null | undefined;
+  matchConfidence?: number | null;
+  url?: string | null;
+  className?: string;
+}) {
+  return (
+    <div className={cn("space-y-0.5 text-xs text-muted-foreground", className)}>
+      <p className="truncate">{source}</p>
+      <p className="num">retrieved {relativeTime(retrievedAt)}</p>
+      {matchConfidence != null ? (
+        <p className="num">match {(Number(matchConfidence) * 100).toFixed(0)}%</p>
+      ) : (
+        <p className="text-caution">match unknown</p>
+      )}
+      {url ? (
+        <a className="text-primary underline" href={url} target="_blank" rel="noreferrer noopener">
+          Open listing
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+/** Persistent reminder that nothing here is live marketplace data. */
+export function DemoDataBanner({ className }: { className?: string }) {
+  return (
+    <div
+      role="note"
+      className={cn(
+        "flex flex-wrap items-center gap-2 border-b border-caution/30 bg-caution/10 px-4 py-2 text-xs text-caution",
+        className,
+      )}
+    >
+      <Chip tone="caution">Demo data</Chip>
+      <span className="text-muted-foreground">
+        Offers and completed sales are synthetic samples for evaluation. No live marketplace
+        scraping or external data APIs are connected.
+      </span>
+    </div>
+  );
+}
+
