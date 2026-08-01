@@ -173,8 +173,8 @@ function EvaluatePage() {
                 </SelectTrigger>
                 <SelectContent>
                   {FEE_SCHEDULES.map((f) => (
-                    <SelectItem key={f.name} value={f.name}>
-                      {f.name}
+                    <SelectItem key={f.marketplace} value={f.marketplace}>
+                      {f.marketplace}
                     </SelectItem>
                   ))}
                 </SelectContent>
