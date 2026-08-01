@@ -1,55 +1,51 @@
-# Finish the marketing surface, auth, fallbacks, and /app states
+# Restore the database, then complete the MarginMap workspace
 
-Verified current state: `PILLARS` (8 entries with full copy, stats, sections, FAQ, related) and `PillarPage`/`faqJsonLd` already exist; `_marketing.tsx` layout renders header+footer around `<Outlet />`; only `_marketing.index.tsx` and `_marketing.methodology.tsx` exist as leaves, so every other header/footer link 404s. `__root.tsx` has `notFoundComponent`/`errorComponent`; `router.tsx` has no defaults and there is no `$.tsx`. `/auth` is email/password only. Sonner is already mounted — no work.
+## What actually broke
 
-## 1. Eight pillar routes
+The project is now pointed at a **different, empty Supabase project** (`mzmeepgamxldfsksaxmu`). Confirmed by query: `information_schema.tables` in `public` returns zero rows, and the generated `src/integrations/supabase/types.ts` has `Tables: { [_ in never]: never }`. That is the single cause of all ~55 typecheck errors across `catalog.ts`, `research.functions.ts` and every `/app/*` route — every `supabase.from("<table>")` call now resolves to `never`.
 
-One leaf per slug under the marketing layout:
+The original 379-line schema + RLS + seed migration is still on disk at `supabase/migrations/20260801002403_*.sql`, so nothing is lost — it just has to be replayed against the new project.
 
-```text
-_marketing.canonical-product-identity.tsx
-_marketing.landed-cost.tsx
-_marketing.sold-comps-vs-asking-price.tsx
-_marketing.evidence-and-data-confidence.tsx
-_marketing.reseller-margin-and-roi.tsx
-_marketing.marketplace-fees.tsx
-_marketing.condition-grading.tsx
-_marketing.sourcing-workflow.tsx
-```
+## Step 1 — Replay the schema (unblocks the build)
 
-Each: `createFileRoute("/_marketing/<slug>")`, `head()` built from the pillar's `metaTitle`/`description` plus `og:title`, `og:description`, `og:type`, `twitter:card`, and the FAQ JSON-LD via `faqJsonLd(pillar.faq)` in `scripts`. Body is `<PillarPage pillar={PILLAR_BY_SLUG[slug]} />`. No `og:image` (no real absolute asset).
+Re-apply the full migration against the current project, unchanged in substance:
 
-## 2. Footer/company pages
+- Enums: `role_mode`, `record_source_type`, `pipeline_status`
+- Catalog: `categories`, `brands`, `products`, `product_variants`, `data_sources`, `offers`, `sale_comps`, `market_snapshots`
+- User workspace: `profiles`, `searches`, `watchlists`, `watchlist_items`, `deal_evaluations`, `inventory_items`, `research_reports`, `research_evidence`, `alerts`
+- GRANTs on every public table (`anon` SELECT on catalog only; `authenticated` full CRUD on user tables; `service_role` everywhere)
+- RLS: catalog public-read, every user table scoped to `auth.uid()`
+- `updated_at` triggers and the signup trigger that creates a `profiles` row
+- Seed data: five categories (cameras, laptops, consoles, collectibles, guitars) with products, variants, offers, sold comps and market snapshots, every `data_sources` row flagged as demo
 
-`_marketing.about.tsx`, `_marketing.pricing.tsx`, `_marketing.faq.tsx`, `_marketing.contact.tsx`, `_marketing.privacy.tsx`, `_marketing.terms.tsx` — each with its own unique `head()` and substantive copy built from `PageHero`, `StatStrip`, `FaqBlock`, `CTABand`.
+Table-name mapping vs the request — keeping existing names, since all app code and the seed already use them:
 
-- About: positioning, who it's for, how the product is built, methodology link.
-- Pricing: three tiers (Free research, Reseller, Team) with real feature deltas and an FAQ; buttons route to `/auth`.
-- FAQ: aggregated cross-pillar questions with JSON-LD.
-- Contact: client-side validated form (name, email, topic, message) with sonner success/error and inline field errors; no backend send.
-- Privacy / Terms: app-owned, factual copy — data collected, where it's stored, retention, deletion requests, user responsibilities. Explicitly no certification or compliance claims; shared-responsibility wording and a "maintained by MarginMap" qualifier.
+| Requested | Existing |
+|---|---|
+| canonical_products | `products` + `product_variants` |
+| sold_comps | `sale_comps` |
+| product_evaluations | `deal_evaluations` |
+| profiles, searches, offers, watchlists, watchlist_items | unchanged |
 
-## 3. Google + Apple sign-in in /auth
+Types regenerate after the migration runs; the ~55 errors clear at that point. No code changes are needed for step 1.
 
-Above the existing email/password form: two provider buttons calling `lovable.auth.signInWithOAuth("google" | "apple", { redirect_uri: window.location.origin })`, handling `result.redirected` (return) and `result.error` (toast), then navigating to `/app` on token success. Divider "or continue with email". Per-provider busy state; email/password untouched.
+## Step 2 — Close the remaining workflow gaps
 
-## 4. Catch-all + router defaults
+With the build green, finish what the workspace is missing against the requested flow:
 
-- `src/routes/$.tsx` — friendly not-found page: headline, search input that navigates to `/app/search?q=…`, links to the main pillar pages, workspace, and home. Renders standalone (outside the marketing layout) but reuses header/footer components.
-- `src/router.tsx` — add `defaultNotFoundComponent` and `defaultErrorComponent` to `createRouter`, sharing the same components as the root boundaries.
-
-## 5. Loading + error states across /app
-
-Wire `src/components/states.tsx` into every workspace route:
-
-- Add `errorComponent: RouteError` and `notFoundComponent: RouteNotFound` to `app.index`, `app.search`, `app.compare`, `app.watchlists`, `app.evaluate`, `app.pipeline`, `app.alerts`, `app.settings`, `app.variant.$id`.
-- Replace bare/absent loading returns with layout-matching skeletons: `CardGridSkeleton` (overview, search results), `TableSkeleton` (offers, evaluations, alerts), `PanelSkeleton` (settings, watchlist panels), kanban column skeletons in pipeline.
-- Route query bodies through `QueryBoundary` where it fits, with `EmptyState` copy per surface (no results, empty watchlist, empty pipeline column, no alerts).
-- Mutation buttons (status change, remove, save evaluation, create watchlist, run research) get `disabled` + `InlineSpinner`/busy label while pending; failures toast and stay recoverable.
+1. **One recommendation verdict — Buy / Watch / Pass.** Today buyers see "Watch / wait" strings and resellers see "Source now / Thin edge / Pass". Normalize both into a single badge (Buy = verified, Watch = caution, Pass = destructive) with a one-line reason, shown on search rows, offer table, variant intel, compare and evaluate.
+2. **Search results as a comparison table.** Search renders cards today. Add a table view (default) with one row per offer: offer, condition, item, ship, tax, marketplace fee, landed cost, median sold, resale estimate, profit, ROI, confidence, verdict. Card view stays as a toggle.
+3. **Fee-inclusive landed cost.** Landed cost is item + shipping + tax today; add the marketplace-fee component as its own column, reusing the evaluator's fee schedules.
+4. **Sold-comp block inline.** Median sold, low/high range, expected resale, profit and ROI surfaced on search rows and the variant page, not only in the evidence drawer.
+5. **Provenance on every value.** Source name, retrieved timestamp, match confidence, and an explicit `estimated` / `missing` marker instead of a silent zero — one shared component used everywhere.
+6. **Demo-data labeling.** Persistent "Demo data — no live marketplace connections" banner in the workspace shell, plus per-source demo badges in the evidence drawer and settings.
+7. **Explicit save actions.** Named "Save this search", "Save evaluation" from search/variant rows, and "Add to watchlist" from any offer row (searches currently only auto-log).
+8. **Loading / error / 404.** Wire the existing `src/components/states.tsx` skeletons and `RouteError` into every `/app/*` route, add `src/routes/$.tsx` as a friendly catch-all, and register `defaultErrorComponent` / `defaultNotFoundComponent` in `src/router.tsx`.
 
 ## Technical notes
 
-- Pillar slugs stay top-level URLs via the pathless `_marketing` layout.
-- `PILLAR_BY_SLUG` lookups are non-null at build; each route passes its literal slug.
-- No hardcoded colors — existing semantic tokens only.
-- `tsgo` typecheck after each batch of route writes.
+- Verdict logic goes in `src/lib/scoring.ts` next to `buyerVerdict` / `evaluateDeal`; scoring weights are unchanged.
+- Fee schedules move out of `app.evaluate.tsx` into `src/lib/scoring.ts` so search, compare and evaluate share one source of truth.
+- New shared components: `RecommendationBadge`, `ProvenanceCell`, `ResultTable`, `DemoDataBanner`.
+- Auth (email/password + Google/Apple) and the marketing site are untouched.
+- No live scraping or external marketplace APIs.
