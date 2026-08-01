@@ -1,49 +1,51 @@
-# Complete the authenticated MarginMap workspace
+# Restore the database, then complete the MarginMap workspace
 
-Most of the requested stack already exists: Supabase auth, the full schema with RLS, seeded demo catalog, the intent parser, landed-cost/ROI scoring, and the `/app/*` routes (overview, search, variant intel, compare, watchlists, evaluate, pipeline, alerts, settings). This plan closes the gaps between what is built and what the request specifies, without rebuilding working parts.
+## What actually broke
 
-## Schema decision
+The project is now pointed at a **different, empty Supabase project** (`mzmeepgamxldfsksaxmu`). Confirmed by query: `information_schema.tables` in `public` returns zero rows, and the generated `src/integrations/supabase/types.ts` has `Tables: { [_ in never]: never }`. That is the single cause of all ~55 typecheck errors across `catalog.ts`, `research.functions.ts` and every `/app/*` route — every `supabase.from("<table>")` call now resolves to `never`.
 
-The database already has equivalent tables under different names. Keeping them (renaming would break every route and drop seeded data):
+The original 379-line schema + RLS + seed migration is still on disk at `supabase/migrations/20260801002403_*.sql`, so nothing is lost — it just has to be replayed against the new project.
+
+## Step 1 — Replay the schema (unblocks the build)
+
+Re-apply the full migration against the current project, unchanged in substance:
+
+- Enums: `role_mode`, `record_source_type`, `pipeline_status`
+- Catalog: `categories`, `brands`, `products`, `product_variants`, `data_sources`, `offers`, `sale_comps`, `market_snapshots`
+- User workspace: `profiles`, `searches`, `watchlists`, `watchlist_items`, `deal_evaluations`, `inventory_items`, `research_reports`, `research_evidence`, `alerts`
+- GRANTs on every public table (`anon` SELECT on catalog only; `authenticated` full CRUD on user tables; `service_role` everywhere)
+- RLS: catalog public-read, every user table scoped to `auth.uid()`
+- `updated_at` triggers and the signup trigger that creates a `profiles` row
+- Seed data: five categories (cameras, laptops, consoles, collectibles, guitars) with products, variants, offers, sold comps and market snapshots, every `data_sources` row flagged as demo
+
+Table-name mapping vs the request — keeping existing names, since all app code and the seed already use them:
 
 | Requested | Existing |
 |---|---|
-| canonical_products | products + product_variants |
-| sold_comps | sale_comps |
-| product_evaluations | deal_evaluations |
-| profiles, searches, offers, watchlists, watchlist_items | same names, already present |
+| canonical_products | `products` + `product_variants` |
+| sold_comps | `sale_comps` |
+| product_evaluations | `deal_evaluations` |
+| profiles, searches, offers, watchlists, watchlist_items | unchanged |
 
-RLS is already enforced: catalog tables are public-read, all user tables are scoped to `auth.uid()`. No migration is needed unless the gaps below require one — none do.
+Types regenerate after the migration runs; the ~55 errors clear at that point. No code changes are needed for step 1.
 
-## Gaps to close
+## Step 2 — Close the remaining workflow gaps
 
-### 1. One recommendation verdict: Buy / Watch / Pass
-Today buyers see "Watch / wait"-style strings and resellers see "Source now / Thin edge / Pass". Add a single normalized verdict mapped from the existing role-aware score plus data confidence, rendered as a colored badge (Buy = verified, Watch = caution, Pass = destructive) with a one-line reason. Shown on search results, the offer table, variant intel, compare, and evaluate.
+With the build green, finish what the workspace is missing against the requested flow:
 
-### 2. Search results as a real comparison table
-Search currently renders result cards. Add a table view (default) with one row per matching offer and columns: offer, condition, item, ship, tax, marketplace fee, landed cost, median sold, resale estimate, profit, ROI, confidence, verdict. Card view stays available as a toggle for narrative context.
-
-### 3. Fee-inclusive landed cost
-Landed cost is item + shipping + tax today. Add the marketplace fee component (reusing the existing fee schedules from the evaluator) as its own column so buyers see the full acquisition cost and resellers see fees on both sides.
-
-### 4. Explicit sold-comp block on every result
-Surface median sold, low/high sold range, expected resale price, estimated profit, and ROI inline on search rows and the variant page — not only inside the evidence drawer.
-
-### 5. Provenance on every value
-Every displayed number gets source name, retrieved timestamp, match confidence, and an explicit `estimated` / `missing` marker instead of a silent zero (today a zero tax renders as "n/a" only in one table). A small shared provenance component handles this consistently.
-
-### 6. Demo-data labeling
-A persistent "Demo data — no live marketplace connections" banner in the workspace shell, plus a per-source badge in the evidence drawer and settings.
-
-### 7. Save actions everywhere
-Searches already auto-log. Add explicit "Save this search" (named), "Save evaluation" from search/variant rows, and "Add to watchlist" from any offer row — all writing to the existing user-scoped tables.
-
-### 8. Loading, error and 404 handling
-Wire the existing `src/components/states.tsx` skeletons and `RouteError` into every `/app/*` route, add `src/routes/$.tsx` as a friendly catch-all, and register `defaultErrorComponent` / `defaultNotFoundComponent` in `src/router.tsx`.
+1. **One recommendation verdict — Buy / Watch / Pass.** Today buyers see "Watch / wait" strings and resellers see "Source now / Thin edge / Pass". Normalize both into a single badge (Buy = verified, Watch = caution, Pass = destructive) with a one-line reason, shown on search rows, offer table, variant intel, compare and evaluate.
+2. **Search results as a comparison table.** Search renders cards today. Add a table view (default) with one row per offer: offer, condition, item, ship, tax, marketplace fee, landed cost, median sold, resale estimate, profit, ROI, confidence, verdict. Card view stays as a toggle.
+3. **Fee-inclusive landed cost.** Landed cost is item + shipping + tax today; add the marketplace-fee component as its own column, reusing the evaluator's fee schedules.
+4. **Sold-comp block inline.** Median sold, low/high range, expected resale, profit and ROI surfaced on search rows and the variant page, not only in the evidence drawer.
+5. **Provenance on every value.** Source name, retrieved timestamp, match confidence, and an explicit `estimated` / `missing` marker instead of a silent zero — one shared component used everywhere.
+6. **Demo-data labeling.** Persistent "Demo data — no live marketplace connections" banner in the workspace shell, plus per-source demo badges in the evidence drawer and settings.
+7. **Explicit save actions.** Named "Save this search", "Save evaluation" from search/variant rows, and "Add to watchlist" from any offer row (searches currently only auto-log).
+8. **Loading / error / 404.** Wire the existing `src/components/states.tsx` skeletons and `RouteError` into every `/app/*` route, add `src/routes/$.tsx` as a friendly catch-all, and register `defaultErrorComponent` / `defaultNotFoundComponent` in `src/router.tsx`.
 
 ## Technical notes
 
-- Verdict logic lands in `src/lib/scoring.ts` as a pure function next to `buyerVerdict` / `evaluateDeal`; no scoring weights change.
-- Fee schedules move from `app.evaluate.tsx` into `src/lib/scoring.ts` so search, compare and evaluate share one source of truth.
+- Verdict logic goes in `src/lib/scoring.ts` next to `buyerVerdict` / `evaluateDeal`; scoring weights are unchanged.
+- Fee schedules move out of `app.evaluate.tsx` into `src/lib/scoring.ts` so search, compare and evaluate share one source of truth.
 - New shared components: `RecommendationBadge`, `ProvenanceCell`, `ResultTable`, `DemoDataBanner`.
-- No database migration; no changes to auth or the marketing site.
+- Auth (email/password + Google/Apple) and the marketing site are untouched.
+- No live scraping or external marketplace APIs.
