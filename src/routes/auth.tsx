@@ -29,6 +29,26 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState<"google" | "apple" | null>(null);
+
+  const signInWith = async (provider: "google" | "apple") => {
+    setOauthBusy(provider);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if ("redirected" in result && result.redirected) return;
+      if (result.error) {
+        toast.error(result.error.message ?? "Sign-in failed.");
+        return;
+      }
+      navigate({ to: "/app" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Sign-in failed.");
+    } finally {
+      setOauthBusy(null);
+    }
+  };
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/app" });
