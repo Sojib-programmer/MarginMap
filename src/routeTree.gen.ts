@@ -16,7 +16,9 @@ import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
 import { Route as MarketingCanonicalProductIdentityRouteImport } from './routes/_marketing.canonical-product-identity'
 import { Route as MarketingConditionGradingRouteImport } from './routes/_marketing.condition-grading'
+import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
 import { Route as MarketingEvidenceAndDataConfidenceRouteImport } from './routes/_marketing.evidence-and-data-confidence'
+import { Route as MarketingFaqRouteImport } from './routes/_marketing.faq'
 import { Route as MarketingLandedCostRouteImport } from './routes/_marketing.landed-cost'
 import { Route as MarketingMarketplaceFeesRouteImport } from './routes/_marketing.marketplace-fees'
 import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
@@ -70,12 +72,22 @@ const MarketingConditionGradingRoute =
     path: '/condition-grading',
     getParentRoute: () => MarketingRoute,
   } as any)
+const MarketingContactRoute = MarketingContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingEvidenceAndDataConfidenceRoute =
   MarketingEvidenceAndDataConfidenceRouteImport.update({
     id: '/evidence-and-data-confidence',
     path: '/evidence-and-data-confidence',
     getParentRoute: () => MarketingRoute,
   } as any)
+const MarketingFaqRoute = MarketingFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingLandedCostRoute = MarketingLandedCostRouteImport.update({
   id: '/landed-cost',
   path: '/landed-cost',
@@ -168,7 +180,9 @@ export interface FileRoutesByFullPath {
   '/about': typeof MarketingAboutRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
+  '/contact': typeof MarketingContactRoute
   '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
+  '/faq': typeof MarketingFaqRoute
   '/landed-cost': typeof MarketingLandedCostRoute
   '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
@@ -191,7 +205,9 @@ export interface FileRoutesByTo {
   '/about': typeof MarketingAboutRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
+  '/contact': typeof MarketingContactRoute
   '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
+  '/faq': typeof MarketingFaqRoute
   '/landed-cost': typeof MarketingLandedCostRoute
   '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
@@ -218,7 +234,9 @@ export interface FileRoutesById {
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/_marketing/condition-grading': typeof MarketingConditionGradingRoute
+  '/_marketing/contact': typeof MarketingContactRoute
   '/_marketing/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
+  '/_marketing/faq': typeof MarketingFaqRoute
   '/_marketing/landed-cost': typeof MarketingLandedCostRoute
   '/_marketing/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/_marketing/methodology': typeof MarketingMethodologyRoute
@@ -246,7 +264,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/canonical-product-identity'
     | '/condition-grading'
+    | '/contact'
     | '/evidence-and-data-confidence'
+    | '/faq'
     | '/landed-cost'
     | '/marketplace-fees'
     | '/methodology'
@@ -269,7 +289,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/canonical-product-identity'
     | '/condition-grading'
+    | '/contact'
     | '/evidence-and-data-confidence'
+    | '/faq'
     | '/landed-cost'
     | '/marketplace-fees'
     | '/methodology'
@@ -295,7 +317,9 @@ export interface FileRouteTypes {
     | '/_marketing/about'
     | '/_marketing/canonical-product-identity'
     | '/_marketing/condition-grading'
+    | '/_marketing/contact'
     | '/_marketing/evidence-and-data-confidence'
+    | '/_marketing/faq'
     | '/_marketing/landed-cost'
     | '/_marketing/marketplace-fees'
     | '/_marketing/methodology'
@@ -372,11 +396,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingConditionGradingRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/contact': {
+      id: '/_marketing/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof MarketingContactRouteImport
+      parentRoute: typeof MarketingRoute
+    }
     '/_marketing/evidence-and-data-confidence': {
       id: '/_marketing/evidence-and-data-confidence'
       path: '/evidence-and-data-confidence'
       fullPath: '/evidence-and-data-confidence'
       preLoaderRoute: typeof MarketingEvidenceAndDataConfidenceRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/faq': {
+      id: '/_marketing/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof MarketingFaqRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/_marketing/landed-cost': {
@@ -498,7 +536,9 @@ interface MarketingRouteChildren {
   MarketingAboutRoute: typeof MarketingAboutRoute
   MarketingCanonicalProductIdentityRoute: typeof MarketingCanonicalProductIdentityRoute
   MarketingConditionGradingRoute: typeof MarketingConditionGradingRoute
+  MarketingContactRoute: typeof MarketingContactRoute
   MarketingEvidenceAndDataConfidenceRoute: typeof MarketingEvidenceAndDataConfidenceRoute
+  MarketingFaqRoute: typeof MarketingFaqRoute
   MarketingLandedCostRoute: typeof MarketingLandedCostRoute
   MarketingMarketplaceFeesRoute: typeof MarketingMarketplaceFeesRoute
   MarketingMethodologyRoute: typeof MarketingMethodologyRoute
@@ -514,8 +554,10 @@ const MarketingRouteChildren: MarketingRouteChildren = {
   MarketingCanonicalProductIdentityRoute:
     MarketingCanonicalProductIdentityRoute,
   MarketingConditionGradingRoute: MarketingConditionGradingRoute,
+  MarketingContactRoute: MarketingContactRoute,
   MarketingEvidenceAndDataConfidenceRoute:
     MarketingEvidenceAndDataConfidenceRoute,
+  MarketingFaqRoute: MarketingFaqRoute,
   MarketingLandedCostRoute: MarketingLandedCostRoute,
   MarketingMarketplaceFeesRoute: MarketingMarketplaceFeesRoute,
   MarketingMethodologyRoute: MarketingMethodologyRoute,
