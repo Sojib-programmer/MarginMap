@@ -48,7 +48,7 @@ export function faqJsonLdScript(items: { q: string; a: string }[]) {
 }
 
 export function pillarHead(slug: string) {
-  const pillar = PILLAR_BY_SLUG[slug];
+  const pillar = PILLAR_BY_SLUG[slug]!;
   const base = pageHead({
     path: `/${slug}`,
     title: pillar.metaTitle,
