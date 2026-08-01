@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
 import { Route as MarketingCanonicalProductIdentityRouteImport } from './routes/_marketing.canonical-product-identity'
+import { Route as MarketingLandedCostRouteImport } from './routes/_marketing.landed-cost'
 import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
@@ -50,6 +51,11 @@ const MarketingCanonicalProductIdentityRoute =
     path: '/canonical-product-identity',
     getParentRoute: () => MarketingRoute,
   } as any)
+const MarketingLandedCostRoute = MarketingLandedCostRouteImport.update({
+  id: '/landed-cost',
+  path: '/landed-cost',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingMethodologyRoute = MarketingMethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
+  '/landed-cost': typeof MarketingLandedCostRoute
   '/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
+  '/landed-cost': typeof MarketingLandedCostRoute
   '/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
+  '/_marketing/landed-cost': typeof MarketingLandedCostRoute
   '/_marketing/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/canonical-product-identity'
+    | '/landed-cost'
     | '/methodology'
     | '/app/alerts'
     | '/app/compare'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/canonical-product-identity'
+    | '/landed-cost'
     | '/methodology'
     | '/app/alerts'
     | '/app/compare'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/_marketing/canonical-product-identity'
+    | '/_marketing/landed-cost'
     | '/_marketing/methodology'
     | '/app/alerts'
     | '/app/compare'
@@ -242,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/canonical-product-identity'
       fullPath: '/canonical-product-identity'
       preLoaderRoute: typeof MarketingCanonicalProductIdentityRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/landed-cost': {
+      id: '/_marketing/landed-cost'
+      path: '/landed-cost'
+      fullPath: '/landed-cost'
+      preLoaderRoute: typeof MarketingLandedCostRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/_marketing/methodology': {
@@ -319,6 +338,7 @@ declare module '@tanstack/react-router' {
 
 interface MarketingRouteChildren {
   MarketingCanonicalProductIdentityRoute: typeof MarketingCanonicalProductIdentityRoute
+  MarketingLandedCostRoute: typeof MarketingLandedCostRoute
   MarketingMethodologyRoute: typeof MarketingMethodologyRoute
   MarketingIndexRoute: typeof MarketingIndexRoute
 }
@@ -326,6 +346,7 @@ interface MarketingRouteChildren {
 const MarketingRouteChildren: MarketingRouteChildren = {
   MarketingCanonicalProductIdentityRoute:
     MarketingCanonicalProductIdentityRoute,
+  MarketingLandedCostRoute: MarketingLandedCostRoute,
   MarketingMethodologyRoute: MarketingMethodologyRoute,
   MarketingIndexRoute: MarketingIndexRoute,
 }
