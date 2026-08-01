@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/hooks/use-session";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
@@ -55,18 +54,6 @@ function AuthPage() {
     navigate({ to: "/app" });
   };
 
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error(result.error.message ?? "Google sign-in failed.");
-      return;
-    }
-    if (result.redirected) return;
-    navigate({ to: "/app" });
-  };
-
   return (
     <div className="grid min-h-screen place-items-center bg-background px-4">
       <div className="w-full max-w-sm">
@@ -79,14 +66,6 @@ function AuthPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Watchlists, deal evaluations and research reports are private to your account.
         </p>
-
-        <Button onClick={google} variant="outline" className="mt-6 w-full">
-          Continue with Google
-        </Button>
-
-        <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-        </div>
 
         <form onSubmit={submit} className="space-y-3">
           <div>
