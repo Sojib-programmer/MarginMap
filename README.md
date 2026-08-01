@@ -2,13 +2,11 @@
 
 Implement exactly the screenshot and nothing else
 
-This project was built with [Lovable](https://lovable.dev).
+This project was built by
 
-**Live app**: https://pixel-perfect-render-330.lovable.app
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/fc4a4197-fabe-40bf-a058-78e29fdb39d4).
+## Build by Sojib Ahmmed
+https://marginmap.assistant.bd
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
 - **Stay in sync**: every change made in Lovable is committed straight to this repository.
