@@ -10,11 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAlertsRouteImport } from './routes/app.alerts'
+import { Route as AppCompareRouteImport } from './routes/app.compare'
+import { Route as AppEvaluateRouteImport } from './routes/app.evaluate'
+import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
+import { Route as AppSearchRouteImport } from './routes/app.search'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
+import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -22,30 +37,141 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAlertsRoute = AppAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCompareRoute = AppCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEvaluateRoute = AppEvaluateRouteImport.update({
+  id: '/evaluate',
+  path: '/evaluate',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPipelineRoute = AppPipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSearchRoute = AppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWatchlistsRoute = AppWatchlistsRouteImport.update({
+  id: '/watchlists',
+  path: '/watchlists',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVariantIdRoute = AppVariantIdRouteImport.update({
+  id: '/variant/$id',
+  path: '/variant/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/alerts': typeof AppAlertsRoute
+  '/app/compare': typeof AppCompareRoute
+  '/app/evaluate': typeof AppEvaluateRoute
+  '/app/pipeline': typeof AppPipelineRoute
+  '/app/search': typeof AppSearchRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/watchlists': typeof AppWatchlistsRoute
+  '/app/': typeof AppIndexRoute
+  '/app/variant/$id': typeof AppVariantIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/alerts': typeof AppAlertsRoute
+  '/app/compare': typeof AppCompareRoute
+  '/app/evaluate': typeof AppEvaluateRoute
+  '/app/pipeline': typeof AppPipelineRoute
+  '/app/search': typeof AppSearchRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/watchlists': typeof AppWatchlistsRoute
+  '/app': typeof AppIndexRoute
+  '/app/variant/$id': typeof AppVariantIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/alerts': typeof AppAlertsRoute
+  '/app/compare': typeof AppCompareRoute
+  '/app/evaluate': typeof AppEvaluateRoute
+  '/app/pipeline': typeof AppPipelineRoute
+  '/app/search': typeof AppSearchRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/watchlists': typeof AppWatchlistsRoute
+  '/app/': typeof AppIndexRoute
+  '/app/variant/$id': typeof AppVariantIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/alerts'
+    | '/app/compare'
+    | '/app/evaluate'
+    | '/app/pipeline'
+    | '/app/search'
+    | '/app/settings'
+    | '/app/watchlists'
+    | '/app/'
+    | '/app/variant/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth'
-  id: '__root__' | '/' | '/auth'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/alerts'
+    | '/app/compare'
+    | '/app/evaluate'
+    | '/app/pipeline'
+    | '/app/search'
+    | '/app/settings'
+    | '/app/watchlists'
+    | '/app'
+    | '/app/variant/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/alerts'
+    | '/app/compare'
+    | '/app/evaluate'
+    | '/app/pipeline'
+    | '/app/search'
+    | '/app/settings'
+    | '/app/watchlists'
+    | '/app/'
+    | '/app/variant/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
@@ -58,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -65,11 +198,101 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/alerts': {
+      id: '/app/alerts'
+      path: '/alerts'
+      fullPath: '/app/alerts'
+      preLoaderRoute: typeof AppAlertsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/compare': {
+      id: '/app/compare'
+      path: '/compare'
+      fullPath: '/app/compare'
+      preLoaderRoute: typeof AppCompareRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/evaluate': {
+      id: '/app/evaluate'
+      path: '/evaluate'
+      fullPath: '/app/evaluate'
+      preLoaderRoute: typeof AppEvaluateRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pipeline': {
+      id: '/app/pipeline'
+      path: '/pipeline'
+      fullPath: '/app/pipeline'
+      preLoaderRoute: typeof AppPipelineRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/search': {
+      id: '/app/search'
+      path: '/search'
+      fullPath: '/app/search'
+      preLoaderRoute: typeof AppSearchRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/watchlists': {
+      id: '/app/watchlists'
+      path: '/watchlists'
+      fullPath: '/app/watchlists'
+      preLoaderRoute: typeof AppWatchlistsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/variant/$id': {
+      id: '/app/variant/$id'
+      path: '/variant/$id'
+      fullPath: '/app/variant/$id'
+      preLoaderRoute: typeof AppVariantIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAlertsRoute: typeof AppAlertsRoute
+  AppCompareRoute: typeof AppCompareRoute
+  AppEvaluateRoute: typeof AppEvaluateRoute
+  AppPipelineRoute: typeof AppPipelineRoute
+  AppSearchRoute: typeof AppSearchRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppWatchlistsRoute: typeof AppWatchlistsRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppVariantIdRoute: typeof AppVariantIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAlertsRoute: AppAlertsRoute,
+  AppCompareRoute: AppCompareRoute,
+  AppEvaluateRoute: AppEvaluateRoute,
+  AppPipelineRoute: AppPipelineRoute,
+  AppSearchRoute: AppSearchRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppWatchlistsRoute: AppWatchlistsRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppVariantIdRoute: AppVariantIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
