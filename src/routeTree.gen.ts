@@ -23,9 +23,11 @@ import { Route as MarketingLandedCostRouteImport } from './routes/_marketing.lan
 import { Route as MarketingMarketplaceFeesRouteImport } from './routes/_marketing.marketplace-fees'
 import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
 import { Route as MarketingPricingRouteImport } from './routes/_marketing.pricing'
+import { Route as MarketingPrivacyRouteImport } from './routes/_marketing.privacy'
 import { Route as MarketingResellerMarginAndRoiRouteImport } from './routes/_marketing.reseller-margin-and-roi'
 import { Route as MarketingSoldCompsVsAskingPriceRouteImport } from './routes/_marketing.sold-comps-vs-asking-price'
 import { Route as MarketingSourcingWorkflowRouteImport } from './routes/_marketing.sourcing-workflow'
+import { Route as MarketingTermsRouteImport } from './routes/_marketing.terms'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
@@ -109,6 +111,11 @@ const MarketingPricingRoute = MarketingPricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => MarketingRoute,
 } as any)
+const MarketingPrivacyRoute = MarketingPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const MarketingResellerMarginAndRoiRoute =
   MarketingResellerMarginAndRoiRouteImport.update({
     id: '/reseller-margin-and-roi',
@@ -127,6 +134,11 @@ const MarketingSourcingWorkflowRoute =
     path: '/sourcing-workflow',
     getParentRoute: () => MarketingRoute,
   } as any)
+const MarketingTermsRoute = MarketingTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => MarketingRoute,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -187,9 +199,11 @@ export interface FileRoutesByFullPath {
   '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
   '/pricing': typeof MarketingPricingRoute
+  '/privacy': typeof MarketingPrivacyRoute
   '/reseller-margin-and-roi': typeof MarketingResellerMarginAndRoiRoute
   '/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
   '/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
+  '/terms': typeof MarketingTermsRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -212,9 +226,11 @@ export interface FileRoutesByTo {
   '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
   '/pricing': typeof MarketingPricingRoute
+  '/privacy': typeof MarketingPrivacyRoute
   '/reseller-margin-and-roi': typeof MarketingResellerMarginAndRoiRoute
   '/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
   '/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
+  '/terms': typeof MarketingTermsRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -241,9 +257,11 @@ export interface FileRoutesById {
   '/_marketing/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/_marketing/methodology': typeof MarketingMethodologyRoute
   '/_marketing/pricing': typeof MarketingPricingRoute
+  '/_marketing/privacy': typeof MarketingPrivacyRoute
   '/_marketing/reseller-margin-and-roi': typeof MarketingResellerMarginAndRoiRoute
   '/_marketing/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
   '/_marketing/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
+  '/_marketing/terms': typeof MarketingTermsRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -271,9 +289,11 @@ export interface FileRouteTypes {
     | '/marketplace-fees'
     | '/methodology'
     | '/pricing'
+    | '/privacy'
     | '/reseller-margin-and-roi'
     | '/sold-comps-vs-asking-price'
     | '/sourcing-workflow'
+    | '/terms'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -296,9 +316,11 @@ export interface FileRouteTypes {
     | '/marketplace-fees'
     | '/methodology'
     | '/pricing'
+    | '/privacy'
     | '/reseller-margin-and-roi'
     | '/sold-comps-vs-asking-price'
     | '/sourcing-workflow'
+    | '/terms'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -324,9 +346,11 @@ export interface FileRouteTypes {
     | '/_marketing/marketplace-fees'
     | '/_marketing/methodology'
     | '/_marketing/pricing'
+    | '/_marketing/privacy'
     | '/_marketing/reseller-margin-and-roi'
     | '/_marketing/sold-comps-vs-asking-price'
     | '/_marketing/sourcing-workflow'
+    | '/_marketing/terms'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -445,6 +469,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingPricingRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/privacy': {
+      id: '/_marketing/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof MarketingPrivacyRouteImport
+      parentRoute: typeof MarketingRoute
+    }
     '/_marketing/reseller-margin-and-roi': {
       id: '/_marketing/reseller-margin-and-roi'
       path: '/reseller-margin-and-roi'
@@ -464,6 +495,13 @@ declare module '@tanstack/react-router' {
       path: '/sourcing-workflow'
       fullPath: '/sourcing-workflow'
       preLoaderRoute: typeof MarketingSourcingWorkflowRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/terms': {
+      id: '/_marketing/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof MarketingTermsRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/app/': {
@@ -543,9 +581,11 @@ interface MarketingRouteChildren {
   MarketingMarketplaceFeesRoute: typeof MarketingMarketplaceFeesRoute
   MarketingMethodologyRoute: typeof MarketingMethodologyRoute
   MarketingPricingRoute: typeof MarketingPricingRoute
+  MarketingPrivacyRoute: typeof MarketingPrivacyRoute
   MarketingResellerMarginAndRoiRoute: typeof MarketingResellerMarginAndRoiRoute
   MarketingSoldCompsVsAskingPriceRoute: typeof MarketingSoldCompsVsAskingPriceRoute
   MarketingSourcingWorkflowRoute: typeof MarketingSourcingWorkflowRoute
+  MarketingTermsRoute: typeof MarketingTermsRoute
   MarketingIndexRoute: typeof MarketingIndexRoute
 }
 
@@ -562,9 +602,11 @@ const MarketingRouteChildren: MarketingRouteChildren = {
   MarketingMarketplaceFeesRoute: MarketingMarketplaceFeesRoute,
   MarketingMethodologyRoute: MarketingMethodologyRoute,
   MarketingPricingRoute: MarketingPricingRoute,
+  MarketingPrivacyRoute: MarketingPrivacyRoute,
   MarketingResellerMarginAndRoiRoute: MarketingResellerMarginAndRoiRoute,
   MarketingSoldCompsVsAskingPriceRoute: MarketingSoldCompsVsAskingPriceRoute,
   MarketingSourcingWorkflowRoute: MarketingSourcingWorkflowRoute,
+  MarketingTermsRoute: MarketingTermsRoute,
   MarketingIndexRoute: MarketingIndexRoute,
 }
 
