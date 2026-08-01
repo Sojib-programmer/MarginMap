@@ -20,7 +20,15 @@ import { useCompare } from "@/lib/compare-store";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
 
-const NAV = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutGrid;
+  exact?: boolean;
+  reseller?: boolean;
+};
+
+const NAV: NavItem[] = [
   { to: "/app", label: "Overview", icon: LayoutGrid, exact: true },
   { to: "/app/search", label: "Search", icon: Search },
   { to: "/app/compare", label: "Compare", icon: GitCompareArrows },
@@ -29,7 +37,7 @@ const NAV = [
   { to: "/app/pipeline", label: "Pipeline", icon: Boxes, reseller: true },
   { to: "/app/alerts", label: "Alerts", icon: Bell },
   { to: "/app/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 export function AppShell() {
   const { mode, setMode } = useRoleMode();
@@ -91,12 +99,12 @@ export function AppShell() {
         </div>
 
         <nav className="flex-1 space-y-0.5 px-2">
-          {NAV.filter((n) => !("reseller" in n && n.reseller) || mode === "reseller").map((item) => {
+          {NAV.filter((n) => !n.reseller || mode === "reseller").map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as never}
                 className={cn(
                   "flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors",
                   active
