@@ -16,7 +16,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Landed cost, fair-market comps, and resale margin in one evidence-backed workspace.",
+          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
       },
     ],
   }),
