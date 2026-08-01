@@ -461,3 +461,159 @@ export function scoreBand(score: number) {
   if (score >= 40) return { label: "Mixed", tone: "caution" as const };
   return { label: "Avoid", tone: "destructive" as const };
 }
+
+/* ------------------- Unified per-offer economics ------------------- */
+
+/**
+ * One calculation path shared by search, compare, offer tables and the
+ * evaluator, so every surface shows the same numbers for the same offer.
+ */
+export type OfferEconomics = {
+  itemPrice: number;
+  shipping: number;
+  tax: number;
+  /** False when the source returned no tax — never silently treated as zero. */
+  taxProvided: boolean;
+  /** Acquisition cost: item + shipping + tax. */
+  landedCost: number;
+  /** Marketplace + payment fees charged on the expected resale. */
+  resaleFees: number;
+  /** Landed cost plus the fees a resale would incur — full round-trip cost. */
+  landedCostWithFees: number;
+  medianSold: number;
+  lowSold: number;
+  highSold: number;
+  expectedResale: number;
+  netProceeds: number;
+  expectedProfit: number;
+  roiPct: number;
+  daysToSell: number;
+  sampleSize: number;
+  confidence: number;
+  buyer: ScoreResult;
+  deal: DealOutput;
+  flags: string[];
+};
+
+export function offerEconomics(
+  offer: OfferLike,
+  stats: MarketStats,
+  liquidity: { activeListings: number; completedSales: number; daysToSell: number },
+  marketplace: string = DEFAULT_DEAL_INPUT.marketplace,
+): OfferEconomics {
+  const itemPrice = Number(offer.item_price);
+  const shipping = Number(offer.shipping_price);
+  const tax = Number(offer.estimated_tax);
+
+  const deal = evaluateDeal(
+    {
+      ...DEFAULT_DEAL_INPUT,
+      marketplace,
+      purchasePrice: itemPrice,
+      inboundShipping: shipping,
+      tax,
+      conditionGrade: offer.condition_grade,
+    },
+    stats,
+    liquidity,
+  );
+  const buyer = buyerScore(offer, stats);
+  const resaleFees = deal.marketplaceFee + deal.paymentFee;
+  const landed = itemPrice + shipping + tax;
+
+  return {
+    itemPrice,
+    shipping,
+    tax,
+    taxProvided: tax > 0,
+    landedCost: landed,
+    resaleFees,
+    landedCostWithFees: landed + resaleFees,
+    medianSold: stats.medianSold,
+    lowSold: stats.lowSold,
+    highSold: stats.highSold,
+    expectedResale: deal.expectedGrossSale,
+    netProceeds: deal.netProceeds,
+    expectedProfit: deal.expectedProfit,
+    roiPct: deal.roiPct,
+    daysToSell: deal.daysToSell,
+    sampleSize: stats.sampleSize,
+    confidence: stats.confidence,
+    buyer,
+    deal,
+    flags: deal.flags,
+  };
+}
+
+/* -------------------- Buy / Watch / Pass verdict -------------------- */
+
+export type RecommendationAction = "Buy" | "Watch" | "Pass";
+
+export type Recommendation = {
+  action: RecommendationAction;
+  tone: "verified" | "caution" | "destructive";
+  reason: string;
+};
+
+const TONE: Record<RecommendationAction, Recommendation["tone"]> = {
+  Buy: "verified",
+  Watch: "caution",
+  Pass: "destructive",
+};
+
+/** Single normalized verdict for both roles, derived from the same economics. */
+export function recommend(
+  mode: "buyer" | "reseller",
+  e: OfferEconomics,
+): Recommendation {
+  const say = (action: RecommendationAction, reason: string): Recommendation => ({
+    action,
+    tone: TONE[action],
+    reason,
+  });
+
+  if (e.sampleSize === 0) {
+    return say("Watch", "No completed sales on record — nothing to price against yet.");
+  }
+
+  if (mode === "buyer") {
+    const score = e.buyer.score;
+    const vsMarket = e.medianSold > 0 ? (e.medianSold - e.landedCost) / e.medianSold : 0;
+    if (e.confidence < 0.35) {
+      return say("Watch", `Only ${e.sampleSize} usable comps — evidence too thin to act on.`);
+    }
+    if (score >= 70 && vsMarket > 0) {
+      return say(
+        "Buy",
+        `Landed cost is ${(vsMarket * 100).toFixed(0)}% under the comp median at a ${score} value score.`,
+      );
+    }
+    if (score >= 45) {
+      return say(
+        "Watch",
+        vsMarket > 0
+          ? `Only ${(vsMarket * 100).toFixed(0)}% below comps — wait for a better listing.`
+          : "Priced at or above what buyers actually paid.",
+      );
+    }
+    return say("Pass", "Landed cost is above the comp median for this condition.");
+  }
+
+  if (e.confidence < 0.4) {
+    return say("Watch", "Comp confidence is too low to commit capital.");
+  }
+  if (e.expectedProfit <= 0) {
+    return say("Pass", `Expected net leaves ${e.expectedProfit.toFixed(0)} after fees and shipping.`);
+  }
+  if (e.roiPct >= 25 && e.deal.score.score >= 60) {
+    return say(
+      "Buy",
+      `${e.roiPct.toFixed(0)}% ROI on ${e.landedCost.toFixed(0)} all-in, ~${e.daysToSell}d to sell.`,
+    );
+  }
+  if (e.roiPct >= 10) {
+    return say("Watch", `Thin ${e.roiPct.toFixed(0)}% ROI — acceptable only at a lower buy price.`);
+  }
+  return say("Pass", `${e.roiPct.toFixed(0)}% ROI does not cover the risk on this hold.`);
+}
+
