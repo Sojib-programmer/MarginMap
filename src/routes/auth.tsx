@@ -88,6 +88,33 @@ function AuthPage() {
           Watchlists, deal evaluations and research reports are private to your account.
         </p>
 
+        <div className="mt-6 space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={oauthBusy !== null}
+            onClick={() => signInWith("google")}
+          >
+            {oauthBusy === "google" ? "Opening Google…" : "Continue with Google"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={oauthBusy !== null}
+            onClick={() => signInWith("apple")}
+          >
+            {oauthBusy === "apple" ? "Opening Apple…" : "Continue with Apple"}
+          </Button>
+        </div>
+
+        <div className="my-5 flex items-center gap-3">
+          <span className="h-px flex-1 bg-border" />
+          <span className="label-meta">or continue with email</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+
         <form onSubmit={submit} className="space-y-3">
           <div>
             <Label htmlFor="email">Email</Label>
