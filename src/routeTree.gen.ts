@@ -13,7 +13,21 @@ import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
+import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
+import { Route as MarketingCanonicalProductIdentityRouteImport } from './routes/_marketing.canonical-product-identity'
+import { Route as MarketingConditionGradingRouteImport } from './routes/_marketing.condition-grading'
+import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
+import { Route as MarketingEvidenceAndDataConfidenceRouteImport } from './routes/_marketing.evidence-and-data-confidence'
+import { Route as MarketingFaqRouteImport } from './routes/_marketing.faq'
+import { Route as MarketingLandedCostRouteImport } from './routes/_marketing.landed-cost'
+import { Route as MarketingMarketplaceFeesRouteImport } from './routes/_marketing.marketplace-fees'
 import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
+import { Route as MarketingPricingRouteImport } from './routes/_marketing.pricing'
+import { Route as MarketingPrivacyRouteImport } from './routes/_marketing.privacy'
+import { Route as MarketingResellerMarginAndRoiRouteImport } from './routes/_marketing.reseller-margin-and-roi'
+import { Route as MarketingSoldCompsVsAskingPriceRouteImport } from './routes/_marketing.sold-comps-vs-asking-price'
+import { Route as MarketingSourcingWorkflowRouteImport } from './routes/_marketing.sourcing-workflow'
+import { Route as MarketingTermsRouteImport } from './routes/_marketing.terms'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
@@ -43,9 +57,86 @@ const MarketingIndexRoute = MarketingIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MarketingRoute,
 } as any)
+const MarketingAboutRoute = MarketingAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingCanonicalProductIdentityRoute =
+  MarketingCanonicalProductIdentityRouteImport.update({
+    id: '/canonical-product-identity',
+    path: '/canonical-product-identity',
+    getParentRoute: () => MarketingRoute,
+  } as any)
+const MarketingConditionGradingRoute =
+  MarketingConditionGradingRouteImport.update({
+    id: '/condition-grading',
+    path: '/condition-grading',
+    getParentRoute: () => MarketingRoute,
+  } as any)
+const MarketingContactRoute = MarketingContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingEvidenceAndDataConfidenceRoute =
+  MarketingEvidenceAndDataConfidenceRouteImport.update({
+    id: '/evidence-and-data-confidence',
+    path: '/evidence-and-data-confidence',
+    getParentRoute: () => MarketingRoute,
+  } as any)
+const MarketingFaqRoute = MarketingFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingLandedCostRoute = MarketingLandedCostRouteImport.update({
+  id: '/landed-cost',
+  path: '/landed-cost',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingMarketplaceFeesRoute =
+  MarketingMarketplaceFeesRouteImport.update({
+    id: '/marketplace-fees',
+    path: '/marketplace-fees',
+    getParentRoute: () => MarketingRoute,
+  } as any)
 const MarketingMethodologyRoute = MarketingMethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingPricingRoute = MarketingPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingPrivacyRoute = MarketingPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingResellerMarginAndRoiRoute =
+  MarketingResellerMarginAndRoiRouteImport.update({
+    id: '/reseller-margin-and-roi',
+    path: '/reseller-margin-and-roi',
+    getParentRoute: () => MarketingRoute,
+  } as any)
+const MarketingSoldCompsVsAskingPriceRoute =
+  MarketingSoldCompsVsAskingPriceRouteImport.update({
+    id: '/sold-comps-vs-asking-price',
+    path: '/sold-comps-vs-asking-price',
+    getParentRoute: () => MarketingRoute,
+  } as any)
+const MarketingSourcingWorkflowRoute =
+  MarketingSourcingWorkflowRouteImport.update({
+    id: '/sourcing-workflow',
+    path: '/sourcing-workflow',
+    getParentRoute: () => MarketingRoute,
+  } as any)
+const MarketingTermsRoute = MarketingTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => MarketingRoute,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -98,7 +189,21 @@ export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/about': typeof MarketingAboutRoute
+  '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
+  '/condition-grading': typeof MarketingConditionGradingRoute
+  '/contact': typeof MarketingContactRoute
+  '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
+  '/faq': typeof MarketingFaqRoute
+  '/landed-cost': typeof MarketingLandedCostRoute
+  '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
+  '/pricing': typeof MarketingPricingRoute
+  '/privacy': typeof MarketingPrivacyRoute
+  '/reseller-margin-and-roi': typeof MarketingResellerMarginAndRoiRoute
+  '/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
+  '/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
+  '/terms': typeof MarketingTermsRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -111,7 +216,21 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/about': typeof MarketingAboutRoute
+  '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
+  '/condition-grading': typeof MarketingConditionGradingRoute
+  '/contact': typeof MarketingContactRoute
+  '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
+  '/faq': typeof MarketingFaqRoute
+  '/landed-cost': typeof MarketingLandedCostRoute
+  '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
+  '/pricing': typeof MarketingPricingRoute
+  '/privacy': typeof MarketingPrivacyRoute
+  '/reseller-margin-and-roi': typeof MarketingResellerMarginAndRoiRoute
+  '/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
+  '/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
+  '/terms': typeof MarketingTermsRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -128,7 +247,21 @@ export interface FileRoutesById {
   '/_marketing': typeof MarketingRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_marketing/about': typeof MarketingAboutRoute
+  '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
+  '/_marketing/condition-grading': typeof MarketingConditionGradingRoute
+  '/_marketing/contact': typeof MarketingContactRoute
+  '/_marketing/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
+  '/_marketing/faq': typeof MarketingFaqRoute
+  '/_marketing/landed-cost': typeof MarketingLandedCostRoute
+  '/_marketing/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/_marketing/methodology': typeof MarketingMethodologyRoute
+  '/_marketing/pricing': typeof MarketingPricingRoute
+  '/_marketing/privacy': typeof MarketingPrivacyRoute
+  '/_marketing/reseller-margin-and-roi': typeof MarketingResellerMarginAndRoiRoute
+  '/_marketing/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
+  '/_marketing/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
+  '/_marketing/terms': typeof MarketingTermsRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -146,7 +279,21 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/about'
+    | '/canonical-product-identity'
+    | '/condition-grading'
+    | '/contact'
+    | '/evidence-and-data-confidence'
+    | '/faq'
+    | '/landed-cost'
+    | '/marketplace-fees'
     | '/methodology'
+    | '/pricing'
+    | '/privacy'
+    | '/reseller-margin-and-roi'
+    | '/sold-comps-vs-asking-price'
+    | '/sourcing-workflow'
+    | '/terms'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -159,7 +306,21 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/about'
+    | '/canonical-product-identity'
+    | '/condition-grading'
+    | '/contact'
+    | '/evidence-and-data-confidence'
+    | '/faq'
+    | '/landed-cost'
+    | '/marketplace-fees'
     | '/methodology'
+    | '/pricing'
+    | '/privacy'
+    | '/reseller-margin-and-roi'
+    | '/sold-comps-vs-asking-price'
+    | '/sourcing-workflow'
+    | '/terms'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -175,7 +336,21 @@ export interface FileRouteTypes {
     | '/_marketing'
     | '/app'
     | '/auth'
+    | '/_marketing/about'
+    | '/_marketing/canonical-product-identity'
+    | '/_marketing/condition-grading'
+    | '/_marketing/contact'
+    | '/_marketing/evidence-and-data-confidence'
+    | '/_marketing/faq'
+    | '/_marketing/landed-cost'
+    | '/_marketing/marketplace-fees'
     | '/_marketing/methodology'
+    | '/_marketing/pricing'
+    | '/_marketing/privacy'
+    | '/_marketing/reseller-margin-and-roi'
+    | '/_marketing/sold-comps-vs-asking-price'
+    | '/_marketing/sourcing-workflow'
+    | '/_marketing/terms'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -224,11 +399,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketingIndexRouteImport
       parentRoute: typeof MarketingRoute
     }
+    '/_marketing/about': {
+      id: '/_marketing/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof MarketingAboutRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/canonical-product-identity': {
+      id: '/_marketing/canonical-product-identity'
+      path: '/canonical-product-identity'
+      fullPath: '/canonical-product-identity'
+      preLoaderRoute: typeof MarketingCanonicalProductIdentityRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/condition-grading': {
+      id: '/_marketing/condition-grading'
+      path: '/condition-grading'
+      fullPath: '/condition-grading'
+      preLoaderRoute: typeof MarketingConditionGradingRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/contact': {
+      id: '/_marketing/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof MarketingContactRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/evidence-and-data-confidence': {
+      id: '/_marketing/evidence-and-data-confidence'
+      path: '/evidence-and-data-confidence'
+      fullPath: '/evidence-and-data-confidence'
+      preLoaderRoute: typeof MarketingEvidenceAndDataConfidenceRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/faq': {
+      id: '/_marketing/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof MarketingFaqRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/landed-cost': {
+      id: '/_marketing/landed-cost'
+      path: '/landed-cost'
+      fullPath: '/landed-cost'
+      preLoaderRoute: typeof MarketingLandedCostRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/marketplace-fees': {
+      id: '/_marketing/marketplace-fees'
+      path: '/marketplace-fees'
+      fullPath: '/marketplace-fees'
+      preLoaderRoute: typeof MarketingMarketplaceFeesRouteImport
+      parentRoute: typeof MarketingRoute
+    }
     '/_marketing/methodology': {
       id: '/_marketing/methodology'
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MarketingMethodologyRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/pricing': {
+      id: '/_marketing/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof MarketingPricingRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/privacy': {
+      id: '/_marketing/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof MarketingPrivacyRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/reseller-margin-and-roi': {
+      id: '/_marketing/reseller-margin-and-roi'
+      path: '/reseller-margin-and-roi'
+      fullPath: '/reseller-margin-and-roi'
+      preLoaderRoute: typeof MarketingResellerMarginAndRoiRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/sold-comps-vs-asking-price': {
+      id: '/_marketing/sold-comps-vs-asking-price'
+      path: '/sold-comps-vs-asking-price'
+      fullPath: '/sold-comps-vs-asking-price'
+      preLoaderRoute: typeof MarketingSoldCompsVsAskingPriceRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/sourcing-workflow': {
+      id: '/_marketing/sourcing-workflow'
+      path: '/sourcing-workflow'
+      fullPath: '/sourcing-workflow'
+      preLoaderRoute: typeof MarketingSourcingWorkflowRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/terms': {
+      id: '/_marketing/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof MarketingTermsRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/app/': {
@@ -298,12 +571,42 @@ declare module '@tanstack/react-router' {
 }
 
 interface MarketingRouteChildren {
+  MarketingAboutRoute: typeof MarketingAboutRoute
+  MarketingCanonicalProductIdentityRoute: typeof MarketingCanonicalProductIdentityRoute
+  MarketingConditionGradingRoute: typeof MarketingConditionGradingRoute
+  MarketingContactRoute: typeof MarketingContactRoute
+  MarketingEvidenceAndDataConfidenceRoute: typeof MarketingEvidenceAndDataConfidenceRoute
+  MarketingFaqRoute: typeof MarketingFaqRoute
+  MarketingLandedCostRoute: typeof MarketingLandedCostRoute
+  MarketingMarketplaceFeesRoute: typeof MarketingMarketplaceFeesRoute
   MarketingMethodologyRoute: typeof MarketingMethodologyRoute
+  MarketingPricingRoute: typeof MarketingPricingRoute
+  MarketingPrivacyRoute: typeof MarketingPrivacyRoute
+  MarketingResellerMarginAndRoiRoute: typeof MarketingResellerMarginAndRoiRoute
+  MarketingSoldCompsVsAskingPriceRoute: typeof MarketingSoldCompsVsAskingPriceRoute
+  MarketingSourcingWorkflowRoute: typeof MarketingSourcingWorkflowRoute
+  MarketingTermsRoute: typeof MarketingTermsRoute
   MarketingIndexRoute: typeof MarketingIndexRoute
 }
 
 const MarketingRouteChildren: MarketingRouteChildren = {
+  MarketingAboutRoute: MarketingAboutRoute,
+  MarketingCanonicalProductIdentityRoute:
+    MarketingCanonicalProductIdentityRoute,
+  MarketingConditionGradingRoute: MarketingConditionGradingRoute,
+  MarketingContactRoute: MarketingContactRoute,
+  MarketingEvidenceAndDataConfidenceRoute:
+    MarketingEvidenceAndDataConfidenceRoute,
+  MarketingFaqRoute: MarketingFaqRoute,
+  MarketingLandedCostRoute: MarketingLandedCostRoute,
+  MarketingMarketplaceFeesRoute: MarketingMarketplaceFeesRoute,
   MarketingMethodologyRoute: MarketingMethodologyRoute,
+  MarketingPricingRoute: MarketingPricingRoute,
+  MarketingPrivacyRoute: MarketingPrivacyRoute,
+  MarketingResellerMarginAndRoiRoute: MarketingResellerMarginAndRoiRoute,
+  MarketingSoldCompsVsAskingPriceRoute: MarketingSoldCompsVsAskingPriceRoute,
+  MarketingSourcingWorkflowRoute: MarketingSourcingWorkflowRoute,
+  MarketingTermsRoute: MarketingTermsRoute,
   MarketingIndexRoute: MarketingIndexRoute,
 }
 
@@ -345,13 +648,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

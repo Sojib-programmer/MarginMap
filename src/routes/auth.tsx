@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/hooks/use-session";
+import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
@@ -28,6 +29,26 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState<"google" | "apple" | null>(null);
+
+  const signInWith = async (provider: "google" | "apple") => {
+    setOauthBusy(provider);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if ("redirected" in result && result.redirected) return;
+      if (result.error) {
+        toast.error(result.error.message ?? "Sign-in failed.");
+        return;
+      }
+      navigate({ to: "/app" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Sign-in failed.");
+    } finally {
+      setOauthBusy(null);
+    }
+  };
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/app" });
@@ -66,6 +87,33 @@ function AuthPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Watchlists, deal evaluations and research reports are private to your account.
         </p>
+
+        <div className="mt-6 space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={oauthBusy !== null}
+            onClick={() => signInWith("google")}
+          >
+            {oauthBusy === "google" ? "Opening Google…" : "Continue with Google"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={oauthBusy !== null}
+            onClick={() => signInWith("apple")}
+          >
+            {oauthBusy === "apple" ? "Opening Apple…" : "Continue with Apple"}
+          </Button>
+        </div>
+
+        <div className="my-5 flex items-center gap-3">
+          <span className="h-px flex-1 bg-border" />
+          <span className="label-meta">or continue with email</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
 
         <form onSubmit={submit} className="space-y-3">
           <div>
