@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppCompareRouteImport } from './routes/app.compare'
 import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 
@@ -36,6 +37,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCompareRoute = AppCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSearchRoute = AppSearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/compare': typeof AppCompareRoute
   '/app/search': typeof AppSearchRoute
   '/app/': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/compare': typeof AppCompareRoute
   '/app/search': typeof AppSearchRoute
   '/app': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/compare': typeof AppCompareRoute
   '/app/search': typeof AppSearchRoute
   '/app/': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
@@ -74,14 +83,22 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/app' | '/auth' | '/app/search' | '/app/' | '/app/variant/$id'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/compare'
+    | '/app/search'
+    | '/app/'
+    | '/app/variant/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app/search' | '/app' | '/app/variant/$id'
+  to:
+    '/' | '/auth' | '/app/compare' | '/app/search' | '/app' | '/app/variant/$id'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/auth'
+    | '/app/compare'
     | '/app/search'
     | '/app/'
     | '/app/variant/$id'
@@ -123,6 +140,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/compare': {
+      id: '/app/compare'
+      path: '/compare'
+      fullPath: '/app/compare'
+      preLoaderRoute: typeof AppCompareRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/search': {
       id: '/app/search'
       path: '/search'
@@ -141,12 +165,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppCompareRoute: typeof AppCompareRoute
   AppSearchRoute: typeof AppSearchRoute
   AppIndexRoute: typeof AppIndexRoute
   AppVariantIdRoute: typeof AppVariantIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCompareRoute: AppCompareRoute,
   AppSearchRoute: AppSearchRoute,
   AppIndexRoute: AppIndexRoute,
   AppVariantIdRoute: AppVariantIdRoute,
