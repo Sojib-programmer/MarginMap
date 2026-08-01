@@ -13,6 +13,7 @@ import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
+import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
@@ -40,6 +41,11 @@ const AuthRoute = AuthRouteImport.update({
 const MarketingIndexRoute = MarketingIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingMethodologyRoute = MarketingMethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
   getParentRoute: () => MarketingRoute,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_marketing': typeof MarketingRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_marketing/methodology': typeof MarketingMethodologyRoute
   '/app/alerts': typeof AppAlertsRoute
   '/app/compare': typeof AppCompareRoute
   '/app/evaluate': typeof AppEvaluateRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/methodology'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/methodology'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_marketing'
     | '/app'
     | '/auth'
+    | '/_marketing/methodology'
     | '/app/alerts'
     | '/app/compare'
     | '/app/evaluate'
@@ -210,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof MarketingIndexRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/methodology': {
+      id: '/_marketing/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MarketingMethodologyRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/app/': {
@@ -279,10 +298,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface MarketingRouteChildren {
+  MarketingMethodologyRoute: typeof MarketingMethodologyRoute
   MarketingIndexRoute: typeof MarketingIndexRoute
 }
 
 const MarketingRouteChildren: MarketingRouteChildren = {
+  MarketingMethodologyRoute: MarketingMethodologyRoute,
   MarketingIndexRoute: MarketingIndexRoute,
 }
 
