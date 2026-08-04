@@ -1,60 +1,72 @@
 import { Link } from "@tanstack/react-router";
-import { ExternalLink } from "lucide-react";
 
-import { Chip, ConditionChip } from "@/components/primitives";
+import {
+  Chip,
+  ConditionChip,
+  ProvenanceCell,
+  RecommendationBadge,
+  ValueCell,
+} from "@/components/primitives";
 import { ScoreGauge } from "@/components/score-gauge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { VariantIntel } from "@/lib/catalog";
+import type { DataSource, VariantIntel } from "@/lib/catalog";
 import { liquidityOf } from "@/lib/catalog";
 import { useCompare } from "@/lib/compare-store";
-import { money2, relativeTime } from "@/lib/format";
+import { money2 } from "@/lib/format";
 import type { RoleMode } from "@/lib/role-mode";
-import {
-  buyerScore,
-  DEFAULT_DEAL_INPUT,
-  evaluateDeal,
-  landedCost,
-} from "@/lib/scoring";
+import { offerEconomics, recommend } from "@/lib/scoring";
 
-export function OfferTable({ variant, mode }: { variant: VariantIntel; mode: RoleMode }) {
+export function OfferTable({
+  variant,
+  mode,
+  sources = [],
+  onSaveEvaluation,
+  onAddToWatchlist,
+  busy,
+}: {
+  variant: VariantIntel;
+  mode: RoleMode;
+  sources?: DataSource[];
+  onSaveEvaluation?: (offerId: string) => void;
+  onAddToWatchlist?: (offerId: string) => void;
+  busy?: boolean;
+}) {
   const { isSelected, toggle } = useCompare();
   const liquidity = liquidityOf(variant);
+  const sourceName = (id: string) => sources.find((s) => s.id === id)?.name ?? "Unregistered source";
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[820px] border-collapse text-sm">
+      <table className="w-full min-w-[1040px] border-collapse text-sm">
         <caption className="sr-only">
-          Offers for {variant.variantTitle} with landed cost and role score
+          Offers for {variant.variantTitle} with landed cost, resale economics and verdict
         </caption>
         <thead>
           <tr className="border-b border-border text-left">
-            <th scope="col" className="label-meta py-2 pr-2">Compare</th>
+            <th scope="col" className="label-meta py-2 pr-2">Cmp</th>
             <th scope="col" className="label-meta py-2 pr-2">Offer</th>
-            <th scope="col" className="label-meta py-2 pr-2">Item</th>
-            <th scope="col" className="label-meta py-2 pr-2">Ship</th>
-            <th scope="col" className="label-meta py-2 pr-2">Tax</th>
-            <th scope="col" className="label-meta py-2 pr-2">Landed</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Item</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Ship</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Tax</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Fees</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Landed</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Exp. resale</th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">Profit / ROI</th>
             <th scope="col" className="label-meta py-2 pr-2">
-              {mode === "buyer" ? "Buyer score" : "Est. profit"}
+              {mode === "buyer" ? "Buyer score" : "Deal score"}
             </th>
-            <th scope="col" className="label-meta py-2 pr-2">Source</th>
+            <th scope="col" className="label-meta py-2 pr-2">Verdict</th>
+            <th scope="col" className="label-meta py-2 pr-2">Provenance</th>
+            <th scope="col" className="label-meta py-2 pr-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {variant.offers.map((offer) => {
-            const cost = landedCost(offer);
-            const deal = evaluateDeal(
-              {
-                ...DEFAULT_DEAL_INPUT,
-                purchasePrice: Number(offer.item_price),
-                inboundShipping: Number(offer.shipping_price),
-                tax: Number(offer.estimated_tax),
-                conditionGrade: offer.condition_grade,
-              },
-              variant.stats,
-              liquidity,
-            );
-            const score = buyerScore(offer, variant.stats);
+            const e = offerEconomics(offer, variant.stats, liquidity);
+            const rec = recommend(mode, e);
+            const noComps = e.sampleSize === 0;
+            const score = mode === "buyer" ? e.buyer : e.deal.score;
 
             return (
               <tr key={offer.id} className="border-b border-border/60 align-top">
@@ -70,68 +82,135 @@ export function OfferTable({ variant, mode }: { variant: VariantIntel; mode: Rol
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     <ConditionChip grade={offer.condition_grade} />
                     <Chip tone={offer.availability === "in_stock" ? "verified" : "caution"}>
-                      {offer.availability.replace("_", " ")}
+                      {offer.availability.replace(/_/g, " ")}
                     </Chip>
                   </div>
                   {offer.condition_notes ? (
-                    <p className="mt-1 text-xs text-muted-foreground">{offer.condition_notes}</p>
+                    <p className="mt-1 max-w-[18rem] text-xs text-muted-foreground">
+                      {offer.condition_notes}
+                    </p>
                   ) : null}
                 </td>
-                <td className="num py-3 pr-2">{money2(offer.item_price)}</td>
-                <td className="num py-3 pr-2">{money2(offer.shipping_price)}</td>
-                <td className="num py-3 pr-2">
-                  {Number(offer.estimated_tax) === 0 ? (
-                    <span className="text-caution">n/a</span>
+                <td className="py-3 pr-2 text-right">
+                  <ValueCell value={money2(e.itemPrice)} />
+                </td>
+                <td className="py-3 pr-2 text-right">
+                  <ValueCell
+                    value={money2(e.shipping)}
+                    state={e.shipping > 0 ? "sourced" : "estimated"}
+                    note={e.shipping > 0 ? "Quoted shipping" : "Free or unstated shipping"}
+                  />
+                </td>
+                <td className="py-3 pr-2 text-right">
+                  <ValueCell
+                    value={money2(e.tax)}
+                    state={e.taxProvided ? "sourced" : "missing"}
+                    note="Source returned no tax figure"
+                  />
+                </td>
+                <td className="py-3 pr-2 text-right">
+                  <ValueCell
+                    value={money2(e.resaleFees)}
+                    state="estimated"
+                    note="Marketplace + payment fees on expected resale"
+                  />
+                </td>
+                <td className="py-3 pr-2 text-right font-semibold">
+                  <ValueCell
+                    value={money2(e.landedCost)}
+                    state={e.taxProvided ? "sourced" : "estimated"}
+                    note="Item + shipping + tax"
+                  />
+                </td>
+                <td className="py-3 pr-2 text-right">
+                  {noComps ? (
+                    <ValueCell value="" state="missing" note="No completed sales on record" />
                   ) : (
-                    money2(offer.estimated_tax)
+                    <ValueCell
+                      value={money2(e.expectedResale)}
+                      state="estimated"
+                      note={`Median ${money2(e.medianSold)} across ${e.sampleSize} comps`}
+                    />
                   )}
                 </td>
-                <td className="num py-3 pr-2 font-semibold">{money2(cost)}</td>
-                <td className="py-3 pr-2">
-                  {mode === "buyer" ? (
-                    <ScoreGauge
-                      score={score.score}
-                      factors={score.factors}
-                      caption="Buyer value"
-                      size={48}
-                    />
+                <td className="py-3 pr-2 text-right">
+                  {noComps ? (
+                    <ValueCell value="" state="missing" />
                   ) : (
                     <div>
                       <p
-                        className={`num font-semibold ${deal.expectedProfit >= 0 ? "text-verified" : "text-destructive"}`}
+                        className={`num font-semibold ${e.expectedProfit >= 0 ? "text-verified" : "text-destructive"}`}
                       >
-                        {money2(deal.expectedProfit)}
+                        {money2(e.expectedProfit)}
                       </p>
                       <p className="num text-xs text-muted-foreground">
-                        {deal.roiPct.toFixed(1)}% ROI · {deal.verdict}
+                        {e.roiPct.toFixed(1)}% ROI · ~{e.daysToSell}d
                       </p>
-                      <Link
-                        to="/app/evaluate"
-                        search={{ offer: offer.id }}
-                        className="text-xs text-primary underline"
-                      >
-                        Evaluate deal
-                      </Link>
                     </div>
                   )}
                 </td>
-                <td className="py-3 pr-2 text-xs text-muted-foreground">
-                  <p>{offer.seller_name ?? "Unknown seller"}</p>
-                  <p>retrieved {relativeTime(offer.retrieved_at)}</p>
-                  {offer.listing_url ? (
-                    <a
-                      className="inline-flex items-center gap-1 text-primary underline"
-                      href={offer.listing_url}
-                      target="_blank"
-                      rel="noreferrer noopener"
+                <td className="py-3 pr-2">
+                  <ScoreGauge
+                    score={score.score}
+                    factors={score.factors}
+                    caption={mode === "buyer" ? "Buyer value" : "Deal quality"}
+                    size={48}
+                  />
+                </td>
+                <td className="py-3 pr-2">
+                  <RecommendationBadge rec={rec} showReason />
+                </td>
+                <td className="py-3 pr-2">
+                  <ProvenanceCell
+                    source={sourceName(offer.data_source_id)}
+                    retrievedAt={offer.retrieved_at}
+                    matchConfidence={offer.match_confidence}
+                    url={offer.listing_url}
+                  />
+                </td>
+                <td className="py-3 pr-2">
+                  <div className="flex flex-col items-start gap-1">
+                    {onAddToWatchlist ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        disabled={busy}
+                        onClick={() => onAddToWatchlist(offer.id)}
+                      >
+                        Watchlist
+                      </Button>
+                    ) : null}
+                    {onSaveEvaluation ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs"
+                        disabled={busy}
+                        onClick={() => onSaveEvaluation(offer.id)}
+                      >
+                        Save evaluation
+                      </Button>
+                    ) : null}
+                    <Link
+                      to="/app/evaluate"
+                      search={{ offer: offer.id }}
+                      className="text-xs text-primary underline"
                     >
-                      Visit <ExternalLink className="size-3" />
-                    </a>
-                  ) : null}
+                      Open calculator
+                    </Link>
+                  </div>
                 </td>
               </tr>
             );
           })}
+          {variant.offers.length === 0 ? (
+            <tr>
+              <td colSpan={13} className="py-3 text-sm text-muted-foreground">
+                No active offers from registered sources for this variant.
+              </td>
+            </tr>
+          ) : null}
         </tbody>
       </table>
     </div>

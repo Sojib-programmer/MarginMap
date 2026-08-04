@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { DemoDataBanner } from "@/components/primitives";
 import { Button } from "@/components/ui/button";
+
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
@@ -169,9 +171,12 @@ export function AppShell() {
           </span>
         </header>
 
+        <DemoDataBanner />
+
         <main className="min-w-0 flex-1 px-4 py-6">
           <Outlet />
         </main>
+
       </div>
     </div>
   );

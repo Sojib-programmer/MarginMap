@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -38,6 +39,11 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketingRoute = MarketingRouteImport.update({
   id: '/_marketing',
   getParentRoute: () => rootRouteImport,
@@ -186,6 +192,7 @@ const AppVariantIdRoute = AppVariantIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/$': typeof SplatRoute
   '/': typeof MarketingIndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/app/variant/$id': typeof AppVariantIdRoute
 }
 export interface FileRoutesByTo {
+  '/$': typeof SplatRoute
   '/auth': typeof AuthRoute
   '/about': typeof MarketingAboutRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/$': typeof SplatRoute
   '/_marketing': typeof MarketingRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
@@ -276,6 +285,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$'
     | '/'
     | '/app'
     | '/auth'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/app/variant/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/$'
     | '/auth'
     | '/about'
     | '/canonical-product-identity'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/app/variant/$id'
   id:
     | '__root__'
+    | '/$'
     | '/_marketing'
     | '/app'
     | '/auth'
@@ -364,6 +376,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  SplatRoute: typeof SplatRoute
   MarketingRoute: typeof MarketingRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
@@ -371,6 +384,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_marketing': {
       id: '/_marketing'
       path: ''
@@ -641,6 +661,7 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  SplatRoute: SplatRoute,
   MarketingRoute: MarketingRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
@@ -648,13 +669,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
