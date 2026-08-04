@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { DemoDataBanner } from "@/components/primitives";
 import { Button } from "@/components/ui/button";
+
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
