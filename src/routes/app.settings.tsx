@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Disclaimer } from "@/components/primitives";
+import { RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ import { catalogQuery } from "@/lib/catalog";
 import { useRoleMode } from "@/lib/role-mode";
 
 export const Route = createFileRoute("/app/settings")({
+  errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: SettingsPage,
 });
 

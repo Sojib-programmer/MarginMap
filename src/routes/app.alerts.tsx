@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Chip, Disclaimer } from "@/components/primitives";
+import { RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ import { money, relativeTime } from "@/lib/format";
 import { alertsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/alerts")({
+  errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: AlertsPage,
 });
 
