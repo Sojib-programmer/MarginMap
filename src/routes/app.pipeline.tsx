@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { Disclaimer } from "@/components/primitives";
+import { CardGridSkeleton, EmptyState, QueryBoundary, RouteError } from "@/components/states";
 import {
   Select,
   SelectContent,
@@ -16,8 +17,10 @@ import { money2, relativeTime } from "@/lib/format";
 import { inventoryQuery, PIPELINE_STATUSES, STATUS_LABEL } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/pipeline")({
+  errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: PipelinePage,
 });
+
 
 function PipelinePage() {
   const qc = useQueryClient();
