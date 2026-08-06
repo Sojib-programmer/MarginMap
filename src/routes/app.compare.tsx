@@ -148,7 +148,11 @@ function ComparePage() {
                     <ValueCell
                       value={money2(e.landedCost)}
                       state={e.taxProvided ? "sourced" : "estimated"}
-                      note={e.taxProvided ? undefined : "Excludes tax the source did not provide"}
+                      note={
+                        e.taxProvided
+                          ? "Item + shipping + tax"
+                          : "Excludes tax the source did not provide"
+                      }
                     />
                   }
                 />
