@@ -45,6 +45,7 @@ export const runResearch = createServerFn({ method: "POST" })
     const { count, error: rateErr } = await context.supabase
       .from("research_reports")
       .select("id", { count: "exact", head: true })
+      .eq("user_id", context.userId)
       .gte("created_at", oneHourAgo);
     if (rateErr) throw new Error("Could not verify rate limit.");
     if ((count ?? 0) >= 10) {
