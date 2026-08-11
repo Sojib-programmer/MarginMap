@@ -36,5 +36,19 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    files: [
+      "src/components/ui/*.tsx",
+      "src/lib/compare-store.tsx",
+      "src/lib/role-mode.tsx",
+      "src/components/marketing.tsx",
+      "src/components/result-table.tsx",
+    ],
+    rules: {
+      // shadcn/ui components and React context/util files intentionally export
+      // components alongside helpers / variants / hooks; fast-refresh is not a concern here.
+      "react-refresh/only-export-components": "off",
+    },
+  },
   eslintPluginPrettier,
 );
