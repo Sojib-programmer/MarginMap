@@ -33,7 +33,10 @@ export const Route = createFileRoute("/_marketing/")({
         content:
           "Search products in plain language, compare landed cost against completed sales, and check resale margin before you buy. Every number opens its evidence.",
       },
-      { property: "og:title", content: "MarginMap — Product intelligence for buyers and resellers" },
+      {
+        property: "og:title",
+        content: "MarginMap — Product intelligence for buyers and resellers",
+      },
       {
         property: "og:description",
         content:
@@ -96,9 +99,21 @@ function Landing() {
           <StatStrip
             className="mt-12 sm:grid-cols-4"
             items={[
-              { label: "Priced on", value: "Landed cost", note: "item + shipping + tax, per offer" },
-              { label: "Valued on", value: "Sold comps", note: "recency-weighted median, IQR trimmed" },
-              { label: "Every figure", value: "Auditable", note: "source, timestamp, match confidence" },
+              {
+                label: "Priced on",
+                value: "Landed cost",
+                note: "item + shipping + tax, per offer",
+              },
+              {
+                label: "Valued on",
+                value: "Sold comps",
+                note: "recency-weighted median, IQR trimmed",
+              },
+              {
+                label: "Every figure",
+                value: "Auditable",
+                note: "source, timestamp, match confidence",
+              },
               { label: "Guessed values", value: "None", note: "missing data is labelled missing" },
             ]}
           />

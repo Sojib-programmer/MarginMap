@@ -77,9 +77,7 @@ export function landedCost(offer: {
   shipping_price: number;
   estimated_tax: number;
 }) {
-  return (
-    Number(offer.item_price) + Number(offer.shipping_price) + Number(offer.estimated_tax)
-  );
+  return Number(offer.item_price) + Number(offer.shipping_price) + Number(offer.estimated_tax);
 }
 
 function daysSince(iso: string) {
@@ -107,8 +105,7 @@ export function robustStats(values: number[]) {
   const excluded = sorted.filter((v) => v < lowBound || v > highBound);
   const base = kept.length ? kept : sorted;
   const mid = Math.floor(base.length / 2);
-  const median =
-    base.length % 2 ? base[mid]! : (base[mid - 1]! + base[mid]!) / 2;
+  const median = base.length % 2 ? base[mid]! : (base[mid - 1]! + base[mid]!) / 2;
   return { median, low: base[0] ?? 0, high: base[base.length - 1] ?? 0, kept, excluded };
 }
 
@@ -160,8 +157,7 @@ export function marketStats(comps: CompLike[]): MarketStats {
   const ages = comps.map((c) => daysSince(c.sold_at)).sort((a, b) => a - b);
   const medianAgeDays = ages[Math.floor(ages.length / 2)] ?? 0;
   const dispersion = median > 0 ? (high - low) / median : 1;
-  const avgMatch =
-    comps.reduce((s, c) => s + Number(c.match_confidence), 0) / comps.length;
+  const avgMatch = comps.reduce((s, c) => s + Number(c.match_confidence), 0) / comps.length;
 
   const confidence = clamp01(
     0.35 * clamp01(comps.length / 12) +
@@ -190,11 +186,7 @@ function weighted(factors: Factor[]) {
 /* ------------------------------ Buyer ------------------------------ */
 
 export type BuyerVerdict =
-  | "Best value"
-  | "Lowest landed cost"
-  | "Safer purchase"
-  | "Best fit"
-  | "Watch / wait";
+  "Best value" | "Lowest landed cost" | "Safer purchase" | "Best fit" | "Watch / wait";
 
 export function buyerScore(offer: OfferLike, stats: MarketStats): ScoreResult {
   const cost = landedCost(offer);
@@ -238,15 +230,20 @@ export function buyerScore(offer: OfferLike, stats: MarketStats): ScoreResult {
       label: "Fulfillment",
       weight: 0.1,
       value:
-        (offer.availability === "in_stock" ? 0.75 : offer.availability === "low_stock" ? 0.5 : 0.25) +
-        (Number(offer.shipping_price) === 0 ? 0.25 : 0),
+        (offer.availability === "in_stock"
+          ? 0.75
+          : offer.availability === "low_stock"
+            ? 0.5
+            : 0.25) + (Number(offer.shipping_price) === 0 ? 0.25 : 0),
       detail: `${offer.availability.replace("_", " ")}, shipping ${Number(offer.shipping_price).toFixed(2)}`,
     },
     {
       key: "data",
       label: "Data confidence & freshness",
       weight: 0.1,
-      value: clamp01(stats.confidence * 0.7 + clamp01(1 - daysSince(offer.retrieved_at) / 14) * 0.3),
+      value: clamp01(
+        stats.confidence * 0.7 + clamp01(1 - daysSince(offer.retrieved_at) / 14) * 0.3,
+      ),
       detail: `${stats.sampleSize} comps, offer retrieved ${daysSince(offer.retrieved_at).toFixed(1)}d ago`,
     },
   ];
@@ -279,10 +276,34 @@ export type FeeSchedule = {
 };
 
 export const FEE_SCHEDULES: FeeSchedule[] = [
-  { marketplace: "Generic marketplace", marketplaceFeePct: 0.13, paymentFeePct: 0.029, paymentFeeFlat: 0.3, effectiveFrom: "2026-01-01" },
-  { marketplace: "Auction marketplace", marketplaceFeePct: 0.1325, paymentFeePct: 0.0, paymentFeeFlat: 0.4, effectiveFrom: "2026-01-01" },
-  { marketplace: "Niche gear marketplace", marketplaceFeePct: 0.05, paymentFeePct: 0.029, paymentFeeFlat: 0.49, effectiveFrom: "2026-01-01" },
-  { marketplace: "Local / cash sale", marketplaceFeePct: 0, paymentFeePct: 0, paymentFeeFlat: 0, effectiveFrom: "2026-01-01" },
+  {
+    marketplace: "Generic marketplace",
+    marketplaceFeePct: 0.13,
+    paymentFeePct: 0.029,
+    paymentFeeFlat: 0.3,
+    effectiveFrom: "2026-01-01",
+  },
+  {
+    marketplace: "Auction marketplace",
+    marketplaceFeePct: 0.1325,
+    paymentFeePct: 0.0,
+    paymentFeeFlat: 0.4,
+    effectiveFrom: "2026-01-01",
+  },
+  {
+    marketplace: "Niche gear marketplace",
+    marketplaceFeePct: 0.05,
+    paymentFeePct: 0.029,
+    paymentFeeFlat: 0.49,
+    effectiveFrom: "2026-01-01",
+  },
+  {
+    marketplace: "Local / cash sale",
+    marketplaceFeePct: 0,
+    paymentFeePct: 0,
+    paymentFeeFlat: 0,
+    effectiveFrom: "2026-01-01",
+  },
 ];
 
 export type DealInput = {
@@ -338,8 +359,7 @@ export function evaluateDeal(
   stats: MarketStats,
   liquidity: { activeListings: number; completedSales: number; daysToSell: number },
 ): DealOutput {
-  const fees =
-    FEE_SCHEDULES.find((f) => f.marketplace === input.marketplace) ?? FEE_SCHEDULES[0]!;
+  const fees = FEE_SCHEDULES.find((f) => f.marketplace === input.marketplace) ?? FEE_SCHEDULES[0]!;
 
   const conditionFactor = (CONDITION_QUALITY[input.conditionGrade] ?? 0.62) / 0.62;
   const expectedGrossSale = (stats.medianSold || 0) * Math.min(1.12, conditionFactor);
@@ -390,7 +410,10 @@ export function evaluateDeal(
       key: "acquisition",
       label: "Acquisition edge",
       weight: 0.15,
-      value: conservativeComp > 0 ? clamp01((conservativeComp - allInCost) / (conservativeComp * 0.35)) : 0,
+      value:
+        conservativeComp > 0
+          ? clamp01((conservativeComp - allInCost) / (conservativeComp * 0.35))
+          : 0,
       detail: `All-in ${allInCost.toFixed(0)} vs conservative comp ${conservativeComp.toFixed(0)}`,
     },
     {
@@ -424,10 +447,16 @@ export function evaluateDeal(
   if (stats.medianAgeDays > 90) flags.push("Comp data is older than 90 days");
   if (sellThrough < 0.25) flags.push("Thin liquidity relative to active supply");
   if (expectedProfit < input.desiredProfit) flags.push("Profit below your target");
-  if (input.tax === 0 && input.purchasePrice > 0) flags.push("No tax entered — landed cost may be understated");
+  if (input.tax === 0 && input.purchasePrice > 0)
+    flags.push("No tax entered — landed cost may be understated");
   if (stats.confidence < 0.4) flags.push("Low data confidence — treat estimates as speculative");
 
-  const score = { score: weighted(factors), confidence: stats.confidence, factors, version: SCORE_VERSION };
+  const score = {
+    score: weighted(factors),
+    confidence: stats.confidence,
+    factors,
+    version: SCORE_VERSION,
+  };
 
   let verdict: DealOutput["verdict"];
   if (stats.confidence < 0.4 && score.score >= 60) verdict = "Speculative";
@@ -562,10 +591,7 @@ const TONE: Record<RecommendationAction, Recommendation["tone"]> = {
 };
 
 /** Single normalized verdict for both roles, derived from the same economics. */
-export function recommend(
-  mode: "buyer" | "reseller",
-  e: OfferEconomics,
-): Recommendation {
+export function recommend(mode: "buyer" | "reseller", e: OfferEconomics): Recommendation {
   const say = (action: RecommendationAction, reason: string): Recommendation => ({
     action,
     tone: TONE[action],
@@ -603,7 +629,10 @@ export function recommend(
     return say("Watch", "Comp confidence is too low to commit capital.");
   }
   if (e.expectedProfit <= 0) {
-    return say("Pass", `Expected net leaves ${e.expectedProfit.toFixed(0)} after fees and shipping.`);
+    return say(
+      "Pass",
+      `Expected net leaves ${e.expectedProfit.toFixed(0)} after fees and shipping.`,
+    );
   }
   if (e.roiPct >= 25 && e.deal.score.score >= 60) {
     return say(
@@ -616,4 +645,3 @@ export function recommend(
   }
   return say("Pass", `${e.roiPct.toFixed(0)}% ROI does not cover the risk on this hold.`);
 }
-

@@ -86,7 +86,10 @@ function TermsPage() {
             <section key={s.heading}>
               <h2 className="text-lg font-semibold tracking-tight">{s.heading}</h2>
               {s.body.map((p) => (
-                <p key={p.slice(0, 40)} className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                <p
+                  key={p.slice(0, 40)}
+                  className="mt-3 text-sm leading-relaxed text-muted-foreground"
+                >
                   {p}
                 </p>
               ))}

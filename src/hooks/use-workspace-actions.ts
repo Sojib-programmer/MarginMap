@@ -50,7 +50,11 @@ export function useCreateWatchlist() {
       const userId = await requireUserId();
       const { data, error } = await supabase
         .from("watchlists")
-        .insert({ user_id: userId, name: vars.name.trim() || "Untitled list", role_mode: vars.mode })
+        .insert({
+          user_id: userId,
+          name: vars.name.trim() || "Untitled list",
+          role_mode: vars.mode,
+        })
         .select("id")
         .single();
       if (error) throw new Error(error.message);

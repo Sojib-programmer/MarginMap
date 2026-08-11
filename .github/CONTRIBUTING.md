@@ -12,11 +12,11 @@ npm run check
 
 This single command runs three checks in sequence:
 
-| Command | What it does |
-|---------|-------------|
-| `npm run typecheck` | TypeScript strict compilation — catches type errors without emitting output |
-| `npm run lint` | ESLint with `--max-warnings=0` — zero warnings allowed |
-| `npm run format:check` | Prettier format validation — ensures consistent code style |
+| Command                | What it does                                                                |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `npm run typecheck`    | TypeScript strict compilation — catches type errors without emitting output |
+| `npm run lint`         | ESLint with `--max-warnings=0` — zero warnings allowed                      |
+| `npm run format:check` | Prettier format validation — ensures consistent code style                  |
 
 ## Local Development Workflow
 
@@ -44,14 +44,17 @@ chmod +x .git/hooks/pre-commit
 ## Troubleshooting
 
 **TypeScript errors (`typecheck` fails)**
+
 - Review the error output and fix the type issues in the indicated files.
 - Run `npm run typecheck` to see all errors at once.
 
 **Lint errors (`lint` fails)**
+
 - Run `npm run lint:fix` to automatically fix fixable issues.
 - Remaining errors must be fixed manually.
 
 **Format errors (`format:check` fails)**
+
 - Run `npm run format` to auto-format all files.
 - Commit the formatting changes, then re-run `npm run check`.
 

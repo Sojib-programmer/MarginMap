@@ -176,7 +176,6 @@ export function AppShell() {
         <main className="min-w-0 flex-1 px-4 py-6">
           <Outlet />
         </main>
-
       </div>
     </div>
   );

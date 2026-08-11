@@ -83,9 +83,7 @@ function WatchlistsPage() {
         <Button
           size="sm"
           disabled={createList.isPending}
-          onClick={() =>
-            createList.mutate({ name, mode }, { onSuccess: () => setName("") })
-          }
+          onClick={() => createList.mutate({ name, mode }, { onSuccess: () => setName("") })}
         >
           Create list
         </Button>
@@ -139,7 +137,8 @@ function WatchlistsPage() {
                     const best = v?.offers.length
                       ? Math.min(...v.offers.map((o) => landedCost(o)))
                       : null;
-                    const hit = item.target_price != null && best != null && best <= item.target_price;
+                    const hit =
+                      item.target_price != null && best != null && best <= item.target_price;
                     return (
                       <li key={item.id} className="flex flex-wrap items-center gap-3 py-3">
                         <div className="min-w-0 flex-1">

@@ -49,7 +49,8 @@ function VariantPage() {
 
   const ask = useMutation({
     mutationFn: async () => {
-      const q = question.trim() || `Should I ${mode === "buyer" ? "buy" : "source"} this right now?`;
+      const q =
+        question.trim() || `Should I ${mode === "buyer" ? "buy" : "source"} this right now?`;
       return research({ data: { variantId: id, query: q, roleMode: mode } });
     },
     onSuccess: () => {
@@ -95,9 +96,7 @@ function VariantPage() {
           <Chip className="num">canonical {variant.canonicalKey}</Chip>
           {variant.gtin ? <Chip className="num">GTIN {variant.gtin}</Chip> : null}
           {variant.sku ? <Chip className="num">MPN {variant.sku}</Chip> : null}
-          <Chip tone="verified">
-            identity {(variant.identityConfidence * 100).toFixed(0)}%
-          </Chip>
+          <Chip tone="verified">identity {(variant.identityConfidence * 100).toFixed(0)}%</Chip>
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-4">

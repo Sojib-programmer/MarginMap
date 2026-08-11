@@ -14,11 +14,7 @@ import {
 import { buildRows, ResultTable } from "@/components/result-table";
 import { EmptyState, QueryBoundary, RouteError, TableSkeleton } from "@/components/states";
 import { Button } from "@/components/ui/button";
-import {
-  useAddToWatchlist,
-  useSaveEvaluation,
-  useSaveSearch,
-} from "@/hooks/use-workspace-actions";
+import { useAddToWatchlist, useSaveEvaluation, useSaveSearch } from "@/hooks/use-workspace-actions";
 import { catalogQuery } from "@/lib/catalog";
 import { money, money2 } from "@/lib/format";
 import { matchVariants, parseIntent } from "@/lib/intent";
@@ -48,7 +44,11 @@ function SearchPage() {
   const intent = useMemo(() => parseIntent(q, variants), [q, variants]);
   const matches = useMemo(() => matchVariants(intent, variants), [intent, variants]);
   const rows = useMemo(
-    () => buildRows(matches.map((m) => m.variant), mode),
+    () =>
+      buildRows(
+        matches.map((m) => m.variant),
+        mode,
+      ),
     [matches, mode],
   );
 

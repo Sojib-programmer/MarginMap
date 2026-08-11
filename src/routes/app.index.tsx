@@ -23,7 +23,9 @@ export const Route = createFileRoute("/app/")({
 });
 
 function bestOffer(v: VariantIntel) {
-  return v.offers.length ? v.offers.reduce((a, b) => (landedCost(a) <= landedCost(b) ? a : b)) : null;
+  return v.offers.length
+    ? v.offers.reduce((a, b) => (landedCost(a) <= landedCost(b) ? a : b))
+    : null;
 }
 
 function Overview() {
@@ -50,8 +52,9 @@ function Overview() {
 
   const totalOffers = variants.reduce((s, v) => s + v.offers.length, 0);
   const totalComps = variants.reduce((s, v) => s + v.comps.length, 0);
-  const avgConfidence =
-    variants.length ? variants.reduce((s, v) => s + v.stats.confidence, 0) / variants.length : 0;
+  const avgConfidence = variants.length
+    ? variants.reduce((s, v) => s + v.stats.confidence, 0) / variants.length
+    : 0;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">

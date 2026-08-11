@@ -103,9 +103,7 @@ function PricingPage() {
             <section
               key={t.name}
               className={
-                t.highlight
-                  ? "panel border-border-strong p-6 ring-1 ring-primary/40"
-                  : "panel p-6"
+                t.highlight ? "panel border-border-strong p-6 ring-1 ring-primary/40" : "panel p-6"
               }
             >
               <p className="label-meta">{t.name}</p>

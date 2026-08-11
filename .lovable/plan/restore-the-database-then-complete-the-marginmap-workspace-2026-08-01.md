@@ -20,12 +20,12 @@ Re-apply the full migration against the current project, unchanged in substance:
 
 Table-name mapping vs the request — keeping existing names, since all app code and the seed already use them:
 
-| Requested | Existing |
-|---|---|
-| canonical_products | `products` + `product_variants` |
-| sold_comps | `sale_comps` |
-| product_evaluations | `deal_evaluations` |
-| profiles, searches, offers, watchlists, watchlist_items | unchanged |
+| Requested                                               | Existing                        |
+| ------------------------------------------------------- | ------------------------------- |
+| canonical_products                                      | `products` + `product_variants` |
+| sold_comps                                              | `sale_comps`                    |
+| product_evaluations                                     | `deal_evaluations`              |
+| profiles, searches, offers, watchlists, watchlist_items | unchanged                       |
 
 Types regenerate after the migration runs; the ~55 errors clear at that point. No code changes are needed for step 1.
 

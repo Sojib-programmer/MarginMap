@@ -22,8 +22,34 @@ const CONDITION_PATTERNS: Array<[RegExp, string]> = [
 ];
 
 const STOPWORDS = new Set([
-  "the","a","an","for","with","under","below","above","over","in","on","of","and","or","to",
-  "used","new","condition","buy","find","me","best","deal","deals","cheap","price","at","my",
+  "the",
+  "a",
+  "an",
+  "for",
+  "with",
+  "under",
+  "below",
+  "above",
+  "over",
+  "in",
+  "on",
+  "of",
+  "and",
+  "or",
+  "to",
+  "used",
+  "new",
+  "condition",
+  "buy",
+  "find",
+  "me",
+  "best",
+  "deal",
+  "deals",
+  "cheap",
+  "price",
+  "at",
+  "my",
 ]);
 
 function parseMoney(text: string, patterns: RegExp[]) {
@@ -51,9 +77,8 @@ export function parseIntent(raw: string, catalog: VariantIntel[]): ParsedIntent 
 
   const categories = Array.from(new Set(catalog.map((v) => [v.category, v.categorySlug] as const)));
   const categorySlug =
-    categories.find(([name]) =>
-      new RegExp(`\\b${name.replace(/s$/, "")}`, "i").test(text),
-    )?.[1] ?? null;
+    categories.find(([name]) => new RegExp(`\\b${name.replace(/s$/, "")}`, "i").test(text))?.[1] ??
+    null;
 
   const keywords = text
     .toLowerCase()
@@ -86,7 +111,9 @@ export function matchVariants(intent: ParsedIntent, catalog: VariantIntel[]): Ma
       reasons.push(`category ${variant.category}`);
     }
     if (intent.priceCeiling != null) {
-      const cheapest = variant.offers.length ? Math.min(...variant.offers.map(landedCost)) : Infinity;
+      const cheapest = variant.offers.length
+        ? Math.min(...variant.offers.map(landedCost))
+        : Infinity;
       if (cheapest <= intent.priceCeiling) {
         relevance += 0.15;
         reasons.push(`offer within $${intent.priceCeiling} landed`);

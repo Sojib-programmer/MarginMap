@@ -57,7 +57,8 @@ export function ResultTable({
   busy?: boolean;
 }) {
   const { isSelected, toggle } = useCompare();
-  const sourceName = (id: string) => sources.find((s) => s.id === id)?.name ?? "Unregistered source";
+  const sourceName = (id: string) =>
+    sources.find((s) => s.id === id)?.name ?? "Unregistered source";
 
   return (
     <div className="panel overflow-x-auto">
@@ -67,20 +68,48 @@ export function ResultTable({
         </caption>
         <thead>
           <tr className="border-b border-border text-left">
-            <th scope="col" className="label-meta px-3 py-2">Cmp</th>
-            <th scope="col" className="label-meta px-3 py-2">Offer</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Item</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Ship</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Tax</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Fees</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Landed</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Median sold</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Exp. resale</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">Profit</th>
-            <th scope="col" className="label-meta px-3 py-2 text-right">ROI</th>
-            <th scope="col" className="label-meta px-3 py-2">Verdict</th>
-            <th scope="col" className="label-meta px-3 py-2">Provenance</th>
-            <th scope="col" className="label-meta px-3 py-2">Actions</th>
+            <th scope="col" className="label-meta px-3 py-2">
+              Cmp
+            </th>
+            <th scope="col" className="label-meta px-3 py-2">
+              Offer
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Item
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Ship
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Tax
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Fees
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Landed
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Median sold
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Exp. resale
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              Profit
+            </th>
+            <th scope="col" className="label-meta px-3 py-2 text-right">
+              ROI
+            </th>
+            <th scope="col" className="label-meta px-3 py-2">
+              Verdict
+            </th>
+            <th scope="col" className="label-meta px-3 py-2">
+              Provenance
+            </th>
+            <th scope="col" className="label-meta px-3 py-2">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -121,7 +150,9 @@ export function ResultTable({
                   <ValueCell
                     value={money2(e.shipping)}
                     state={e.shipping > 0 ? "sourced" : "estimated"}
-                    note={e.shipping > 0 ? "Quoted shipping" : "Listing shows free or unstated shipping"}
+                    note={
+                      e.shipping > 0 ? "Quoted shipping" : "Listing shows free or unstated shipping"
+                    }
                   />
                 </td>
                 <td className="px-3 py-3 text-right">

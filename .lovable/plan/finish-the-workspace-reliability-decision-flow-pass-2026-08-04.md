@@ -40,12 +40,12 @@ item price → shipping → tax → marketplace fees → landed cost
 
 Four working mutations against the existing tables, each with success/error toasts via sonner and a query invalidation:
 
-| Action | Table |
-|---|---|
-| Save this search | `searches` |
-| Save evaluation | `deal_evaluations` |
-| Create watchlist | `watchlists` |
-| Add offer/evaluation to watchlist | `watchlist_items` |
+| Action                            | Table              |
+| --------------------------------- | ------------------ |
+| Save this search                  | `searches`         |
+| Save evaluation                   | `deal_evaluations` |
+| Create watchlist                  | `watchlists`       |
+| Add offer/evaluation to watchlist | `watchlist_items`  |
 
 All go through the browser Supabase client with `user_id` set from the current session, so the existing `auth.uid()` RLS policies enforce isolation. No policy changes needed — the current policies already scope every one of these tables to the owner.
 

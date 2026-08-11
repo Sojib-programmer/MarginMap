@@ -31,7 +31,8 @@ function ComparePage() {
   const saveEvaluation = useSaveEvaluation();
 
   const sources = catalog.data?.sources ?? [];
-  const sourceName = (id: string) => sources.find((s) => s.id === id)?.name ?? "Unregistered source";
+  const sourceName = (id: string) =>
+    sources.find((s) => s.id === id)?.name ?? "Unregistered source";
 
   const picks: Array<{ offer: Offer; variant: VariantIntel }> = [];
   for (const v of catalog.data?.variants ?? []) {
@@ -52,8 +53,8 @@ function ComparePage() {
           <p className="label-meta">Compare</p>
           <h1 className="text-2xl font-semibold tracking-tight">Side-by-side offers</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every column runs through the same economics path as search: landed cost, comp
-            baseline, fees, profit and verdict.
+            Every column runs through the same economics path as search: landed cost, comp baseline,
+            fees, profit and verdict.
           </p>
         </div>
         {rows.length ? (
@@ -216,7 +217,10 @@ function ComparePage() {
                     )
                   }
                 />
-                <Row label="Est. days to sell" cell={<ValueCell value={`${e.daysToSell}d`} state="estimated" />} />
+                <Row
+                  label="Est. days to sell"
+                  cell={<ValueCell value={`${e.daysToSell}d`} state="estimated" />}
+                />
 
                 <div className="pt-1">
                   <RecommendationBadge rec={recommendation} showReason />
@@ -276,15 +280,7 @@ function ComparePage() {
   );
 }
 
-function Row({
-  label,
-  cell,
-  strong,
-}: {
-  label: string;
-  cell: React.ReactNode;
-  strong?: boolean;
-}) {
+function Row({ label, cell, strong }: { label: string; cell: React.ReactNode; strong?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-2 border-b border-border/60 py-1">
       <span className="label-meta">{label}</span>

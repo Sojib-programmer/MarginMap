@@ -46,17 +46,23 @@ export const runResearch = createServerFn({ method: "POST" })
       await Promise.all([
         supabaseAdmin
           .from("product_variants")
-          .select("id,title,attributes,canonical_key,products(canonical_name,slug,specs,brands(name),categories(name))")
+          .select(
+            "id,title,attributes,canonical_key,products(canonical_name,slug,specs,brands(name),categories(name))",
+          )
           .eq("id", data.variantId)
           .maybeSingle(),
         supabaseAdmin
           .from("offers")
-          .select("title,condition_grade,condition_notes,item_price,shipping_price,estimated_tax,seller_name,seller_rating,availability,listing_url,retrieved_at,match_confidence,data_sources(name)")
+          .select(
+            "title,condition_grade,condition_notes,item_price,shipping_price,estimated_tax,seller_name,seller_rating,availability,listing_url,retrieved_at,match_confidence,data_sources(name)",
+          )
           .eq("variant_id", data.variantId)
           .eq("is_active", true),
         supabaseAdmin
           .from("sale_comps")
-          .select("title,condition_grade,sold_price,shipping_paid,sold_at,sale_url,match_confidence,is_verified_completed_sale,data_sources(name)")
+          .select(
+            "title,condition_grade,sold_price,shipping_paid,sold_at,sale_url,match_confidence,is_verified_completed_sale,data_sources(name)",
+          )
           .eq("variant_id", data.variantId)
           .order("sold_at", { ascending: false })
           .limit(20),
@@ -98,13 +104,22 @@ export const runResearch = createServerFn({ method: "POST" })
 
     const markdown = [
       `## Recommendation\n\n${report.recommendation}`,
-      `## Why\n\n${report.why.slice(0, 5).map((w) => `- ${w}`).join("\n")}`,
+      `## Why\n\n${report.why
+        .slice(0, 5)
+        .map((w) => `- ${w}`)
+        .join("\n")}`,
       `## Numbers\n\n${report.numbers
         .slice(0, 4)
         .map((n) => `- **${n.label}:** ${n.value} _(${n.assumption})_`)
         .join("\n")}`,
-      `## Risks & unknowns\n\n${report.risks.slice(0, 4).map((r) => `- ${r}`).join("\n")}`,
-      `## Next actions\n\n${report.next_actions.slice(0, 4).map((a) => `- ${a}`).join("\n")}`,
+      `## Risks & unknowns\n\n${report.risks
+        .slice(0, 4)
+        .map((r) => `- ${r}`)
+        .join("\n")}`,
+      `## Next actions\n\n${report.next_actions
+        .slice(0, 4)
+        .map((a) => `- ${a}`)
+        .join("\n")}`,
     ].join("\n\n");
 
     const { data: saved, error: saveError } = await context.supabase

@@ -34,7 +34,8 @@ export function OfferTable({
 }) {
   const { isSelected, toggle } = useCompare();
   const liquidity = liquidityOf(variant);
-  const sourceName = (id: string) => sources.find((s) => s.id === id)?.name ?? "Unregistered source";
+  const sourceName = (id: string) =>
+    sources.find((s) => s.id === id)?.name ?? "Unregistered source";
 
   return (
     <div className="overflow-x-auto">
@@ -44,21 +45,45 @@ export function OfferTable({
         </caption>
         <thead>
           <tr className="border-b border-border text-left">
-            <th scope="col" className="label-meta py-2 pr-2">Cmp</th>
-            <th scope="col" className="label-meta py-2 pr-2">Offer</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Item</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Ship</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Tax</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Fees</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Landed</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Exp. resale</th>
-            <th scope="col" className="label-meta py-2 pr-2 text-right">Profit / ROI</th>
+            <th scope="col" className="label-meta py-2 pr-2">
+              Cmp
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2">
+              Offer
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Item
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Ship
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Tax
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Fees
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Landed
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Exp. resale
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2 text-right">
+              Profit / ROI
+            </th>
             <th scope="col" className="label-meta py-2 pr-2">
               {mode === "buyer" ? "Buyer score" : "Deal score"}
             </th>
-            <th scope="col" className="label-meta py-2 pr-2">Verdict</th>
-            <th scope="col" className="label-meta py-2 pr-2">Provenance</th>
-            <th scope="col" className="label-meta py-2 pr-2">Actions</th>
+            <th scope="col" className="label-meta py-2 pr-2">
+              Verdict
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2">
+              Provenance
+            </th>
+            <th scope="col" className="label-meta py-2 pr-2">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
