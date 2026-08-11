@@ -39,8 +39,8 @@ function SearchPage() {
   const saveEvaluation = useSaveEvaluation();
   const addToWatchlist = useAddToWatchlist();
 
-  const variants = catalog.data?.variants ?? [];
-  const sources = catalog.data?.sources ?? [];
+  const variants = useMemo(() => catalog.data?.variants ?? [], [catalog.data?.variants]);
+  const sources = useMemo(() => catalog.data?.sources ?? [], [catalog.data?.sources]);
   const intent = useMemo(() => parseIntent(q, variants), [q, variants]);
   const matches = useMemo(() => matchVariants(intent, variants), [intent, variants]);
   const rows = useMemo(
