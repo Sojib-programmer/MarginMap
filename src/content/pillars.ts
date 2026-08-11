@@ -30,14 +30,18 @@ export const PILLARS: Pillar[] = [
     lede: "Every price question starts with an identity question. If two listings are not the same product in the same configuration, comparing their prices produces a number that looks precise and means nothing.",
     stats: [
       { label: "Match tiers", value: "4", note: "identifier, model+config, fuzzy, unresolved" },
-      { label: "Confidence floor", value: "0.55", note: "below this a listing never joins a comp set" },
+      {
+        label: "Confidence floor",
+        value: "0.55",
+        note: "below this a listing never joins a comp set",
+      },
       { label: "Variant axes", value: "6", note: "model, storage, color, region, kit, generation" },
     ],
     sections: [
       {
         heading: "The problem: titles are marketing copy, not identifiers",
         body: [
-          "A single camera body appears on marketplaces as \"Sony A7IV Body Only MINT\", \"a7 iv 33mp full frame ILCE-7M4\", and \"Sony Alpha 7 IV + 2 batteries + 128GB card\". These are three different economic objects — one is a bare body, one is a bundle — but a naive text search treats them as interchangeable and reports a price spread that is actually a bundling difference.",
+          'A single camera body appears on marketplaces as "Sony A7IV Body Only MINT", "a7 iv 33mp full frame ILCE-7M4", and "Sony Alpha 7 IV + 2 batteries + 128GB card". These are three different economic objects — one is a bare body, one is a bundle — but a naive text search treats them as interchangeable and reports a price spread that is actually a bundling difference.',
           "Marketplace category trees do not solve this. They are optimized for browsing, not for equivalence. A category can contain body-only listings, kits, and broken units side by side.",
         ],
       },
@@ -111,7 +115,11 @@ export const PILLARS: Pillar[] = [
     stats: [
       { label: "Components", value: "3", note: "item, shipping, tax" },
       { label: "Never estimated", value: "Tax", note: "unknown tax is labelled, not modelled" },
-      { label: "Typical spread", value: "8–22%", note: "gap between cheapest sticker and cheapest landed" },
+      {
+        label: "Typical spread",
+        value: "8–22%",
+        note: "gap between cheapest sticker and cheapest landed",
+      },
     ],
     sections: [
       {
@@ -120,9 +128,21 @@ export const PILLARS: Pillar[] = [
           "Landed cost = item price + shipping + tax. Each term is sourced independently and each carries its own availability flag. When a term is unavailable, MarginMap shows the partial total and marks it partial — it does not silently substitute an average.",
         ],
         list: [
-          { term: "Item price", detail: "The seller's current asking price in the offer currency, excluding promotional strikethroughs that are not actually applied at checkout." },
-          { term: "Shipping", detail: "Destination-aware. Free-shipping thresholds are evaluated against the item price rather than assumed." },
-          { term: "Tax", detail: "Applied where the source publishes a rate or the destination rule is unambiguous. Otherwise flagged as unknown." },
+          {
+            term: "Item price",
+            detail:
+              "The seller's current asking price in the offer currency, excluding promotional strikethroughs that are not actually applied at checkout.",
+          },
+          {
+            term: "Shipping",
+            detail:
+              "Destination-aware. Free-shipping thresholds are evaluated against the item price rather than assumed.",
+          },
+          {
+            term: "Tax",
+            detail:
+              "Applied where the source publishes a rate or the destination rule is unambiguous. Otherwise flagged as unknown.",
+          },
         ],
       },
       {
@@ -190,10 +210,26 @@ export const PILLARS: Pillar[] = [
           "MarginMap computes fair market value from completed sales only, using a recency-weighted median rather than a mean.",
         ],
         list: [
-          { term: "Median, not mean", detail: "A single restoration-grade sale or a mistyped price cannot drag the central estimate." },
-          { term: "Recency weighting", detail: "Sales decay exponentially over the window, so a shifting market shows up in weeks, not quarters." },
-          { term: "IQR trimming", detail: "Values beyond 1.5 interquartile ranges are excluded and shown separately as flagged outliers." },
-          { term: "Condition stratification", detail: "Comps are grouped by condition grade before aggregation; a used-fair sale never sets the price for a sealed unit." },
+          {
+            term: "Median, not mean",
+            detail:
+              "A single restoration-grade sale or a mistyped price cannot drag the central estimate.",
+          },
+          {
+            term: "Recency weighting",
+            detail:
+              "Sales decay exponentially over the window, so a shifting market shows up in weeks, not quarters.",
+          },
+          {
+            term: "IQR trimming",
+            detail:
+              "Values beyond 1.5 interquartile ranges are excluded and shown separately as flagged outliers.",
+          },
+          {
+            term: "Condition stratification",
+            detail:
+              "Comps are grouped by condition grade before aggregation; a used-fair sale never sets the price for a sealed unit.",
+          },
         ],
       },
       {
@@ -235,7 +271,11 @@ export const PILLARS: Pillar[] = [
     kicker: "Trust model",
     lede: "A recommendation you cannot audit is a recommendation you cannot act on with money. Every figure in MarginMap opens into the records that produced it.",
     stats: [
-      { label: "Confidence inputs", value: "4", note: "identity, freshness, sample size, source rank" },
+      {
+        label: "Confidence inputs",
+        value: "4",
+        note: "identity, freshness, sample size, source rank",
+      },
       { label: "Freshness tiers", value: "3", note: "fresh, aging, stale" },
       { label: "Unsourced claims", value: "0", note: "by construction" },
     ],
@@ -253,10 +293,25 @@ export const PILLARS: Pillar[] = [
           "Data confidence is a single composite between 0 and 1, displayed on every variant and folded into both role scores.",
         ],
         list: [
-          { term: "Identity confidence", detail: "The match tier of the underlying records. Tier 1 identifiers score highest." },
-          { term: "Freshness", detail: "Time since retrieval, decayed continuously and bucketed into fresh, aging and stale for display." },
-          { term: "Sample depth", detail: "Number of usable comps after outlier trimming, relative to the category's typical density." },
-          { term: "Source rank", detail: "Whether the record came from a registered source with stable schema and stated refresh policy." },
+          {
+            term: "Identity confidence",
+            detail: "The match tier of the underlying records. Tier 1 identifiers score highest.",
+          },
+          {
+            term: "Freshness",
+            detail:
+              "Time since retrieval, decayed continuously and bucketed into fresh, aging and stale for display.",
+          },
+          {
+            term: "Sample depth",
+            detail:
+              "Number of usable comps after outlier trimming, relative to the category's typical density.",
+          },
+          {
+            term: "Source rank",
+            detail:
+              "Whether the record came from a registered source with stable schema and stated refresh policy.",
+          },
         ],
       },
       {
@@ -355,7 +410,11 @@ export const PILLARS: Pillar[] = [
     kicker: "Sell-side economics",
     lede: "Sellers quote themselves a single headline percentage. Actual fee load is a stack of category commission, processing, per-order fixed charges and optional promotion — routinely half again the number people carry in their heads.",
     stats: [
-      { label: "Fee layers", value: "5", note: "commission, processing, fixed, promotion, shipping" },
+      {
+        label: "Fee layers",
+        value: "5",
+        note: "commission, processing, fixed, promotion, shipping",
+      },
       { label: "Typical stack", value: "13–19%", note: "of gross sale on consumer electronics" },
       { label: "Headline error", value: "+3–6pt", note: "gap between quoted and effective rate" },
     ],
@@ -366,11 +425,28 @@ export const PILLARS: Pillar[] = [
           "MarginMap models each layer independently so you can see which one is eating the deal.",
         ],
         list: [
-          { term: "Category commission", detail: "Varies by marketplace and category, sometimes tiered by sale price." },
-          { term: "Payment processing", detail: "A percentage plus a fixed per-order charge, which dominates on low-value items." },
-          { term: "Fixed order fees", detail: "Flat insertion or transaction charges applied regardless of price." },
-          { term: "Promoted listings", detail: "Optional ad rate applied to the final sale price; often the difference between selling this month and next." },
-          { term: "Shipping subsidy", detail: "Free-shipping offers are a seller cost. Modelled as a line, not ignored." },
+          {
+            term: "Category commission",
+            detail: "Varies by marketplace and category, sometimes tiered by sale price.",
+          },
+          {
+            term: "Payment processing",
+            detail:
+              "A percentage plus a fixed per-order charge, which dominates on low-value items.",
+          },
+          {
+            term: "Fixed order fees",
+            detail: "Flat insertion or transaction charges applied regardless of price.",
+          },
+          {
+            term: "Promoted listings",
+            detail:
+              "Optional ad rate applied to the final sale price; often the difference between selling this month and next.",
+          },
+          {
+            term: "Shipping subsidy",
+            detail: "Free-shipping offers are a seller cost. Modelled as a line, not ignored.",
+          },
         ],
       },
       {
@@ -412,8 +488,16 @@ export const PILLARS: Pillar[] = [
     kicker: "Data foundation",
     lede: "Condition is the field with the highest price impact and the lowest standardization. 'Excellent' is a claim, not a measurement, and it means different things on every platform.",
     stats: [
-      { label: "Grade ladder", value: "6", note: "sealed, open box, excellent, good, fair, for parts" },
-      { label: "Price impact", value: "up to 45%", note: "spread between sealed and fair on the same variant" },
+      {
+        label: "Grade ladder",
+        value: "6",
+        note: "sealed, open box, excellent, good, fair, for parts",
+      },
+      {
+        label: "Price impact",
+        value: "up to 45%",
+        note: "spread between sealed and fair on the same variant",
+      },
       { label: "Comp rule", value: "Stratified", note: "grades never pooled into one median" },
     ],
     sections: [
@@ -458,7 +542,11 @@ export const PILLARS: Pillar[] = [
         a: "Yes, on a deal evaluation. The override is recorded with the evaluation so the assumption is visible later.",
       },
     ],
-    related: ["canonical-product-identity", "sold-comps-vs-asking-price", "evidence-and-data-confidence"],
+    related: [
+      "canonical-product-identity",
+      "sold-comps-vs-asking-price",
+      "evidence-and-data-confidence",
+    ],
   },
   {
     slug: "sourcing-workflow",
@@ -471,8 +559,16 @@ export const PILLARS: Pillar[] = [
     lede: "Research that ends in a browser tab is not a workflow. MarginMap tracks a candidate from first sighting through acquisition, listing and sale, and then compares your realized price to the estimate.",
     stats: [
       { label: "Pipeline stages", value: "7", note: "watch through sold or passed" },
-      { label: "Alert triggers", value: "Landed cost", note: "thresholds evaluated on total, not sticker" },
-      { label: "Feedback loop", value: "Realized vs est.", note: "every closed item scores the model" },
+      {
+        label: "Alert triggers",
+        value: "Landed cost",
+        note: "thresholds evaluated on total, not sticker",
+      },
+      {
+        label: "Feedback loop",
+        value: "Realized vs est.",
+        note: "every closed item scores the model",
+      },
     ],
     sections: [
       {

@@ -57,9 +57,21 @@ function AboutPage() {
         <StatStrip
           className="mt-8"
           items={[
-            { label: "Categories seeded", value: "5", note: "cameras, laptops, consoles, collectibles, guitars" },
-            { label: "Scoring inputs", value: "6", note: "price, fit, condition, trust, fulfillment, confidence" },
-            { label: "Evidence policy", value: "100%", note: "every score opens to its source rows" },
+            {
+              label: "Categories seeded",
+              value: "5",
+              note: "cameras, laptops, consoles, collectibles, guitars",
+            },
+            {
+              label: "Scoring inputs",
+              value: "6",
+              note: "price, fit, condition, trust, fulfillment, confidence",
+            },
+            {
+              label: "Evidence policy",
+              value: "100%",
+              note: "every score opens to its source rows",
+            },
           ]}
         />
       </PageHero>
@@ -81,17 +93,29 @@ function AboutPage() {
         <section className="mt-14">
           <h2 className="label-meta">Go deeper</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <Link to="/methodology" className="panel p-4 transition-colors hover:border-border-strong">
+            <Link
+              to="/methodology"
+              className="panel p-4 transition-colors hover:border-border-strong"
+            >
               <span className="block text-sm font-medium">Methodology</span>
-              <span className="mt-1 block text-xs text-muted-foreground">How every figure is produced</span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                How every figure is produced
+              </span>
             </Link>
-            <Link to="/evidence-and-data-confidence" className="panel p-4 transition-colors hover:border-border-strong">
+            <Link
+              to="/evidence-and-data-confidence"
+              className="panel p-4 transition-colors hover:border-border-strong"
+            >
               <span className="block text-sm font-medium">Evidence & confidence</span>
-              <span className="mt-1 block text-xs text-muted-foreground">What we do with thin data</span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                What we do with thin data
+              </span>
             </Link>
             <Link to="/pricing" className="panel p-4 transition-colors hover:border-border-strong">
               <span className="block text-sm font-medium">Pricing</span>
-              <span className="mt-1 block text-xs text-muted-foreground">Plans and what each includes</span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                Plans and what each includes
+              </span>
             </Link>
           </div>
         </section>

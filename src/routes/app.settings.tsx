@@ -109,7 +109,9 @@ function SettingsPage() {
           <Input
             className="mt-1 h-9"
             value={form.currency_code ?? ""}
-            onChange={(e) => setForm((f) => ({ ...f, currency_code: e.target.value.toUpperCase() }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, currency_code: e.target.value.toUpperCase() }))
+            }
           />
         </div>
         <div>

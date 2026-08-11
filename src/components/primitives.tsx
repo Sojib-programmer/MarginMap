@@ -52,13 +52,23 @@ export function FreshnessBadge({ iso }: { iso: string | null | undefined }) {
   );
 }
 
-export function ConfidenceMeter({ value, label = "Confidence" }: { value: number; label?: string }) {
+export function ConfidenceMeter({
+  value,
+  label = "Confidence",
+}: {
+  value: number;
+  label?: string;
+}) {
   const pctValue = Math.round(value * 100);
   const tone = pctValue >= 65 ? "bg-verified" : pctValue >= 40 ? "bg-caution" : "bg-destructive";
   return (
     <div className="flex items-center gap-2">
       <span className="label-meta">{label}</span>
-      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-muted" role="img" aria-label={`${label} ${pctValue} percent`}>
+      <div
+        className="h-1.5 w-20 overflow-hidden rounded-full bg-muted"
+        role="img"
+        aria-label={`${label} ${pctValue} percent`}
+      >
         <div className={cn("h-full rounded-full", tone)} style={{ width: `${pctValue}%` }} />
       </div>
       <span className="num text-xs text-muted-foreground">{pctValue}%</span>
@@ -91,7 +101,9 @@ export function RecommendationBadge({
         {rec.action}
       </Chip>
       {showReason ? (
-        <p className="mt-1 max-w-[22rem] text-xs leading-snug text-muted-foreground">{rec.reason}</p>
+        <p className="mt-1 max-w-[22rem] text-xs leading-snug text-muted-foreground">
+          {rec.reason}
+        </p>
       ) : (
         <span className="sr-only">{rec.reason}</span>
       )}
@@ -186,4 +198,3 @@ export function DemoDataBanner({ className }: { className?: string }) {
     </div>
   );
 }
-

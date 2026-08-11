@@ -23,9 +23,7 @@ export const Route = createFileRoute("/_marketing/methodology")({
         content: "https://pixel-perfect-render-330.lovable.app/methodology",
       },
     ],
-    links: [
-      { rel: "canonical", href: "https://pixel-perfect-render-330.lovable.app/methodology" },
-    ],
+    links: [{ rel: "canonical", href: "https://pixel-perfect-render-330.lovable.app/methodology" }],
   }),
   component: MethodologyPage,
 });

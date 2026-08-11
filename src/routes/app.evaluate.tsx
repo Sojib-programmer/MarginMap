@@ -181,20 +181,40 @@ function EvaluatePage() {
           <section className="panel space-y-4 p-4">
             <h2 className="text-sm font-semibold">Inputs</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Purchase price" value={input.purchasePrice} onChange={num("purchasePrice")} />
-              <Field label="Inbound shipping" value={input.inboundShipping} onChange={num("inboundShipping")} />
+              <Field
+                label="Purchase price"
+                value={input.purchasePrice}
+                onChange={num("purchasePrice")}
+              />
+              <Field
+                label="Inbound shipping"
+                value={input.inboundShipping}
+                onChange={num("inboundShipping")}
+              />
               <Field label="Tax paid" value={input.tax} onChange={num("tax")} />
               <Field label="Repair / prep" value={input.repairPrep} onChange={num("repairPrep")} />
               <Field label="Other costs" value={input.otherCosts} onChange={num("otherCosts")} />
-              <Field label="Outbound shipping" value={input.outboundShipping} onChange={num("outboundShipping")} />
+              <Field
+                label="Outbound shipping"
+                value={input.outboundShipping}
+                onChange={num("outboundShipping")}
+              />
               <Field label="Packaging" value={input.packaging} onChange={num("packaging")} />
               <Field
                 label="Returns reserve %"
                 value={Math.round(input.returnsReservePct * 100)}
                 onChange={(e) => set("returnsReservePct", (Number(e.target.value) || 0) / 100)}
               />
-              <Field label="Target hold days" value={input.targetHoldDays} onChange={num("targetHoldDays")} />
-              <Field label="Desired profit" value={input.desiredProfit} onChange={num("desiredProfit")} />
+              <Field
+                label="Target hold days"
+                value={input.targetHoldDays}
+                onChange={num("targetHoldDays")}
+              />
+              <Field
+                label="Desired profit"
+                value={input.desiredProfit}
+                onChange={num("desiredProfit")}
+              />
 
               <div>
                 <Label className="label-meta">Marketplace</Label>
@@ -214,18 +234,27 @@ function EvaluatePage() {
 
               <div>
                 <Label className="label-meta">Condition</Label>
-                <Select value={input.conditionGrade} onValueChange={(v) => set("conditionGrade", v)}>
+                <Select
+                  value={input.conditionGrade}
+                  onValueChange={(v) => set("conditionGrade", v)}
+                >
                   <SelectTrigger className="mt-1 h-9">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {["new_sealed", "open_box", "refurbished", "used_excellent", "used_good", "used_fair", "for_parts"].map(
-                      (c) => (
-                        <SelectItem key={c} value={c}>
-                          {c.replace(/_/g, " ")}
-                        </SelectItem>
-                      ),
-                    )}
+                    {[
+                      "new_sealed",
+                      "open_box",
+                      "refurbished",
+                      "used_excellent",
+                      "used_good",
+                      "used_fair",
+                      "for_parts",
+                    ].map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c.replace(/_/g, " ")}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -306,7 +335,10 @@ function EvaluatePage() {
                 noComps ? (
                   <ValueCell value="" state="missing" note="No completed sales on record" />
                 ) : (
-                  <ValueCell value={money2(economics.medianSold)} note={`${economics.sampleSize} comps`} />
+                  <ValueCell
+                    value={money2(economics.medianSold)}
+                    note={`${economics.sampleSize} comps`}
+                  />
                 )
               }
             />
@@ -464,7 +496,9 @@ function EvaluatePage() {
                     state={e.roi_pct == null ? "missing" : "estimated"}
                     className="text-muted-foreground"
                   />
-                  <span className="text-xs text-muted-foreground">{relativeTime(e.created_at)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {relativeTime(e.created_at)}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -494,15 +528,7 @@ function Field({
   );
 }
 
-function Line({
-  label,
-  cell,
-  strong,
-}: {
-  label: string;
-  cell: React.ReactNode;
-  strong?: boolean;
-}) {
+function Line({ label, cell, strong }: { label: string; cell: React.ReactNode; strong?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-2 border-b border-border/60 py-1">
       <span className="label-meta">{label}</span>

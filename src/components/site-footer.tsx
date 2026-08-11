@@ -80,7 +80,6 @@ export function SiteFooter() {
             © {new Date().getFullYear()} MarginMap. All rights reserved.
           </p>
         </div>
-
       </div>
     </footer>
   );

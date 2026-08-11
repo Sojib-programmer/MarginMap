@@ -143,7 +143,8 @@ export function QueryBoundary({
   children: React.ReactNode;
 }) {
   if (isLoading) return <>{skeleton ?? <CardGridSkeleton count={3} />}</>;
-  if (error) return <RouteError error={error instanceof Error ? error : new Error(String(error))} />;
+  if (error)
+    return <RouteError error={error instanceof Error ? error : new Error(String(error))} />;
   if (isEmpty && empty) return <>{empty}</>;
   return <>{children}</>;
 }

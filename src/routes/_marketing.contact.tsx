@@ -82,9 +82,7 @@ function ContactPage() {
                 aria-invalid={Boolean(errors.name)}
                 autoComplete="name"
               />
-              {errors.name ? (
-                <p className="mt-1 text-xs text-destructive">{errors.name}</p>
-              ) : null}
+              {errors.name ? <p className="mt-1 text-xs text-destructive">{errors.name}</p> : null}
             </div>
 
             <div>
@@ -151,8 +149,8 @@ function ContactPage() {
             <div className="panel p-4">
               <h2 className="label-meta">Security reports</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Choose the security topic and include reproduction steps. Please do not test
-                against other users' accounts or data.
+                Choose the security topic and include reproduction steps. Please do not test against
+                other users' accounts or data.
               </p>
             </div>
           </aside>

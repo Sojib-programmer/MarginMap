@@ -1,10 +1,6 @@
 import { cn } from "@/lib/utils";
 import { scoreBand, type Factor } from "@/lib/scoring";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const TONE_TEXT = {
   verified: "text-verified",

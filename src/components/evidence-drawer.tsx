@@ -52,8 +52,9 @@ export function EvidenceDrawer({
                     <div>
                       <p className="text-sm font-medium">{o.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {sourceName(o.data_source_id)} · {sourceType(o.data_source_id).replace("_", " ")} ·
-                        retrieved {relativeTime(o.retrieved_at)}
+                        {sourceName(o.data_source_id)} ·{" "}
+                        {sourceType(o.data_source_id).replace("_", " ")} · retrieved{" "}
+                        {relativeTime(o.retrieved_at)}
                       </p>
                     </div>
                     <span className="num text-sm font-semibold">{money2(landedCost(o))}</span>
@@ -61,7 +62,9 @@ export function EvidenceDrawer({
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Chip tone="primary">Active offer</Chip>
                     <ConditionChip grade={o.condition_grade} />
-                    <Chip className="num">match {(Number(o.match_confidence) * 100).toFixed(0)}%</Chip>
+                    <Chip className="num">
+                      match {(Number(o.match_confidence) * 100).toFixed(0)}%
+                    </Chip>
                     {o.listing_url ? (
                       <a
                         className="inline-flex items-center gap-1 text-xs text-primary underline"
@@ -76,7 +79,9 @@ export function EvidenceDrawer({
                 </li>
               ))}
               {variant.offers.length === 0 ? (
-                <li className="text-sm text-muted-foreground">No active offers from a registered source.</li>
+                <li className="text-sm text-muted-foreground">
+                  No active offers from a registered source.
+                </li>
               ) : null}
             </ul>
           </section>
@@ -90,7 +95,8 @@ export function EvidenceDrawer({
                     <div>
                       <p className="text-sm font-medium">{c.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {sourceName(c.data_source_id)} · sold {new Date(c.sold_at).toLocaleDateString()}
+                        {sourceName(c.data_source_id)} · sold{" "}
+                        {new Date(c.sold_at).toLocaleDateString()}
                       </p>
                     </div>
                     <span className="num text-sm font-semibold">
@@ -102,7 +108,9 @@ export function EvidenceDrawer({
                       {c.is_verified_completed_sale ? "Verified completed sale" : "Unverified"}
                     </Chip>
                     <ConditionChip grade={c.condition_grade} />
-                    <Chip className="num">match {(Number(c.match_confidence) * 100).toFixed(0)}%</Chip>
+                    <Chip className="num">
+                      match {(Number(c.match_confidence) * 100).toFixed(0)}%
+                    </Chip>
                   </div>
                 </li>
               ))}
@@ -112,14 +120,17 @@ export function EvidenceDrawer({
           <section>
             <p className="label-meta mb-2">Calculated assumptions</p>
             <ul className="space-y-1 text-xs text-muted-foreground">
-              <li>Landed cost = item price + shipping + estimated tax (where the source supplies it).</li>
               <li>
-                Fair market = recency-weighted median of completed sales, 60-day half-life, IQR outlier filter
-                ({variant.stats.excludedCount} comp(s) excluded as outliers).
+                Landed cost = item price + shipping + estimated tax (where the source supplies it).
               </li>
               <li>
-                Sample: {variant.stats.sampleSize} comps, median age {variant.stats.medianAgeDays.toFixed(0)} days,
-                data confidence {(variant.stats.confidence * 100).toFixed(0)}%.
+                Fair market = recency-weighted median of completed sales, 60-day half-life, IQR
+                outlier filter ({variant.stats.excludedCount} comp(s) excluded as outliers).
+              </li>
+              <li>
+                Sample: {variant.stats.sampleSize} comps, median age{" "}
+                {variant.stats.medianAgeDays.toFixed(0)} days, data confidence{" "}
+                {(variant.stats.confidence * 100).toFixed(0)}%.
               </li>
             </ul>
           </section>

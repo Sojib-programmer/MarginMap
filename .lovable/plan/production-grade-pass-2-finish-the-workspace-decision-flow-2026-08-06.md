@@ -11,11 +11,11 @@ Search is done (ResultTable + economics + provenance + save-search + QueryBounda
 
 ## 1. One economics path in the remaining decision views
 
-| View | Change |
-|---|---|
-| `app.compare.tsx` | Drop `evaluateDeal`/`buyerScore`; each card renders the full chain from `offerEconomics()` + `recommend()` with `ValueCell` and `ProvenanceCell`, plus an "add to watchlist" action |
-| `app.variant.$id.tsx` | Market metrics switch to `ValueCell`; offer table already shares the engine; add "save evaluation" for the best offer |
-| `app.evaluate.tsx` | Keep the input controls, but the verdict panel reads fee schedule, profit, ROI and recommendation from the shared functions and persists via `useSaveEvaluation` |
+| View                  | Change                                                                                                                                                                              |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app.compare.tsx`     | Drop `evaluateDeal`/`buyerScore`; each card renders the full chain from `offerEconomics()` + `recommend()` with `ValueCell` and `ProvenanceCell`, plus an "add to watchlist" action |
+| `app.variant.$id.tsx` | Market metrics switch to `ValueCell`; offer table already shares the engine; add "save evaluation" for the best offer                                                               |
+| `app.evaluate.tsx`    | Keep the input controls, but the verdict panel reads fee schedule, profit, ROI and recommendation from the shared functions and persists via `useSaveEvaluation`                    |
 
 Displayed chain, identical everywhere:
 

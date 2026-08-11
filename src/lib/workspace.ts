@@ -2,7 +2,12 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 
-export type WatchlistRow = { id: string; name: string; role_mode: "buyer" | "reseller"; created_at: string };
+export type WatchlistRow = {
+  id: string;
+  name: string;
+  role_mode: "buyer" | "reseller";
+  created_at: string;
+};
 export type WatchlistItemRow = {
   id: string;
   watchlist_id: string;
@@ -68,7 +73,10 @@ export type ReportRow = {
 };
 
 async function rows<T>(table: string, order = "created_at") {
-  const { data, error } = await supabase.from(table as never).select("*").order(order, { ascending: false });
+  const { data, error } = await supabase
+    .from(table as never)
+    .select("*")
+    .order(order, { ascending: false });
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as T[];
 }

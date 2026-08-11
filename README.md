@@ -1,11 +1,11 @@
-# Product SEARCH ASSISTANT 
+# Product SEARCH ASSISTANT
 
 Implement exactly the screenshot and nothing else
 
 This project was built by
 
-
 ## Build by Sojib Ahmmed
+
 https://marginmap.assistant.bd
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.

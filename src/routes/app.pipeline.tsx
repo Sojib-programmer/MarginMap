@@ -21,7 +21,6 @@ export const Route = createFileRoute("/app/pipeline")({
   component: PipelinePage,
 });
 
-
 function PipelinePage() {
   const qc = useQueryClient();
   const items = useQuery(inventoryQuery);
@@ -69,9 +68,7 @@ function PipelinePage() {
             body="Run a deal through the calculator and send it here once the numbers work."
             action={
               <Button asChild size="sm">
-                <Link to="/app/evaluate" search={{}}>
-                  Open the deal calculator
-                </Link>
+                <Link to="/app/evaluate">Open the deal calculator</Link>
               </Button>
             }
           />
@@ -130,7 +127,6 @@ function PipelinePage() {
           })}
         </div>
       </QueryBoundary>
-
 
       <Disclaimer />
     </div>

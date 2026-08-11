@@ -79,17 +79,43 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "MarginMap — Product intelligence for buyers and resellers" },
-      { name: "description", content: "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence." },
+      {
+        name: "description",
+        content:
+          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
+      },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "MarginMap — Product intelligence for buyers and resellers" },
-      { property: "og:description", content: "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence." },
+      {
+        property: "og:title",
+        content: "MarginMap — Product intelligence for buyers and resellers",
+      },
+      {
+        property: "og:description",
+        content:
+          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "MarginMap — Product intelligence for buyers and resellers" },
-      { name: "twitter:description", content: "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/84ee6256-8b73-4b66-965f-fb4cd07f2bd4" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/84ee6256-8b73-4b66-965f-fb4cd07f2bd4" },
+      {
+        name: "twitter:title",
+        content: "MarginMap — Product intelligence for buyers and resellers",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/84ee6256-8b73-4b66-965f-fb4cd07f2bd4",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/84ee6256-8b73-4b66-965f-fb4cd07f2bd4",
+      },
     ],
     links: [
       {
