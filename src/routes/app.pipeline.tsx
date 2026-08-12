@@ -68,7 +68,9 @@ function PipelinePage() {
             body="Run a deal through the calculator and send it here once the numbers work."
             action={
               <Button asChild size="sm">
-                <Link to="/app/evaluate" search={{ offer: undefined }}>Open the deal calculator</Link>
+                <Link to="/app/evaluate" search={{ offer: undefined }}>
+                  Open the deal calculator
+                </Link>
               </Button>
             }
           />
