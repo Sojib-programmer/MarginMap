@@ -35,7 +35,7 @@ Absolute rules:
 
 export const runResearch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => Input.parse(data))
+  .validator((input: unknown) => Input.parse(input))
   .handler(async ({ data, context }) => {
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("AI is not configured for this project.");
