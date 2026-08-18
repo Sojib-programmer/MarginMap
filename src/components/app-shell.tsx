@@ -64,11 +64,9 @@ export function AppShell() {
     <div className="grid min-h-screen grid-cols-1 bg-background md:grid-cols-[220px_1fr]">
       <aside className="hidden border-r border-border bg-surface md:flex md:flex-col">
         <Link to="/" className="flex items-center gap-2 px-4 py-4">
-          <span className="grid size-7 place-items-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
-            MM
-          </span>
-          <span className="text-sm font-semibold tracking-tight">MarginMap</span>
+          <BrandLogo size={26} priority />
         </Link>
+
 
         <div className="px-3 pb-3">
           <div
