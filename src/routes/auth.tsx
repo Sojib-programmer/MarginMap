@@ -78,9 +78,8 @@ function AuthPage() {
   return (
     <div className="grid min-h-screen place-items-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <span className="grid size-9 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-          MM
-        </span>
+        <BrandLogo size={36} priority />
+
         <h1 className="mt-5 text-2xl font-semibold tracking-tight">
           {mode === "signin" ? "Sign in to MarginMap" : "Create your workspace"}
         </h1>
