@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/brand-logo";
 import { Link } from "@tanstack/react-router";
 
 import { Disclaimer } from "@/components/primitives";
@@ -39,12 +40,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-1">
-            <span className="flex items-center gap-2">
-              <span className="grid size-7 place-items-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
-                MM
-              </span>
-              <span className="font-semibold tracking-tight">MarginMap</span>
-            </span>
+            <BrandLogo />
+
             <p className="mt-3 text-sm text-muted-foreground">
               Product intelligence for people who move money on the answer.
             </p>

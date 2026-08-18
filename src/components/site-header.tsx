@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/brand-logo";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -22,11 +23,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-7 place-items-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
-            MM
-          </span>
-          <span className="font-semibold tracking-tight">MarginMap</span>
+          <BrandLogo priority />
         </Link>
+
 
         <nav className="ml-4 hidden items-center gap-1 md:flex">
           <div
