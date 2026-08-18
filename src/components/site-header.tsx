@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/brand-logo";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
