@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
-import { CTABand, FaqBlock, StatStrip, faqJsonLd } from "@/components/marketing";
+import { CTABand, FaqBlock, StatStrip } from "@/components/marketing";
 import { Button } from "@/components/ui/button";
 import { PILLARS } from "@/content/pillars";
+import { faqJsonLdScript, organizationJsonLdScript, pageHead } from "@/lib/seo";
+
 
 const HOME_FAQ = [
   {
