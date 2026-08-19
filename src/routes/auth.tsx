@@ -18,6 +18,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to your MarginMap product intelligence workspace." },
       { property: "og:title", content: "Sign in — MarginMap" },
       { property: "og:description", content: "Access buyer and reseller product intelligence." },
+      { name: "robots", content: "noindex" },
+
     ],
   }),
   component: AuthPage,
