@@ -106,7 +106,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
       },
-
     ],
     links: [
       {
@@ -116,7 +115,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,

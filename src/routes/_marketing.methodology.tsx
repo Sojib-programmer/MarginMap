@@ -16,7 +16,6 @@ export const Route = createFileRoute("/_marketing/methodology")({
   component: MethodologyPage,
 });
 
-
 function MethodologyPage() {
   return (
     <>

@@ -19,7 +19,6 @@ export const Route = createFileRoute("/auth")({
       { property: "og:title", content: "Sign in — MarginMap" },
       { property: "og:description", content: "Access buyer and reseller product intelligence." },
       { name: "robots", content: "noindex" },
-
     ],
   }),
   component: AuthPage,

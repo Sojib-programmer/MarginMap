@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { PILLARS } from "@/content/pillars";
 import { faqJsonLdScript, organizationJsonLdScript, pageHead } from "@/lib/seo";
 
-
 const HOME_FAQ = [
   {
     q: "Where does the data come from?",
@@ -36,15 +35,11 @@ export const Route = createFileRoute("/_marketing/")({
     });
     return {
       ...base,
-      scripts: [
-        ...faqJsonLdScript(HOME_FAQ),
-        ...organizationJsonLdScript(),
-      ],
+      scripts: [...faqJsonLdScript(HOME_FAQ), ...organizationJsonLdScript()],
     };
   },
   component: Landing,
 });
-
 
 const STEPS = [
   {

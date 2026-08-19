@@ -59,7 +59,6 @@ export function organizationJsonLdScript() {
   ];
 }
 
-
 export function faqJsonLdScript(items: { q: string; a: string }[]) {
   return [
     {
