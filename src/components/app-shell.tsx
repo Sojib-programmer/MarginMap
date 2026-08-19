@@ -68,7 +68,6 @@ export function AppShell() {
           <BrandLogo size={26} priority />
         </Link>
 
-
         <div className="px-3 pb-3">
           <div
             role="radiogroup"

@@ -26,7 +26,6 @@ export function SiteHeader() {
           <BrandLogo priority />
         </Link>
 
-
         <nav className="ml-4 hidden items-center gap-1 md:flex">
           <div
             className="relative"

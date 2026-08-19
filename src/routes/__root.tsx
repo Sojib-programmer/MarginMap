@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
       },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "MarginMap" },
       {
         property: "og:title",
         content: "MarginMap — Product intelligence for buyers and resellers",
@@ -95,8 +95,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "MarginMap" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
       {
         name: "twitter:title",
         content: "MarginMap — Product intelligence for buyers and resellers",
@@ -105,16 +105,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "twitter:description",
         content:
           "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/84ee6256-8b73-4b66-965f-fb4cd07f2bd4",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/84ee6256-8b73-4b66-965f-fb4cd07f2bd4",
       },
     ],
     links: [
@@ -125,7 +115,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,

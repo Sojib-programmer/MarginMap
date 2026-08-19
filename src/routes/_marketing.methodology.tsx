@@ -2,29 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { CTABand, PageHero } from "@/components/marketing";
 import { PILLARS } from "@/content/pillars";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_marketing/methodology")({
-  head: () => ({
-    meta: [
-      { title: "Methodology — MarginMap" },
-      {
-        name: "description",
-        content:
-          "How MarginMap resolves product identity, computes landed cost, estimates fair market value from completed sales, and scores data confidence.",
-      },
-      { property: "og:title", content: "Methodology — MarginMap" },
-      {
-        property: "og:description",
-        content: "Identity resolution, landed cost, sold-comp estimation and confidence scoring.",
-      },
-      { property: "og:type", content: "article" },
-      {
-        property: "og:url",
-        content: "https://pixel-perfect-render-330.lovable.app/methodology",
-      },
-    ],
-    links: [{ rel: "canonical", href: "https://pixel-perfect-render-330.lovable.app/methodology" }],
-  }),
+  head: () =>
+    pageHead({
+      path: "/methodology",
+      title: "Methodology — MarginMap",
+      description:
+        "How MarginMap resolves product identity, computes landed cost, estimates fair market value from completed sales, and scores data confidence.",
+      type: "article",
+    }),
   component: MethodologyPage,
 });
 

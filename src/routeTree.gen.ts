@@ -13,6 +13,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
 import { Route as MarketingCanonicalProductIdentityRouteImport } from './routes/_marketing.canonical-product-identity'
@@ -56,6 +57,11 @@ const AppRoute = AppRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketingIndexRoute = MarketingIndexRouteImport.update({
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof MarketingAboutRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof MarketingAboutRoute
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/_marketing': typeof MarketingRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/_marketing/condition-grading': typeof MarketingConditionGradingRoute
@@ -289,6 +298,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/sitemap.xml'
     | '/about'
     | '/canonical-product-identity'
     | '/condition-grading'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
   to:
     | '/$'
     | '/auth'
+    | '/sitemap.xml'
     | '/about'
     | '/canonical-product-identity'
     | '/condition-grading'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/_marketing'
     | '/app'
     | '/auth'
+    | '/sitemap.xml'
     | '/_marketing/about'
     | '/_marketing/canonical-product-identity'
     | '/_marketing/condition-grading'
@@ -380,6 +392,7 @@ export interface RootRouteChildren {
   MarketingRoute: typeof MarketingRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -410,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_marketing/': {
@@ -665,6 +685,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketingRoute: MarketingRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

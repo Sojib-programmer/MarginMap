@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
-import { CTABand, FaqBlock, StatStrip, faqJsonLd } from "@/components/marketing";
+import { CTABand, FaqBlock, StatStrip } from "@/components/marketing";
 import { Button } from "@/components/ui/button";
 import { PILLARS } from "@/content/pillars";
+import { faqJsonLdScript, organizationJsonLdScript, pageHead } from "@/lib/seo";
 
 const HOME_FAQ = [
   {
@@ -25,29 +26,18 @@ const HOME_FAQ = [
 ];
 
 export const Route = createFileRoute("/_marketing/")({
-  head: () => ({
-    meta: [
-      { title: "MarginMap — Product intelligence for buyers and resellers" },
-      {
-        name: "description",
-        content:
-          "Search products in plain language, compare landed cost against completed sales, and check resale margin before you buy. Every number opens its evidence.",
-      },
-      {
-        property: "og:title",
-        content: "MarginMap — Product intelligence for buyers and resellers",
-      },
-      {
-        property: "og:description",
-        content:
-          "Landed cost, sold comps and reseller margin in one workspace. Every number opens its evidence.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://pixel-perfect-render-330.lovable.app/" },
-    ],
-    links: [{ rel: "canonical", href: "https://pixel-perfect-render-330.lovable.app/" }],
-    scripts: [{ type: "application/ld+json", children: faqJsonLd(HOME_FAQ) }],
-  }),
+  head: () => {
+    const base = pageHead({
+      path: "/",
+      title: "MarginMap — Product intelligence for buyers and resellers",
+      description:
+        "Search products in plain language, compare landed cost against completed sales, and check resale margin before you buy. Every number opens its evidence.",
+    });
+    return {
+      ...base,
+      scripts: [...faqJsonLdScript(HOME_FAQ), ...organizationJsonLdScript()],
+    };
+  },
   component: Landing,
 });
 
