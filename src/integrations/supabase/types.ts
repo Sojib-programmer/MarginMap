@@ -120,6 +120,7 @@ export type Database = {
           attribution_text: string | null
           base_url: string | null
           id: string
+          marketplace: string | null
           name: string
           refresh_policy: string | null
           source_type: Database["public"]["Enums"]["record_source_type"]
@@ -130,6 +131,7 @@ export type Database = {
           attribution_text?: string | null
           base_url?: string | null
           id?: string
+          marketplace?: string | null
           name: string
           refresh_policy?: string | null
           source_type: Database["public"]["Enums"]["record_source_type"]
@@ -140,6 +142,7 @@ export type Database = {
           attribution_text?: string | null
           base_url?: string | null
           id?: string
+          marketplace?: string | null
           name?: string
           refresh_policy?: string | null
           source_type?: Database["public"]["Enums"]["record_source_type"]
