@@ -80,8 +80,27 @@ export function Disclaimer({ className }: { className?: string }) {
   return (
     <p className={cn("text-xs leading-relaxed text-muted-foreground", className)}>
       Market estimates are decision support, not a guarantee of availability, authenticity, taxes,
-      fees, or resale outcome. Demo data comes from synthetic registered sources.
+      fees, or resale outcome.
     </p>
+  );
+}
+
+/** Neutral, one-line provenance statement about catalog coverage. */
+export function CatalogNote({ className }: { className?: string }) {
+  return (
+    <p className={cn("text-xs leading-relaxed text-muted-foreground", className)}>
+      Catalog is a curated sample dataset. Live marketplace connectors are enabled per account.
+    </p>
+  );
+}
+
+/** "Data as of …" line derived from the newest record in the visible set. */
+export function DataAsOf({ iso, className }: { iso: string | null | undefined; className?: string }) {
+  if (!iso) return null;
+  return (
+    <span className={cn("num text-xs text-muted-foreground", className)}>
+      Data as of {new Date(iso).toLocaleString()} · {relativeTime(iso)}
+    </span>
   );
 }
 
