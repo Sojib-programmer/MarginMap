@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { DemoDataBanner } from "@/components/primitives";
 import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
+import { useAlertHits } from "@/hooks/use-alert-hits";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
@@ -48,6 +48,7 @@ export function AppShell() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { selected } = useCompare();
+  const { hits } = useAlertHits();
   const [q, setQ] = useState("");
 
   useEffect(() => {
@@ -119,12 +120,26 @@ export function AppShell() {
                     {selected.length}
                   </span>
                 ) : null}
+                {item.to === "/app/alerts" && hits.length > 0 ? (
+                  <span className="num ml-auto rounded-full bg-verified/20 px-1.5 text-[11px] text-verified">
+                    {hits.length}
+                  </span>
+                ) : null}
               </Link>
             );
           })}
         </nav>
 
         <div className="border-t border-border p-3">
+          <Link
+            to="/pricing"
+            className="mb-3 block rounded-md border border-border bg-background p-2.5 transition-colors hover:border-primary/50"
+          >
+            <p className="text-xs font-medium">Research plan</p>
+            <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+              Unlock the deal calculator, pipeline and unlimited alerts — see plans.
+            </p>
+          </Link>
           <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
           <Button
             variant="ghost"
@@ -164,12 +179,19 @@ export function AppShell() {
               Search
             </Button>
           </form>
-          <span className="ml-auto hidden text-xs text-muted-foreground lg:block">
-            Press <kbd className="rounded border border-border px-1">/</kbd> to focus
-          </span>
+          <Link
+            to="/app/alerts"
+            className="relative ml-auto hidden rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground lg:block"
+            aria-label={hits.length ? `${hits.length} price alerts triggered` : "Price alerts"}
+          >
+            <Bell className="size-4" />
+            {hits.length > 0 ? (
+              <span className="num absolute -right-0.5 -top-0.5 rounded-full bg-verified px-1 text-[10px] font-semibold text-background">
+                {hits.length}
+              </span>
+            ) : null}
+          </Link>
         </header>
-
-        <DemoDataBanner />
 
         <main className="min-w-0 flex-1 px-4 py-6">
           <Outlet />
