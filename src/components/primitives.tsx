@@ -198,22 +198,3 @@ export function ProvenanceCell({
     </div>
   );
 }
-
-/** Persistent reminder that nothing here is live marketplace data. */
-export function DemoDataBanner({ className }: { className?: string }) {
-  return (
-    <div
-      role="note"
-      className={cn(
-        "flex flex-wrap items-center gap-2 border-b border-caution/30 bg-caution/10 px-4 py-2 text-xs text-caution",
-        className,
-      )}
-    >
-      <Chip tone="caution">Demo data</Chip>
-      <span className="text-muted-foreground">
-        Offers and completed sales are synthetic samples for evaluation. No live marketplace
-        scraping or external data APIs are connected.
-      </span>
-    </div>
-  );
-}
