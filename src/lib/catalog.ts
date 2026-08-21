@@ -62,6 +62,7 @@ export type DataSource = {
   base_url: string | null;
   refresh_policy: string | null;
   active: boolean;
+  marketplace: string | null;
 };
 
 export type VariantIntel = {
@@ -173,4 +174,85 @@ export function liquidityOf(v: VariantIntel) {
     completedSales: v.snapshot?.completed_sale_count ?? v.comps.length,
     daysToSell: v.snapshot?.days_to_sell_estimate ?? 30,
   };
+}
+
+/** Marketplace channels offered as filters. Derived from registered sources. */
+export const MARKETPLACE_LABEL: Record<string, string> = {
+  amazon: "Amazon",
+  ebay: "eBay",
+  shopify: "Shopify",
+  manual: "Manual entry",
+  other: "Other",
+  comps: "Completed sales",
+};
+
+export function marketplaceOptions(sources: DataSource[]) {
+  const seen = new Map<string, string>();
+  for (const s of sources) {
+    const key = s.marketplace ?? "other";
+    if (key === "comps") continue;
+    seen.set(key, MARKETPLACE_LABEL[key] ?? s.name);
+  }
+  return [...seen.entries()].map(([key, label]) => ({ key, label }));
+}
+
+export function marketplaceIndex(sources: DataSource[]) {
+  const map = new Map<string, string>();
+  for (const s of sources) map.set(s.id, s.marketplace ?? "other");
+  return map;
+}
+
+export function sourceNameIndex(sources: DataSource[]) {
+  const map = new Map<string, string>();
+  for (const s of sources) map.set(s.id, s.name);
+  return map;
+}
+
+/**
+ * Applies marketplace and category filters. Offers are filtered first so every
+ * downstream number (landed cost, ranking, verdict) reflects the filtered view.
+ */
+export function filterCatalog(
+  variants: VariantIntel[],
+  sources: DataSource[],
+  opts: { marketplaces?: string[]; categories?: string[] },
+): VariantIntel[] {
+  const marketplaces = opts.marketplaces?.filter(Boolean) ?? [];
+  const categories = opts.categories?.filter(Boolean) ?? [];
+  const byMarketplace = marketplaceIndex(sources);
+
+  return variants
+    .filter((v) => categories.length === 0 || categories.includes(v.categorySlug))
+    .map((v) =>
+      marketplaces.length === 0
+        ? v
+        : {
+            ...v,
+            offers: v.offers.filter((o) =>
+              marketplaces.includes(byMarketplace.get(o.data_source_id) ?? "other"),
+            ),
+          },
+    )
+    .filter((v) => marketplaces.length === 0 || v.offers.length > 0);
+}
+
+/** Newest offer retrieval timestamp across the visible set. */
+export function latestRetrievedAt(variants: VariantIntel[]): string | null {
+  let best: string | null = null;
+  for (const v of variants) {
+    for (const o of v.offers) {
+      if (!best || +new Date(o.retrieved_at) > +new Date(best)) best = o.retrieved_at;
+    }
+  }
+  return best;
+}
+
+/** Lowest landed cost across a variant's current offers, or null. */
+export function bestLandedCost(v: VariantIntel | null | undefined) {
+  if (!v || v.offers.length === 0) return null;
+  return Math.min(
+    ...v.offers.map(
+      (o) => Number(o.item_price) + Number(o.shipping_price) + Number(o.estimated_tax),
+    ),
+  );
 }
