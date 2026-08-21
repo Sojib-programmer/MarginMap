@@ -40,6 +40,20 @@ export const runResearch = createServerFn({ method: "POST" })
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("AI is not configured for this project.");
 
+    // Rate-limit: max 10 AI research calls per user per hour.
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count, error: rateErr } = await context.supabase
+      .from("research_reports")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", context.userId)
+      .gte("created_at", oneHourAgo);
+    if (rateErr) throw new Error("Could not verify rate limit.");
+    if ((count ?? 0) >= 10) {
+      throw new Error(
+        "Rate limit reached: you can run up to 10 research reports per hour. Please try again later.",
+      );
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const [{ data: variant }, { data: offers }, { data: comps }, { data: snapshot }] =

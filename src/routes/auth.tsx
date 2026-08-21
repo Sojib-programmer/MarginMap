@@ -27,9 +27,10 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useSession();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "reset" | "update-password">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [oauthBusy, setOauthBusy] = useState<"google" | "apple" | null>(null);
 
@@ -53,8 +54,48 @@ function AuthPage() {
   };
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app" });
-  }, [loading, session, navigate]);
+    if (!loading && session && mode !== "update-password") navigate({ to: "/app" });
+  }, [loading, session, navigate, mode]);
+
+  // Detect Supabase recovery token in the URL hash (type=recovery) and switch
+  // to the update-password form so users can enter their new password.
+  useEffect(() => {
+    if (window.location.hash.includes("type=recovery")) {
+      setMode("update-password");
+    }
+  }, []);
+
+  const submitUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Password updated. You're now signed in.");
+    navigate({ to: "/app" });
+  };
+
+  const submitReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Password reset email sent — check your inbox.");
+    setMode("signin");
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +117,81 @@ function AuthPage() {
     if (mode === "signup") toast.success("Account created. You're signed in.");
     navigate({ to: "/app" });
   };
+
+  if (mode === "update-password") {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-4">
+        <div className="w-full max-w-sm">
+          <span className="grid size-9 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
+            MM
+          </span>
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">Choose a new password</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Enter a new password for your MarginMap account.
+          </p>
+
+          <form onSubmit={submitUpdatePassword} className="mt-6 space-y-3">
+            <div>
+              <Label htmlFor="new-password">New password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                required
+                minLength={8}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Updating…" : "Set new password"}
+            </Button>
+          </form>
+
+          <Disclaimer className="mt-8" />
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "reset") {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-4">
+        <div className="w-full max-w-sm">
+          <span className="grid size-9 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
+            MM
+          </span>
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">Reset your password</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Enter your email and we'll send you a link to reset your password.
+          </p>
+
+          <form onSubmit={submitReset} className="mt-6 space-y-3">
+            <div>
+              <Label htmlFor="reset-email">Email</Label>
+              <Input
+                id="reset-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Sending…" : "Send reset link"}
+            </Button>
+          </form>
+
+          <button className="mt-4 text-sm text-primary underline" onClick={() => setMode("signin")}>
+            Back to sign in
+          </button>
+
+          <Disclaimer className="mt-8" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid min-h-screen place-items-center bg-background px-4">
@@ -145,12 +261,22 @@ function AuthPage() {
           </Button>
         </form>
 
-        <button
-          className="mt-4 text-sm text-primary underline"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-        >
-          {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
-        </button>
+        <div className="mt-4 flex flex-col items-start gap-1">
+          <button
+            className="text-sm text-primary underline"
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          >
+            {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+          </button>
+          {mode === "signin" && (
+            <button
+              className="text-sm text-muted-foreground underline"
+              onClick={() => setMode("reset")}
+            >
+              Forgot your password?
+            </button>
+          )}
+        </div>
 
         <Disclaimer className="mt-8" />
       </div>
