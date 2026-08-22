@@ -38,8 +38,10 @@ const asList = (value: unknown): string[] =>
       ? value.filter((v): v is string => typeof v === "string")
       : [];
 
+export type SearchFilters = { q: string; mk?: string[]; cat?: string[] };
+
 export const Route = createFileRoute("/app/search")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): SearchFilters => ({
     q: typeof search["q"] === "string" ? (search["q"] as string) : "",
     mk: asList(search["mk"]),
     cat: asList(search["cat"]),
@@ -49,7 +51,8 @@ export const Route = createFileRoute("/app/search")({
 });
 
 function SearchPage() {
-  const { q, mk, cat } = Route.useSearch();
+  const { q, mk = [], cat = [] } = Route.useSearch();
+
   const navigate = useNavigate({ from: "/app/search" });
   const { mode } = useRoleMode();
   const catalog = useQuery(catalogQuery);
