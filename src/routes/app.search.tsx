@@ -20,6 +20,7 @@ import { useAddToWatchlist, useSaveEvaluation, useSaveSearch } from "@/hooks/use
 import {
   catalogQuery,
   filterCatalog,
+  MARKETPLACE_LABEL,
   latestRetrievedAt,
   marketplaceIndex,
   marketplaceOptions,
