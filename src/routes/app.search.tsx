@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { EvidenceDrawer } from "@/components/evidence-drawer";
+import { FilterGroup } from "@/components/filter-bar";
 import {
   Chip,
   ConfidenceMeter,
+  DataAsOf,
   Disclaimer,
   FreshnessBadge,
   RecommendationBadge,
@@ -15,21 +17,40 @@ import { buildRows, ResultTable } from "@/components/result-table";
 import { EmptyState, QueryBoundary, RouteError, TableSkeleton } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { useAddToWatchlist, useSaveEvaluation, useSaveSearch } from "@/hooks/use-workspace-actions";
-import { catalogQuery } from "@/lib/catalog";
+import {
+  catalogQuery,
+  filterCatalog,
+  latestRetrievedAt,
+  marketplaceIndex,
+  marketplaceOptions,
+  sourceNameIndex,
+} from "@/lib/catalog";
+import { downloadCsv } from "@/lib/csv";
+import { OFFER_CSV_HEADERS, offerCsvRows } from "@/lib/export-rows";
 import { money, money2 } from "@/lib/format";
 import { matchVariants, parseIntent } from "@/lib/intent";
 import { useRoleMode } from "@/lib/role-mode";
 
+const asList = (value: unknown): string[] =>
+  typeof value === "string" && value.length
+    ? value.split(",").filter(Boolean)
+    : Array.isArray(value)
+      ? value.filter((v): v is string => typeof v === "string")
+      : [];
+
 export const Route = createFileRoute("/app/search")({
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search["q"] === "string" ? (search["q"] as string) : "",
+    mk: asList(search["mk"]),
+    cat: asList(search["cat"]),
   }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: SearchPage,
 });
 
 function SearchPage() {
-  const { q } = Route.useSearch();
+  const { q, mk, cat } = Route.useSearch();
+  const navigate = useNavigate({ from: "/app/search" });
   const { mode } = useRoleMode();
   const catalog = useQuery(catalogQuery);
   const logged = useRef<string | null>(null);
@@ -39,8 +60,12 @@ function SearchPage() {
   const saveEvaluation = useSaveEvaluation();
   const addToWatchlist = useAddToWatchlist();
 
-  const variants = useMemo(() => catalog.data?.variants ?? [], [catalog.data?.variants]);
+  const allVariants = useMemo(() => catalog.data?.variants ?? [], [catalog.data?.variants]);
   const sources = useMemo(() => catalog.data?.sources ?? [], [catalog.data?.sources]);
+  const variants = useMemo(
+    () => filterCatalog(allVariants, sources, { marketplaces: mk, categories: cat }),
+    [allVariants, sources, mk, cat],
+  );
   const intent = useMemo(() => parseIntent(q, variants), [q, variants]);
   const matches = useMemo(() => matchVariants(intent, variants), [intent, variants]);
   const rows = useMemo(
@@ -52,6 +77,40 @@ function SearchPage() {
     [matches, mode],
   );
 
+  const marketplaces = useMemo(() => marketplaceOptions(sources), [sources]);
+  const categories = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const v of allVariants) seen.set(v.categorySlug, v.category);
+    return [...seen.entries()].map(([key, label]) => ({ key, label }));
+  }, [allVariants]);
+
+  const toggleParam = (field: "mk" | "cat", key: string) =>
+    navigate({
+      search: (prev) => {
+        const current = (prev[field] as string[] | undefined) ?? [];
+        return {
+          ...prev,
+          [field]: current.includes(key) ? current.filter((k) => k !== key) : [...current, key],
+        };
+      },
+    });
+
+  const clearParam = (field: "mk" | "cat") =>
+    navigate({ search: (prev) => ({ ...prev, [field]: [] }) });
+
+  const exportCsv = () => {
+    const byMarketplace = marketplaceIndex(sources);
+    const byName = sourceNameIndex(sources);
+    downloadCsv(
+      "search",
+      OFFER_CSV_HEADERS,
+      offerCsvRows(rows, {
+        sourceName: (id) => byName.get(id) ?? "Unregistered source",
+        marketplace: (id) => byMarketplace.get(id) ?? "other",
+      }),
+    );
+  };
+
   useEffect(() => {
     if (q.trim().length > 1 && variants.length && logged.current !== q) {
       logged.current = q;
@@ -61,6 +120,7 @@ function SearchPage() {
   }, [q, variants.length]);
 
   const busy = saveEvaluation.isPending || addToWatchlist.isPending;
+
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
