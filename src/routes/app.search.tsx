@@ -128,7 +128,10 @@ function SearchPage() {
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
       <header>
-        <p className="label-meta">Search</p>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <p className="label-meta">Search</p>
+          <DataAsOf iso={latestRetrievedAt(matches.map((m) => m.variant))} />
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight">
           {q.trim() ? `“${q}”` : "Describe what you want"}
         </h1>
@@ -152,7 +155,31 @@ function SearchPage() {
             label="Budget floor"
             value={intent.priceFloor ? money(intent.priceFloor) : "none"}
           />
-          <IntentField label="Source preference" value="all registered demo sources" />
+          <IntentField
+            label="Source preference"
+            value={
+              mk.length
+                ? mk.map((k) => MARKETPLACE_LABEL[k] ?? k).join(", ")
+                : "all registered sources"
+            }
+          />
+        </div>
+
+        <div className="mt-2 space-y-2 rounded-lg border border-border bg-surface p-3">
+          <FilterGroup
+            label="Marketplace"
+            options={marketplaces}
+            selected={mk}
+            onToggle={(key) => toggleParam("mk", key)}
+            onClear={() => clearParam("mk")}
+          />
+          <FilterGroup
+            label="Category"
+            options={categories}
+            selected={cat}
+            onToggle={(key) => toggleParam("cat", key)}
+            onClear={() => clearParam("cat")}
+          />
         </div>
 
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -168,6 +195,9 @@ function SearchPage() {
               onClick={() => saveSearch.mutate({ query: q, mode, intent })}
             >
               Save this search
+            </Button>
+            <Button size="sm" variant="outline" disabled={rows.length === 0} onClick={exportCsv}>
+              Export CSV
             </Button>
             <div className="flex rounded-md border border-border p-0.5">
               {(["table", "cards"] as const).map((v) => (
@@ -195,7 +225,8 @@ function SearchPage() {
         empty={
           <EmptyState
             title="No canonical products matched"
-            body="Try fewer words, or drop the price bound. The demo catalog covers cameras, laptops, consoles, collectibles and guitars."
+            body="Try fewer words, drop the price bound, or clear the marketplace and category filters. The catalog covers cameras, laptops, consoles, collectibles and guitars."
+
             action={
               <Button asChild size="sm" variant="outline">
                 <Link to="/app/search" search={{ q: "" }}>
