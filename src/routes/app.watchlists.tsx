@@ -272,14 +272,20 @@ function WatchlistsPage() {
                               state={best != null ? "sourced" : "missing"}
                               note="No active offer for this product right now"
                             />
-                            {item.target_price != null ? (
-                              <Chip className="num" tone={hit ? "verified" : "neutral"}>
-                                target {money(item.target_price)}
-                                {hit ? " · hit" : ""}
+                            {hit ? (
+                              <Chip className="num" tone="verified">
+                                target hit
                               </Chip>
                             ) : null}
                           </div>
                         </div>
+                        <TargetPriceEditor
+                          value={item.target_price}
+                          busy={setTarget.isPending}
+                          onSave={(target) =>
+                            setTarget.mutate({ id: item.id, variantId: item.variant_id, target })
+                          }
+                        />
                         <Button
                           size="sm"
                           variant="ghost"
@@ -291,6 +297,7 @@ function WatchlistsPage() {
                       </li>
                     );
                   })}
+
                   {listItems.length === 0 ? (
                     <li className="py-3 text-sm text-muted-foreground">
                       No items in this list yet — add one from search or compare.
