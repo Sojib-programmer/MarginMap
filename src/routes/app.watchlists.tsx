@@ -3,13 +3,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Chip, Disclaimer, ValueCell } from "@/components/primitives";
+import { Chip, DataAsOf, Disclaimer, ValueCell } from "@/components/primitives";
 import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useWatchlistHits } from "@/hooks/use-alert-hits";
 import { useCreateWatchlist } from "@/hooks/use-workspace-actions";
 import { supabase } from "@/integrations/supabase/client";
-import { catalogQuery } from "@/lib/catalog";
+import { catalogQuery, latestRetrievedAt } from "@/lib/catalog";
+import { downloadCsv } from "@/lib/csv";
 import { money, relativeTime } from "@/lib/format";
 import { useRoleMode } from "@/lib/role-mode";
 import { landedCost } from "@/lib/scoring";
@@ -26,11 +28,13 @@ function WatchlistsPage() {
   const lists = useQuery(watchlistsQuery);
   const items = useQuery(watchlistItemsQuery);
   const catalog = useQuery(catalogQuery);
+  const hits = useWatchlistHits();
   const [name, setName] = useState("");
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["watchlists"] });
     qc.invalidateQueries({ queryKey: ["watchlist_items"] });
+    qc.invalidateQueries({ queryKey: ["alerts"] });
   };
 
   const createList = useCreateWatchlist();
@@ -43,6 +47,62 @@ function WatchlistsPage() {
     onSuccess: () => {
       invalidate();
       toast.success("Item removed");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  /** Writes the target price and keeps a matching landed-cost alert in sync. */
+  const setTarget = useMutation({
+    mutationFn: async ({
+      id,
+      variantId,
+      target,
+    }: {
+      id: string;
+      variantId: string | null;
+      target: number | null;
+    }) => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("Not signed in");
+
+      const { error } = await supabase
+        .from("watchlist_items")
+        .update({ target_price: target })
+        .eq("id", id);
+      if (error) throw new Error(error.message);
+
+      if (!variantId) return;
+      const { data: existing } = await supabase
+        .from("alerts")
+        .select("id")
+        .eq("variant_id", variantId)
+        .eq("rule_type", "landed_cost_below")
+        .limit(1);
+
+      if (target == null) {
+        if (existing?.[0]) await supabase.from("alerts").delete().eq("id", existing[0].id);
+        return;
+      }
+      if (existing?.[0]) {
+        const { error: upErr } = await supabase
+          .from("alerts")
+          .update({ rule_config: { threshold: target } as never, enabled: true })
+          .eq("id", existing[0].id);
+        if (upErr) throw new Error(upErr.message);
+      } else {
+        const { error: insErr } = await supabase.from("alerts").insert({
+          user_id: auth.user.id,
+          variant_id: variantId,
+          rule_type: "landed_cost_below",
+          rule_config: { threshold: target } as never,
+          channel: "in_app",
+        });
+        if (insErr) throw new Error(insErr.message);
+      }
+    },
+    onSuccess: () => {
+      invalidate();
+      toast.success("Target price saved");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -61,6 +121,43 @@ function WatchlistsPage() {
 
   const variantById = (id: string | null) =>
     catalog.data?.variants.find((v) => v.variantId === id) ?? null;
+
+  const exportCsv = () => {
+    const listName = new Map((lists.data ?? []).map((l) => [l.id, l.name]));
+    const rows = (items.data ?? []).map((item) => {
+      const v = variantById(item.variant_id);
+      const hit = hits.get(item.id);
+      return [
+        listName.get(item.watchlist_id) ?? "",
+        v?.productName ?? "Unknown product",
+        v?.variantTitle ?? "",
+        v?.brand ?? "",
+        v?.category ?? "",
+        hit?.best ?? "",
+        item.target_price ?? "",
+        hit?.hit ? "yes" : "no",
+        item.note ?? "",
+        item.created_at,
+      ];
+    });
+    downloadCsv(
+      "watchlists",
+      [
+        "List",
+        "Product",
+        "Variant",
+        "Brand",
+        "Category",
+        "Best landed cost",
+        "Target price",
+        "Target hit",
+        "Note",
+        "Added at",
+      ],
+      rows,
+    );
+  };
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-5">
