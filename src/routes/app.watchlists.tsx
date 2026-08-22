@@ -161,13 +161,28 @@ function WatchlistsPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-5">
-      <header>
-        <p className="label-meta">Watchlists</p>
-        <h1 className="text-2xl font-semibold tracking-tight">Tracked products</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Target prices are compared against the current best landed cost, not the sticker price.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div className="flex flex-wrap items-baseline gap-x-3">
+            <p className="label-meta">Watchlists</p>
+            <DataAsOf iso={latestRetrievedAt(catalog.data?.variants ?? [])} />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">Tracked products</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Target prices are compared against the current best landed cost, not the sticker price.
+            Saving a target also creates a matching landed-cost alert.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={(items.data ?? []).length === 0}
+          onClick={exportCsv}
+        >
+          Export CSV
+        </Button>
       </header>
+
 
       <div className="panel flex flex-wrap items-center gap-2 p-4">
         <Input
