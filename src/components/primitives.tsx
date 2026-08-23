@@ -95,7 +95,13 @@ export function CatalogNote({ className }: { className?: string }) {
 }
 
 /** "Data as of …" line derived from the newest record in the visible set. */
-export function DataAsOf({ iso, className }: { iso: string | null | undefined; className?: string }) {
+export function DataAsOf({
+  iso,
+  className,
+}: {
+  iso: string | null | undefined;
+  className?: string;
+}) {
   if (!iso) return null;
   return (
     <span className={cn("num text-xs text-muted-foreground", className)}>

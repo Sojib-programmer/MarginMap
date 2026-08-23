@@ -201,15 +201,17 @@ function Landing() {
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           {HOME_TIERS.map((t) => (
-            <div
-              key={t.name}
-              className={`panel p-5 ${t.highlight ? "border-border-strong" : ""}`}
-            >
+            <div key={t.name} className={`panel p-5 ${t.highlight ? "border-border-strong" : ""}`}>
               <p className="label-meta">{t.name}</p>
               <p className="num mt-1 text-2xl font-semibold tracking-tight">{t.price}</p>
               <p className="text-xs text-muted-foreground">{t.cadence}</p>
               <p className="mt-3 text-sm text-muted-foreground">{t.body}</p>
-              <Button asChild size="sm" variant={t.highlight ? "default" : "outline"} className="mt-4">
+              <Button
+                asChild
+                size="sm"
+                variant={t.highlight ? "default" : "outline"}
+                className="mt-4"
+              >
                 <Link to="/pricing">See what is included</Link>
               </Button>
             </div>

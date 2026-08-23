@@ -125,7 +125,6 @@ function SearchPage() {
 
   const busy = saveEvaluation.isPending || addToWatchlist.isPending;
 
-
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
       <header>

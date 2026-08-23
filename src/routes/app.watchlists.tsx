@@ -158,7 +158,6 @@ function WatchlistsPage() {
     );
   };
 
-
   return (
     <div className="mx-auto max-w-5xl space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -182,7 +181,6 @@ function WatchlistsPage() {
           Export CSV
         </Button>
       </header>
-
 
       <div className="panel flex flex-wrap items-center gap-2 p-4">
         <Input
