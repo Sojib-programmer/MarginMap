@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Disclaimer } from "@/components/primitives";
+import { CatalogNote, Disclaimer } from "@/components/primitives";
 import { RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,6 +141,7 @@ function SettingsPage() {
 
       <section className="panel p-4">
         <h2 className="text-sm font-semibold">Registered data sources</h2>
+        <CatalogNote className="mt-1" />
         <ul className="mt-2 divide-y divide-border">
           {(catalog.data?.sources ?? []).map((s) => (
             <li key={s.id} className="py-2 text-sm">

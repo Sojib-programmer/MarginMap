@@ -314,3 +314,36 @@ function WatchlistsPage() {
     </div>
   );
 }
+
+function TargetPriceEditor({
+  value,
+  busy,
+  onSave,
+}: {
+  value: number | null;
+  busy: boolean;
+  onSave: (target: number | null) => void;
+}) {
+  const [draft, setDraft] = useState(value != null ? String(value) : "");
+  return (
+    <div className="flex items-center gap-1.5">
+      <Input
+        className="num h-8 w-24"
+        inputMode="decimal"
+        placeholder="target"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        aria-label="Target price"
+      />
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 text-xs"
+        disabled={busy}
+        onClick={() => onSave(draft.trim() === "" ? null : Number(draft))}
+      >
+        Save
+      </Button>
+    </div>
+  );
+}

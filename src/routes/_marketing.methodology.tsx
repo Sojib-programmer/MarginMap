@@ -35,8 +35,9 @@ function MethodologyPage() {
           ))}
         </ol>
         <p className="mt-8 text-sm text-muted-foreground">
-          Demo data comes from synthetic registered sources. Estimates are decision support, not a
-          guarantee of availability, authenticity, taxes, fees, or resale outcome.
+          Catalog is a curated sample dataset; live marketplace connectors are enabled per account.
+          Estimates are decision support, not a guarantee of availability, authenticity, taxes,
+          fees, or resale outcome.
         </p>
       </div>
       <CTABand />
