@@ -17,7 +17,7 @@ import {
   catalogQuery,
   latestRetrievedAt,
   liquidityOf,
-  marketplaceOfSource,
+  marketplaceIndex,
   type Offer,
   type VariantIntel,
 } from "@/lib/catalog";
@@ -79,7 +79,7 @@ function ComparePage() {
                   OFFER_CSV_HEADERS,
                   offerCsvRows(rows, {
                     sourceName,
-                    marketplace: (id) => marketplaceOfSource(sources, id),
+                    marketplace: (id) => marketplaceIndex(sources).get(id) ?? "other",
                   }),
                 )
               }
