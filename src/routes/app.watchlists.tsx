@@ -158,7 +158,6 @@ function WatchlistsPage() {
     );
   };
 
-
   return (
     <div className="mx-auto max-w-5xl space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -182,7 +181,6 @@ function WatchlistsPage() {
           Export CSV
         </Button>
       </header>
-
 
       <div className="panel flex flex-wrap items-center gap-2 p-4">
         <Input
@@ -311,6 +309,39 @@ function WatchlistsPage() {
       </QueryBoundary>
 
       <Disclaimer />
+    </div>
+  );
+}
+
+function TargetPriceEditor({
+  value,
+  busy,
+  onSave,
+}: {
+  value: number | null;
+  busy: boolean;
+  onSave: (target: number | null) => void;
+}) {
+  const [draft, setDraft] = useState(value != null ? String(value) : "");
+  return (
+    <div className="flex items-center gap-1.5">
+      <Input
+        className="num h-8 w-24"
+        inputMode="decimal"
+        placeholder="target"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        aria-label="Target price"
+      />
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 text-xs"
+        disabled={busy}
+        onClick={() => onSave(draft.trim() === "" ? null : Number(draft))}
+      >
+        Save
+      </Button>
     </div>
   );
 }

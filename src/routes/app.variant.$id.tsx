@@ -10,6 +10,7 @@ import {
   Chip,
   ConditionChip,
   ConfidenceMeter,
+  DataAsOf,
   Disclaimer,
   RecommendationBadge,
   ValueCell,
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAddToWatchlist, useSaveEvaluation } from "@/hooks/use-workspace-actions";
-import { catalogQuery, liquidityOf } from "@/lib/catalog";
+import { catalogQuery, latestRetrievedAt, liquidityOf } from "@/lib/catalog";
 import { money, money2, relativeTime } from "@/lib/format";
 import { runResearch } from "@/lib/research.functions";
 import { useRoleMode } from "@/lib/role-mode";
@@ -97,6 +98,7 @@ function VariantPage() {
           {variant.gtin ? <Chip className="num">GTIN {variant.gtin}</Chip> : null}
           {variant.sku ? <Chip className="num">MPN {variant.sku}</Chip> : null}
           <Chip tone="verified">identity {(variant.identityConfidence * 100).toFixed(0)}%</Chip>
+          <DataAsOf iso={latestRetrievedAt([variant])} />
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-4">

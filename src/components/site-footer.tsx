@@ -1,7 +1,7 @@
 import { BrandLogo } from "@/components/brand-logo";
 import { Link } from "@tanstack/react-router";
 
-import { Disclaimer } from "@/components/primitives";
+import { CatalogNote, Disclaimer } from "@/components/primitives";
 import { PILLARS } from "@/content/pillars";
 
 const COLUMNS: { title: string; links: { to: string; label: string }[] }[] = [
@@ -68,6 +68,7 @@ export function SiteFooter() {
 
         <div className="mt-10 border-t border-border pt-6">
           <Disclaimer />
+          <CatalogNote className="mt-3" />
           <p className="mt-3 text-xs text-muted-foreground">
             Marketsync Global Ltd. · Reg. No RAJC-2483/2025 · TIN 317774303960 · Trade Licence
             01/13-2665 · Kashidanga City Gate, Rajpara, Rajshahi-6201, Bangladesh · Incorporated

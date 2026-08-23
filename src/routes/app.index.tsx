@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import {
   Chip,
+  DataAsOf,
   ConfidenceMeter,
   Disclaimer,
   FreshnessBadge,
@@ -11,7 +12,7 @@ import {
 } from "@/components/primitives";
 import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
-import { catalogQuery, liquidityOf, type VariantIntel } from "@/lib/catalog";
+import { catalogQuery, latestRetrievedAt, liquidityOf, type VariantIntel } from "@/lib/catalog";
 import { money, money2 } from "@/lib/format";
 import { useRoleMode } from "@/lib/role-mode";
 import { landedCost, offerEconomics, recommend } from "@/lib/scoring";
@@ -66,6 +67,7 @@ function Overview() {
             ? "Ranked by buyer value: landed cost against completed-sale comps, fit and trust."
             : "Ranked by risk-adjusted resale: net proceeds, ROI, liquidity and data confidence."}
         </p>
+        <DataAsOf className="mt-2 block" iso={latestRetrievedAt(variants)} />
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

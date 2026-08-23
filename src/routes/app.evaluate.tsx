@@ -36,6 +36,7 @@ import {
   type DealInput,
   type OfferEconomics,
 } from "@/lib/scoring";
+import { downloadCsv } from "@/lib/csv";
 import { evaluationsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/evaluate")({
@@ -469,7 +470,33 @@ function EvaluatePage() {
       </QueryBoundary>
 
       <section className="panel p-4">
-        <h2 className="text-sm font-semibold">Saved evaluations</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Saved evaluations</h2>
+          {(saved.data ?? []).length ? (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+              onClick={() =>
+                downloadCsv(
+                  "evaluations",
+                  ["Label", "Profit", "ROI %", "Score", "Net proceeds", "Confidence", "Saved at"],
+                  (saved.data ?? []).map((e) => [
+                    e.label ?? "",
+                    e.profit ?? "",
+                    e.roi_pct ?? "",
+                    e.score ?? "",
+                    e.net_proceeds ?? "",
+                    e.confidence != null ? Math.round(Number(e.confidence) * 100) : "",
+                    e.created_at,
+                  ]),
+                )
+              }
+            >
+              Export CSV
+            </Button>
+          ) : null}
+        </div>
         <div className="mt-2">
           <QueryBoundary
             isLoading={saved.isLoading}

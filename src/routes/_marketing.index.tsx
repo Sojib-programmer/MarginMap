@@ -59,6 +59,30 @@ const STEPS = [
   },
 ];
 
+const HOME_TIERS = [
+  {
+    name: "Research",
+    price: "Free",
+    cadence: "for individual buyers",
+    body: "Search, canonical variant pages, landed cost and completed-sale comparables.",
+    highlight: false,
+  },
+  {
+    name: "Reseller",
+    price: "$29",
+    cadence: "per seat / month",
+    body: "Deal calculator, pipeline, unlimited watchlists and landed-cost alerts.",
+    highlight: true,
+  },
+  {
+    name: "Team",
+    price: "$79",
+    cadence: "per seat / month",
+    body: "Shared watchlists and pipeline with per-seat attribution and exports.",
+    highlight: false,
+  },
+];
+
 function Landing() {
   return (
     <>
@@ -165,6 +189,32 @@ function Landing() {
               <h3 className="mt-2 text-sm font-semibold">{p.nav}</h3>
               <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{p.description}</p>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-10">
+        <h2 className="text-2xl font-semibold tracking-tight">Plans</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Flat per-seat pricing. We never take a percentage of your margin — that would reward
+          optimistic numbers.
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {HOME_TIERS.map((t) => (
+            <div key={t.name} className={`panel p-5 ${t.highlight ? "border-border-strong" : ""}`}>
+              <p className="label-meta">{t.name}</p>
+              <p className="num mt-1 text-2xl font-semibold tracking-tight">{t.price}</p>
+              <p className="text-xs text-muted-foreground">{t.cadence}</p>
+              <p className="mt-3 text-sm text-muted-foreground">{t.body}</p>
+              <Button
+                asChild
+                size="sm"
+                variant={t.highlight ? "default" : "outline"}
+                className="mt-4"
+              >
+                <Link to="/pricing">See what is included</Link>
+              </Button>
+            </div>
           ))}
         </div>
       </section>

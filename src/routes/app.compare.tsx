@@ -4,6 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Chip,
   ConditionChip,
+  DataAsOf,
   Disclaimer,
   ProvenanceCell,
   RecommendationBadge,
@@ -12,7 +13,16 @@ import {
 import { CardGridSkeleton, EmptyState, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { useAddToWatchlist, useSaveEvaluation } from "@/hooks/use-workspace-actions";
-import { catalogQuery, liquidityOf, type Offer, type VariantIntel } from "@/lib/catalog";
+import {
+  catalogQuery,
+  latestRetrievedAt,
+  liquidityOf,
+  marketplaceIndex,
+  type Offer,
+  type VariantIntel,
+} from "@/lib/catalog";
+import { downloadCsv } from "@/lib/csv";
+import { OFFER_CSV_HEADERS, offerCsvRows } from "@/lib/export-rows";
 import { useCompare } from "@/lib/compare-store";
 import { money2 } from "@/lib/format";
 import { useRoleMode } from "@/lib/role-mode";
@@ -58,9 +68,28 @@ function ComparePage() {
           </p>
         </div>
         {rows.length ? (
-          <Button size="sm" variant="outline" onClick={clear}>
-            Clear selection
-          </Button>
+          <div className="flex items-center gap-2">
+            <DataAsOf iso={latestRetrievedAt(rows.map((r) => r.variant))} />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                downloadCsv(
+                  "compare",
+                  OFFER_CSV_HEADERS,
+                  offerCsvRows(rows, {
+                    sourceName,
+                    marketplace: (id) => marketplaceIndex(sources).get(id) ?? "other",
+                  }),
+                )
+              }
+            >
+              Export CSV
+            </Button>
+            <Button size="sm" variant="outline" onClick={clear}>
+              Clear selection
+            </Button>
+          </div>
         ) : null}
       </header>
 
