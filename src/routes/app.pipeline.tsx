@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadCsv } from "@/lib/csv";
 import { money2, relativeTime } from "@/lib/format";
 import { inventoryQuery, PIPELINE_STATUSES, STATUS_LABEL } from "@/lib/workspace";
 
@@ -49,12 +50,49 @@ function PipelinePage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-5">
-      <header>
-        <p className="label-meta">Reseller · pipeline</p>
-        <h1 className="text-2xl font-semibold tracking-tight">Sourcing to sold</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Candidates saved from the deal calculator, tracked through acquisition and sale.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="label-meta">Reseller · pipeline</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Sourcing to sold</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Candidates saved from the deal calculator, tracked through acquisition and sale.
+          </p>
+        </div>
+        {all.length ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              downloadCsv(
+                "pipeline",
+                [
+                  "Title",
+                  "Status",
+                  "Quantity",
+                  "Condition",
+                  "Cost basis",
+                  "Listed price",
+                  "Sold price",
+                  "Actual profit",
+                  "Created at",
+                ],
+                all.map((i) => [
+                  i.title,
+                  STATUS_LABEL[i.status] ?? i.status,
+                  i.quantity,
+                  i.condition_grade ?? "",
+                  i.cost_basis ?? "",
+                  i.listed_price ?? "",
+                  i.sold_price ?? "",
+                  i.actual_profit ?? "",
+                  i.created_at,
+                ]),
+              )
+            }
+          >
+            Export CSV
+          </Button>
+        ) : null}
       </header>
 
       <QueryBoundary
