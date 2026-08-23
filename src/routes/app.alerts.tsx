@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAlertHits } from "@/hooks/use-alert-hits";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery } from "@/lib/catalog";
 import { money, relativeTime } from "@/lib/format";
@@ -30,6 +31,7 @@ function AlertsPage() {
   const qc = useQueryClient();
   const alerts = useQuery(alertsQuery);
   const catalog = useQuery(catalogQuery);
+  const { rows: hitRows } = useAlertHits();
   const [variantId, setVariantId] = useState("");
   const [threshold, setThreshold] = useState("");
 
@@ -119,6 +121,7 @@ function AlertsPage() {
         {(alerts.data ?? []).map((a) => {
           const v = variants.find((x) => x.variantId === a.variant_id);
           const threshold = Number((a.rule_config as { threshold?: number })?.threshold ?? 0);
+          const hitRow = hitRows.find((r) => r.alert.id === a.id);
           return (
             <li key={a.id} className="panel flex flex-wrap items-center gap-3 p-3">
               <div className="min-w-0 flex-1">
@@ -126,6 +129,12 @@ function AlertsPage() {
                 <div className="mt-1 flex flex-wrap gap-1.5">
                   <Chip className="num">below {money(threshold)}</Chip>
                   <Chip>{a.channel.replace("_", " ")}</Chip>
+                  {hitRow?.bestLanded != null ? (
+                    <Chip className="num">best landed {money(hitRow.bestLanded)}</Chip>
+                  ) : (
+                    <Chip>no live offer</Chip>
+                  )}
+                  {hitRow?.hit ? <Chip tone="verified">target hit</Chip> : null}
                   {a.last_triggered_at ? (
                     <Chip tone="verified">triggered {relativeTime(a.last_triggered_at)}</Chip>
                   ) : null}
