@@ -8,9 +8,9 @@ import { EvidenceDrawer } from "@/components/evidence-drawer";
 import { OfferTable } from "@/components/offer-table";
 import {
   Chip,
-  DataAsOf,
   ConditionChip,
   ConfidenceMeter,
+  DataAsOf,
   Disclaimer,
   RecommendationBadge,
   ValueCell,
