@@ -41,8 +41,13 @@ function WatchlistsPage() {
 
   const removeItem = useMutation({
     mutationFn: async (id: string) => {
+      const ws = requireWrite();
       const { error } = await supabase.from("watchlist_items").delete().eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "watchlist.item_removed", {
+        type: "watchlist_item",
+        id,
+      });
     },
     onSuccess: () => {
       invalidate();
@@ -62,6 +67,7 @@ function WatchlistsPage() {
       variantId: string | null;
       target: number | null;
     }) => {
+      const ws = requireWrite();
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
 
@@ -70,6 +76,11 @@ function WatchlistsPage() {
         .update({ target_price: target })
         .eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "watchlist.target_price_changed", {
+        type: "watchlist_item",
+        id,
+        metadata: { target_price: target },
+      });
 
       if (!variantId) return;
       const { data: existing } = await supabase
@@ -92,6 +103,7 @@ function WatchlistsPage() {
       } else {
         const { error: insErr } = await supabase.from("alerts").insert({
           user_id: auth.user.id,
+          workspace_id: ws.workspaceId,
           variant_id: variantId,
           rule_type: "landed_cost_below",
           rule_config: { threshold: target } as never,
@@ -109,8 +121,10 @@ function WatchlistsPage() {
 
   const deleteList = useMutation({
     mutationFn: async (id: string) => {
+      const ws = requireWrite();
       const { error } = await supabase.from("watchlists").delete().eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "watchlist.deleted", { type: "watchlist", id });
     },
     onSuccess: () => {
       invalidate();
