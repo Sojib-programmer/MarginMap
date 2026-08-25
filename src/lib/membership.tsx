@@ -94,12 +94,19 @@ export async function logActivity(
   action: string,
   target?: { type?: string; id?: string | null; metadata?: Record<string, unknown> },
 ) {
-  const { error } = await supabase.rpc("log_activity", {
+  const args: {
+    _workspace_id: string;
+    _action: string;
+    _metadata: never;
+    _target_type?: string;
+    _target_id?: string;
+  } = {
     _workspace_id: workspaceId,
     _action: action,
-    _target_type: target?.type ?? undefined,
-    _target_id: target?.id ?? undefined,
     _metadata: (target?.metadata ?? {}) as never,
-  });
+  };
+  if (target?.type) args._target_type = target.type;
+  if (target?.id) args._target_id = target.id;
+  const { error } = await supabase.rpc("log_activity", args);
   if (error) console.warn("activity log failed", error.message);
 }
