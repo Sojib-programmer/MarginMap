@@ -97,8 +97,8 @@ export async function logActivity(
   const { error } = await supabase.rpc("log_activity", {
     _workspace_id: workspaceId,
     _action: action,
-    _target_type: target?.type ?? null,
-    _target_id: target?.id ?? null,
+    _target_type: target?.type ?? undefined,
+    _target_id: target?.id ?? undefined,
     _metadata: (target?.metadata ?? {}) as never,
   });
   if (error) console.warn("activity log failed", error.message);
