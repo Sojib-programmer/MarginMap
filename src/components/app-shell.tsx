@@ -53,6 +53,7 @@ const NAV: NavItem[] = [
 export function AppShell() {
   const { mode, setMode } = useRoleMode();
   const { user } = useSession();
+  const { membership } = useMembership();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { selected } = useCompare();
@@ -108,7 +109,11 @@ export function AppShell() {
         </div>
 
         <nav className="flex-1 space-y-0.5 px-2">
-          {NAV.filter((n) => !n.reseller || mode === "reseller").map((item) => {
+          {NAV.filter(
+            (n) =>
+              (!n.reseller || mode === "reseller") &&
+              (!n.resellerPlan || hasResellerPlan(membership)),
+          ).map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             return (
               <Link
@@ -140,12 +145,19 @@ export function AppShell() {
 
         <div className="border-t border-border p-3">
           <Link
-            to="/pricing"
+            to="/app/billing"
             className="mb-3 block rounded-md border border-border bg-background p-2.5 transition-colors hover:border-primary/50"
           >
-            <p className="text-xs font-medium">Research plan</p>
+            <p className="text-xs font-medium">
+              {membership ? `${PLAN_LABEL[membership.plan]} plan` : "Plan"}
+              {membership ? (
+                <span className="text-muted-foreground"> · {ROLE_LABEL[membership.role]}</span>
+              ) : null}
+            </p>
             <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-              Unlock the deal calculator, pipeline and unlimited alerts — see plans.
+              {membership && !hasResellerPlan(membership)
+                ? "Unlock the deal calculator, pipeline and unlimited alerts — see Billing."
+                : "Plan, seat and workspace details."}
             </p>
           </Link>
           <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
