@@ -14,6 +14,7 @@ import type { DataSource, VariantIntel } from "@/lib/catalog";
 import { liquidityOf } from "@/lib/catalog";
 import { useCompare } from "@/lib/compare-store";
 import { money2 } from "@/lib/format";
+import { ageInDays } from "@/lib/freshness";
 import type { RoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend } from "@/lib/scoring";
 
@@ -89,7 +90,7 @@ export function OfferTable({
         <tbody>
           {variant.offers.map((offer) => {
             const e = offerEconomics(offer, variant.stats, liquidity);
-            const rec = recommend(mode, e);
+            const rec = recommend(mode, e, { evidenceAgeDays: ageInDays(offer.retrieved_at) });
             const noComps = e.sampleSize === 0;
             const score = mode === "buyer" ? e.buyer : e.deal.score;
 

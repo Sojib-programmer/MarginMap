@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAddToWatchlist, useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { catalogQuery, latestRetrievedAt, liquidityOf } from "@/lib/catalog";
 import { money, money2, relativeTime } from "@/lib/format";
+import { ageInDays, stalenessCaveat } from "@/lib/freshness";
 import { runResearch } from "@/lib/research.functions";
 import { useRoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend } from "@/lib/scoring";
@@ -73,7 +74,13 @@ function VariantPage() {
   // Best offer under the current role, on the shared economics path.
   const scored = variant.offers.map((offer) => {
     const economics = offerEconomics(offer, variant.stats, liquidity);
-    return { offer, economics, recommendation: recommend(mode, economics) };
+    return {
+      offer,
+      economics,
+      recommendation: recommend(mode, economics, {
+        evidenceAgeDays: ageInDays(offer.retrieved_at),
+      }),
+    };
   });
   const best = scored.sort((a, b) =>
     mode === "buyer"
