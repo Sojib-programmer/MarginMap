@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery, liquidityOf } from "@/lib/catalog";
 import { money2, relativeTime } from "@/lib/format";
 import { logActivity, useRequireWrite } from "@/lib/membership";
+import { ageInDays, stalenessCaveat } from "@/lib/freshness";
 import { useRoleMode } from "@/lib/role-mode";
 import {
   buyerScore,
@@ -119,7 +120,10 @@ function EvaluatePage() {
     deal: result,
     flags: result.flags,
   };
-  const rec = recommend(mode, economics);
+  const rec = recommend(mode, economics, {
+    evidenceAgeDays: ageInDays(found?.offer.retrieved_at),
+  });
+  const staleCaveat = stalenessCaveat(found?.offer.retrieved_at);
   const noComps = stats.sampleSize === 0;
 
   const sourceName =
