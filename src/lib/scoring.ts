@@ -599,7 +599,7 @@ const TONE: Record<RecommendationAction, Recommendation["tone"]> = {
 export function recommend(
   mode: "buyer" | "reseller",
   e: OfferEconomics,
-  opts?: { evidenceAgeDays?: number },
+  opts?: { evidenceAgeDays?: number | null },
 ): Recommendation {
   const say = (action: RecommendationAction, reason: string): Recommendation => {
     const age = opts?.evidenceAgeDays;
