@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAddToWatchlist, useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { catalogQuery, latestRetrievedAt, liquidityOf } from "@/lib/catalog";
 import { money, money2, relativeTime } from "@/lib/format";
-import { ageInDays, stalenessCaveat } from "@/lib/freshness";
+import { ageInDays } from "@/lib/freshness";
 import { runResearch } from "@/lib/research.functions";
 import { useRoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend } from "@/lib/scoring";
