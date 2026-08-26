@@ -15,6 +15,7 @@ import {
   RecommendationBadge,
   ValueCell,
 } from "@/components/primitives";
+import { StalenessWarning } from "@/components/freshness";
 import { PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
