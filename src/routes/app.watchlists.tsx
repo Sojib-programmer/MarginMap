@@ -30,7 +30,16 @@ function WatchlistsPage() {
   const items = useQuery(watchlistItemsQuery);
   const catalog = useQuery(catalogQuery);
   const hits = useWatchlistHits();
+  const { membership } = useMembership();
   const [name, setName] = useState("");
+
+  /** Mirrors the DB boundary so the UI fails loudly before the round trip. */
+  const requireWrite = () => {
+    if (!membership) throw new Error("No workspace found for this account.");
+    if (membership.role === "auditor")
+      throw new Error("Auditor access is read-only. Ask an admin for Editor access.");
+    return membership;
+  };
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["watchlists"] });
