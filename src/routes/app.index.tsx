@@ -14,6 +14,7 @@ import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/componen
 import { Button } from "@/components/ui/button";
 import { catalogQuery, latestRetrievedAt, liquidityOf, type VariantIntel } from "@/lib/catalog";
 import { money, money2 } from "@/lib/format";
+import { ageInDays } from "@/lib/freshness";
 import { useRoleMode } from "@/lib/role-mode";
 import { landedCost, offerEconomics, recommend } from "@/lib/scoring";
 import { searchesQuery, watchlistItemsQuery } from "@/lib/workspace";
@@ -42,7 +43,16 @@ function Overview() {
       const offer = bestOffer(v);
       if (!offer) return [];
       const economics = offerEconomics(offer, v.stats, liquidityOf(v));
-      return [{ v, offer, economics, recommendation: recommend(mode, economics) }];
+      return [
+        {
+          v,
+          offer,
+          economics,
+          recommendation: recommend(mode, economics, {
+            evidenceAgeDays: ageInDays(offer.retrieved_at),
+          }),
+        },
+      ];
     })
     .sort((a, b) =>
       mode === "buyer"

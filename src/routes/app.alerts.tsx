@@ -20,6 +20,7 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery } from "@/lib/catalog";
 import { money, relativeTime } from "@/lib/format";
+import { logActivity, useRequireWrite } from "@/lib/membership";
 import { alertsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/alerts")({
@@ -32,24 +33,39 @@ function AlertsPage() {
   const alerts = useQuery(alertsQuery);
   const catalog = useQuery(catalogQuery);
   const { rows: hitRows } = useAlertHits();
+  const requireWrite = useRequireWrite();
   const [variantId, setVariantId] = useState("");
   const [threshold, setThreshold] = useState("");
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["alerts"] });
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["alerts"] });
+    qc.invalidateQueries({ queryKey: ["activity"] });
+  };
 
   const create = useMutation({
     mutationFn: async () => {
+      const ws = requireWrite();
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
       if (!variantId) throw new Error("Pick a product first");
-      const { error } = await supabase.from("alerts").insert({
-        user_id: auth.user.id,
-        variant_id: variantId,
-        rule_type: "landed_cost_below",
-        rule_config: { threshold: Number(threshold) || 0 } as never,
-        channel: "in_app",
-      });
+      const { data: row, error } = await supabase
+        .from("alerts")
+        .insert({
+          user_id: auth.user.id,
+          workspace_id: ws.workspaceId,
+          variant_id: variantId,
+          rule_type: "landed_cost_below",
+          rule_config: { threshold: Number(threshold) || 0 } as never,
+          channel: "in_app",
+        })
+        .select("id")
+        .single();
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "alert.created", {
+        type: "alert",
+        id: row.id,
+        metadata: { variant_id: variantId, threshold: Number(threshold) || 0 },
+      });
     },
     onSuccess: () => {
       toast.success("Alert created");
@@ -61,16 +77,23 @@ function AlertsPage() {
 
   const toggle = useMutation({
     mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) => {
+      const ws = requireWrite();
       const { error } = await supabase.from("alerts").update({ enabled }).eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, enabled ? "alert.enabled" : "alert.disabled", {
+        type: "alert",
+        id,
+      });
     },
     onSuccess: invalidate,
   });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
+      const ws = requireWrite();
       const { error } = await supabase.from("alerts").delete().eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "alert.deleted", { type: "alert", id });
     },
     onSuccess: invalidate,
   });

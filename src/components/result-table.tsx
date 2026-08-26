@@ -13,6 +13,7 @@ import type { DataSource, Offer, VariantIntel } from "@/lib/catalog";
 import { liquidityOf } from "@/lib/catalog";
 import { useCompare } from "@/lib/compare-store";
 import { money2 } from "@/lib/format";
+import { ageInDays } from "@/lib/freshness";
 import type { RoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend, type OfferEconomics, type Recommendation } from "@/lib/scoring";
 
@@ -30,7 +31,14 @@ export function buildRows(variants: VariantIntel[], mode: RoleMode): ResultRow[]
     const liquidity = liquidityOf(variant);
     for (const offer of variant.offers) {
       const economics = offerEconomics(offer, variant.stats, liquidity);
-      rows.push({ variant, offer, economics, recommendation: recommend(mode, economics) });
+      rows.push({
+        variant,
+        offer,
+        economics,
+        recommendation: recommend(mode, economics, {
+          evidenceAgeDays: ageInDays(offer.retrieved_at),
+        }),
+      });
     }
   }
   const rank = { Buy: 0, Watch: 1, Pass: 2 } as const;

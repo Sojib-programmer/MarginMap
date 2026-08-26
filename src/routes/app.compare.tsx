@@ -25,6 +25,7 @@ import { downloadCsv } from "@/lib/csv";
 import { OFFER_CSV_HEADERS, offerCsvRows } from "@/lib/export-rows";
 import { useCompare } from "@/lib/compare-store";
 import { money2 } from "@/lib/format";
+import { ageInDays } from "@/lib/freshness";
 import { useRoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend } from "@/lib/scoring";
 
@@ -51,7 +52,14 @@ function ComparePage() {
 
   const rows = picks.map(({ offer, variant }) => {
     const economics = offerEconomics(offer, variant.stats, liquidityOf(variant));
-    return { offer, variant, economics, recommendation: recommend(mode, economics) };
+    return {
+      offer,
+      variant,
+      economics,
+      recommendation: recommend(mode, economics, {
+        evidenceAgeDays: ageInDays(offer.retrieved_at),
+      }),
+    };
   });
 
   const cheapest = rows.length ? Math.min(...rows.map((r) => r.economics.landedCost)) : 0;

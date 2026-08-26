@@ -88,6 +88,20 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
 
 export const useMembership = () => useContext(MembershipContext);
 
+/**
+ * Returns a guard that throws when the caller has no writable workspace.
+ * UI-side mirror of the database boundary only.
+ */
+export function useRequireWrite() {
+  const { membership } = useMembership();
+  return () => {
+    if (!membership) throw new Error("No workspace found for this account.");
+    if (membership.role === "auditor")
+      throw new Error("Auditor access is read-only. Ask an admin for Editor access.");
+    return membership;
+  };
+}
+
 /** Append-only audit write. Failure to log never silently succeeds. */
 export async function logActivity(
   workspaceId: string,

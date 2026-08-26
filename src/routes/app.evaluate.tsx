@@ -10,6 +10,7 @@ import {
   RecommendationBadge,
   ValueCell,
 } from "@/components/primitives";
+import { StalenessWarning } from "@/components/freshness";
 import { ScoreGauge } from "@/components/score-gauge";
 import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ import { useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery, liquidityOf } from "@/lib/catalog";
 import { money2, relativeTime } from "@/lib/format";
+import { logActivity, useRequireWrite } from "@/lib/membership";
+import { ageInDays, stalenessCaveat } from "@/lib/freshness";
 import { useRoleMode } from "@/lib/role-mode";
 import {
   buyerScore,
@@ -54,6 +57,7 @@ function EvaluatePage() {
   const catalog = useQuery(catalogQuery);
   const saved = useQuery(evaluationsQuery);
   const saveEvaluation = useSaveEvaluation();
+  const requireWrite = useRequireWrite();
 
   const found = useMemo(() => {
     for (const v of catalog.data?.variants ?? []) {
@@ -117,7 +121,10 @@ function EvaluatePage() {
     deal: result,
     flags: result.flags,
   };
-  const rec = recommend(mode, economics);
+  const rec = recommend(mode, economics, {
+    evidenceAgeDays: ageInDays(found?.offer.retrieved_at),
+  });
+  const staleCaveat = stalenessCaveat(found?.offer.retrieved_at);
   const noComps = stats.sampleSize === 0;
 
   const sourceName =
@@ -131,21 +138,35 @@ function EvaluatePage() {
 
   const addToPipeline = useMutation({
     mutationFn: async () => {
+      const ws = requireWrite();
+      if (ws.plan === "research")
+        throw new Error("The pipeline requires the Reseller plan. See Billing.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
-      const { error } = await supabase.from("inventory_items").insert({
-        user_id: auth.user.id,
-        variant_id: found?.variant.variantId ?? null,
-        title: found?.variant.productName ?? "Manual candidate",
-        status: "source_now",
-        cost_basis: result.allInCost,
-        condition_grade: input.conditionGrade,
-      });
+      const { data: row, error } = await supabase
+        .from("inventory_items")
+        .insert({
+          user_id: auth.user.id,
+          workspace_id: ws.workspaceId,
+          variant_id: found?.variant.variantId ?? null,
+          title: found?.variant.productName ?? "Manual candidate",
+          status: "source_now",
+          cost_basis: result.allInCost,
+          condition_grade: input.conditionGrade,
+        })
+        .select("id")
+        .single();
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "pipeline.item_added", {
+        type: "inventory_item",
+        id: row.id,
+        metadata: { title: found?.variant.productName ?? "Manual candidate" },
+      });
     },
     onSuccess: () => {
       toast.success("Added to pipeline");
       qc.invalidateQueries({ queryKey: ["inventory_items"] });
+      qc.invalidateQueries({ queryKey: ["activity"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -274,6 +295,8 @@ function EvaluatePage() {
             </div>
 
             <RecommendationBadge rec={rec} showReason />
+
+            <StalenessWarning iso={found?.offer.retrieved_at} />
 
             <Line
               label="Item price"

@@ -31,8 +31,11 @@ import { Route as MarketingSoldCompsVsAskingPriceRouteImport } from './routes/_m
 import { Route as MarketingSourcingWorkflowRouteImport } from './routes/_marketing.sourcing-workflow'
 import { Route as MarketingTermsRouteImport } from './routes/_marketing.terms'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
+import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
+import { Route as AppDataSourcesRouteImport } from './routes/app.data-sources'
 import { Route as AppEvaluateRouteImport } from './routes/app.evaluate'
 import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
 import { Route as AppSearchRouteImport } from './routes/app.search'
@@ -156,14 +159,29 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAlertsRoute = AppAlertsRouteImport.update({
   id: '/alerts',
   path: '/alerts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBillingRoute = AppBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCompareRoute = AppCompareRouteImport.update({
   id: '/compare',
   path: '/compare',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDataSourcesRoute = AppDataSourcesRouteImport.update({
+  id: '/data-sources',
+  path: '/data-sources',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEvaluateRoute = AppEvaluateRouteImport.update({
@@ -218,8 +236,11 @@ export interface FileRoutesByFullPath {
   '/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
   '/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
   '/terms': typeof MarketingTermsRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
+  '/app/data-sources': typeof AppDataSourcesRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/search': typeof AppSearchRoute
@@ -247,8 +268,11 @@ export interface FileRoutesByTo {
   '/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
   '/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
   '/terms': typeof MarketingTermsRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
+  '/app/data-sources': typeof AppDataSourcesRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/search': typeof AppSearchRoute
@@ -280,8 +304,11 @@ export interface FileRoutesById {
   '/_marketing/sold-comps-vs-asking-price': typeof MarketingSoldCompsVsAskingPriceRoute
   '/_marketing/sourcing-workflow': typeof MarketingSourcingWorkflowRoute
   '/_marketing/terms': typeof MarketingTermsRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
+  '/app/data-sources': typeof AppDataSourcesRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/search': typeof AppSearchRoute
@@ -314,8 +341,11 @@ export interface FileRouteTypes {
     | '/sold-comps-vs-asking-price'
     | '/sourcing-workflow'
     | '/terms'
+    | '/app/activity'
     | '/app/alerts'
+    | '/app/billing'
     | '/app/compare'
+    | '/app/data-sources'
     | '/app/evaluate'
     | '/app/pipeline'
     | '/app/search'
@@ -343,8 +373,11 @@ export interface FileRouteTypes {
     | '/sold-comps-vs-asking-price'
     | '/sourcing-workflow'
     | '/terms'
+    | '/app/activity'
     | '/app/alerts'
+    | '/app/billing'
     | '/app/compare'
+    | '/app/data-sources'
     | '/app/evaluate'
     | '/app/pipeline'
     | '/app/search'
@@ -375,8 +408,11 @@ export interface FileRouteTypes {
     | '/_marketing/sold-comps-vs-asking-price'
     | '/_marketing/sourcing-workflow'
     | '/_marketing/terms'
+    | '/app/activity'
     | '/app/alerts'
+    | '/app/billing'
     | '/app/compare'
+    | '/app/data-sources'
     | '/app/evaluate'
     | '/app/pipeline'
     | '/app/search'
@@ -551,6 +587,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/alerts': {
       id: '/app/alerts'
       path: '/alerts'
@@ -558,11 +601,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAlertsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/billing': {
+      id: '/app/billing'
+      path: '/billing'
+      fullPath: '/app/billing'
+      preLoaderRoute: typeof AppBillingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/compare': {
       id: '/app/compare'
       path: '/compare'
       fullPath: '/app/compare'
       preLoaderRoute: typeof AppCompareRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/data-sources': {
+      id: '/app/data-sources'
+      path: '/data-sources'
+      fullPath: '/app/data-sources'
+      preLoaderRoute: typeof AppDataSourcesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/evaluate': {
@@ -655,8 +712,11 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
   AppAlertsRoute: typeof AppAlertsRoute
+  AppBillingRoute: typeof AppBillingRoute
   AppCompareRoute: typeof AppCompareRoute
+  AppDataSourcesRoute: typeof AppDataSourcesRoute
   AppEvaluateRoute: typeof AppEvaluateRoute
   AppPipelineRoute: typeof AppPipelineRoute
   AppSearchRoute: typeof AppSearchRoute
@@ -667,8 +727,11 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
   AppAlertsRoute: AppAlertsRoute,
+  AppBillingRoute: AppBillingRoute,
   AppCompareRoute: AppCompareRoute,
+  AppDataSourcesRoute: AppDataSourcesRoute,
   AppEvaluateRoute: AppEvaluateRoute,
   AppPipelineRoute: AppPipelineRoute,
   AppSearchRoute: AppSearchRoute,

@@ -590,13 +590,28 @@ const TONE: Record<RecommendationAction, Recommendation["tone"]> = {
   Pass: "destructive",
 };
 
-/** Single normalized verdict for both roles, derived from the same economics. */
-export function recommend(mode: "buyer" | "reseller", e: OfferEconomics): Recommendation {
-  const say = (action: RecommendationAction, reason: string): Recommendation => ({
-    action,
-    tone: TONE[action],
-    reason,
-  });
+/**
+ * Single normalized verdict for both roles, derived from the same economics.
+ * `evidenceAgeDays` is the age of the offer evidence powering the numbers —
+ * when it exceeds the staleness threshold a "Buy" can never stand on it, so
+ * the verdict downgrades to Watch with the age stated plainly.
+ */
+export function recommend(
+  mode: "buyer" | "reseller",
+  e: OfferEconomics,
+  opts?: { evidenceAgeDays?: number | null },
+): Recommendation {
+  const say = (action: RecommendationAction, reason: string): Recommendation => {
+    const age = opts?.evidenceAgeDays;
+    if (action === "Buy" && typeof age === "number" && age > 7) {
+      return {
+        action: "Watch",
+        tone: "caution",
+        reason: `Evidence is ${Math.floor(age)} days old — too stale to act on without re-verification. ${reason}`,
+      };
+    }
+    return { action, tone: TONE[action], reason };
+  };
 
   if (e.sampleSize === 0) {
     return say("Watch", "No completed sales on record — nothing to price against yet.");

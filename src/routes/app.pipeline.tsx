@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadCsv } from "@/lib/csv";
 import { money2, relativeTime } from "@/lib/format";
+import { logActivity, useRequireWrite } from "@/lib/membership";
 import { inventoryQuery, PIPELINE_STATUSES, STATUS_LABEL } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/pipeline")({
@@ -25,25 +26,39 @@ export const Route = createFileRoute("/app/pipeline")({
 function PipelinePage() {
   const qc = useQueryClient();
   const items = useQuery(inventoryQuery);
+  const requireWrite = useRequireWrite();
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["inventory_items"] });
+    qc.invalidateQueries({ queryKey: ["activity"] });
+  };
 
   const update = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const ws = requireWrite();
       const { error } = await supabase
         .from("inventory_items")
         .update({ status: status as never })
         .eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "pipeline.status_changed", {
+        type: "inventory_item",
+        id,
+        metadata: { status },
+      });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["inventory_items"] }),
+    onSuccess: invalidate,
     onError: (e: Error) => toast.error(e.message),
   });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
+      const ws = requireWrite();
       const { error } = await supabase.from("inventory_items").delete().eq("id", id);
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "pipeline.item_removed", { type: "inventory_item", id });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["inventory_items"] }),
+    onSuccess: invalidate,
   });
 
   const all = items.data ?? [];

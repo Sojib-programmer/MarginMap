@@ -15,6 +15,7 @@ import {
   RecommendationBadge,
   ValueCell,
 } from "@/components/primitives";
+import { StalenessWarning } from "@/components/freshness";
 import { PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAddToWatchlist, useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { catalogQuery, latestRetrievedAt, liquidityOf } from "@/lib/catalog";
 import { money, money2, relativeTime } from "@/lib/format";
+import { ageInDays } from "@/lib/freshness";
 import { runResearch } from "@/lib/research.functions";
 import { useRoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend } from "@/lib/scoring";
@@ -73,7 +75,13 @@ function VariantPage() {
   // Best offer under the current role, on the shared economics path.
   const scored = variant.offers.map((offer) => {
     const economics = offerEconomics(offer, variant.stats, liquidity);
-    return { offer, economics, recommendation: recommend(mode, economics) };
+    return {
+      offer,
+      economics,
+      recommendation: recommend(mode, economics, {
+        evidenceAgeDays: ageInDays(offer.retrieved_at),
+      }),
+    };
   });
   const best = scored.sort((a, b) =>
     mode === "buyer"
@@ -214,6 +222,7 @@ function VariantPage() {
         {best ? (
           <div className="mt-4 rounded-lg border border-border p-3">
             <p className="label-meta">Best offer verdict · {best.offer.title}</p>
+            <StalenessWarning iso={best.offer.retrieved_at} className="mt-2" />
             <div className="mt-2 flex flex-wrap items-start gap-4">
               <RecommendationBadge rec={best.recommendation} showReason />
               <div className="flex flex-wrap gap-4 text-sm">
