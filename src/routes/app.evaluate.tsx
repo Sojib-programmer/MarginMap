@@ -131,21 +131,35 @@ function EvaluatePage() {
 
   const addToPipeline = useMutation({
     mutationFn: async () => {
+      const ws = requireWrite();
+      if (ws.plan === "research")
+        throw new Error("The pipeline requires the Reseller plan. See Billing.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
-      const { error } = await supabase.from("inventory_items").insert({
-        user_id: auth.user.id,
-        variant_id: found?.variant.variantId ?? null,
-        title: found?.variant.productName ?? "Manual candidate",
-        status: "source_now",
-        cost_basis: result.allInCost,
-        condition_grade: input.conditionGrade,
-      });
+      const { data: row, error } = await supabase
+        .from("inventory_items")
+        .insert({
+          user_id: auth.user.id,
+          workspace_id: ws.workspaceId,
+          variant_id: found?.variant.variantId ?? null,
+          title: found?.variant.productName ?? "Manual candidate",
+          status: "source_now",
+          cost_basis: result.allInCost,
+          condition_grade: input.conditionGrade,
+        })
+        .select("id")
+        .single();
       if (error) throw new Error(error.message);
+      await logActivity(ws.workspaceId, "pipeline.item_added", {
+        type: "inventory_item",
+        id: row.id,
+        metadata: { title: found?.variant.productName ?? "Manual candidate" },
+      });
     },
     onSuccess: () => {
       toast.success("Added to pipeline");
       qc.invalidateQueries({ queryKey: ["inventory_items"] });
+      qc.invalidateQueries({ queryKey: ["activity"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useSession } from "@/hooks/use-session";
 import { CompareProvider } from "@/lib/compare-store";
+import { MembershipProvider } from "@/lib/membership";
 import { RoleModeProvider } from "@/lib/role-mode";
 
 export const Route = createFileRoute("/app")({
