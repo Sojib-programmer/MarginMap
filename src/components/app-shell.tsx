@@ -4,7 +4,10 @@ import {
   Bell,
   Boxes,
   Calculator,
+  CreditCard,
+  Database,
   GitCompareArrows,
+  History,
   LayoutGrid,
   LogOut,
   Search,
@@ -20,6 +23,7 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
+import { hasResellerPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
 
@@ -29,6 +33,7 @@ type NavItem = {
   icon: typeof LayoutGrid;
   exact?: boolean;
   reseller?: boolean;
+  resellerPlan?: boolean;
 };
 
 const NAV: NavItem[] = [
@@ -36,9 +41,12 @@ const NAV: NavItem[] = [
   { to: "/app/search", label: "Search", icon: Search },
   { to: "/app/compare", label: "Compare", icon: GitCompareArrows },
   { to: "/app/watchlists", label: "Watchlists", icon: Star },
-  { to: "/app/evaluate", label: "Evaluate", icon: Calculator, reseller: true },
-  { to: "/app/pipeline", label: "Pipeline", icon: Boxes, reseller: true },
+  { to: "/app/evaluate", label: "Evaluate", icon: Calculator, reseller: true, resellerPlan: true },
+  { to: "/app/pipeline", label: "Pipeline", icon: Boxes, reseller: true, resellerPlan: true },
   { to: "/app/alerts", label: "Alerts", icon: Bell },
+  { to: "/app/activity", label: "Activity", icon: History },
+  { to: "/app/data-sources", label: "Data sources", icon: Database },
+  { to: "/app/billing", label: "Billing", icon: CreditCard },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
