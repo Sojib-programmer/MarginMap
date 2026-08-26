@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery, latestRetrievedAt } from "@/lib/catalog";
 import { downloadCsv } from "@/lib/csv";
 import { money, relativeTime } from "@/lib/format";
+import { logActivity, useMembership } from "@/lib/membership";
 import { useRoleMode } from "@/lib/role-mode";
 import { landedCost } from "@/lib/scoring";
 import { watchlistItemsQuery, watchlistsQuery } from "@/lib/workspace";
