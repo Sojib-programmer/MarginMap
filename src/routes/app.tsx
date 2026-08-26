@@ -42,10 +42,12 @@ function AppLayout() {
   }
 
   return (
-    <RoleModeProvider>
-      <CompareProvider>
-        <AppShell />
-      </CompareProvider>
-    </RoleModeProvider>
+    <MembershipProvider>
+      <RoleModeProvider>
+        <CompareProvider>
+          <AppShell />
+        </CompareProvider>
+      </RoleModeProvider>
+    </MembershipProvider>
   );
 }

@@ -26,6 +26,7 @@ import { useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery, liquidityOf } from "@/lib/catalog";
 import { money2, relativeTime } from "@/lib/format";
+import { logActivity, useRequireWrite } from "@/lib/membership";
 import { useRoleMode } from "@/lib/role-mode";
 import {
   buyerScore,
@@ -54,6 +55,7 @@ function EvaluatePage() {
   const catalog = useQuery(catalogQuery);
   const saved = useQuery(evaluationsQuery);
   const saveEvaluation = useSaveEvaluation();
+  const requireWrite = useRequireWrite();
 
   const found = useMemo(() => {
     for (const v of catalog.data?.variants ?? []) {
