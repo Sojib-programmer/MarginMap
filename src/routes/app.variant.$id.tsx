@@ -221,6 +221,7 @@ function VariantPage() {
         {best ? (
           <div className="mt-4 rounded-lg border border-border p-3">
             <p className="label-meta">Best offer verdict · {best.offer.title}</p>
+            <StalenessWarning iso={best.offer.retrieved_at} className="mt-2" />
             <div className="mt-2 flex flex-wrap items-start gap-4">
               <RecommendationBadge rec={best.recommendation} showReason />
               <div className="flex flex-wrap gap-4 text-sm">

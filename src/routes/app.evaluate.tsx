@@ -10,6 +10,7 @@ import {
   RecommendationBadge,
   ValueCell,
 } from "@/components/primitives";
+import { StalenessWarning } from "@/components/freshness";
 import { ScoreGauge } from "@/components/score-gauge";
 import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -294,6 +295,8 @@ function EvaluatePage() {
             </div>
 
             <RecommendationBadge rec={rec} showReason />
+
+            <StalenessWarning iso={found?.offer.retrieved_at} />
 
             <Line
               label="Item price"
