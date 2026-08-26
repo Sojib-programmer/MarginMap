@@ -20,6 +20,7 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery } from "@/lib/catalog";
 import { money, relativeTime } from "@/lib/format";
+import { logActivity, useRequireWrite } from "@/lib/membership";
 import { alertsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/alerts")({
