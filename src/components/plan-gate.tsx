@@ -32,7 +32,7 @@ export function ResellerPlanGate({
             <Link to="/app/billing">View plans</Link>
           </Button>
           <Button asChild size="sm" variant="outline">
-            <Link to="/app/search">Back to search</Link>
+            <Link to="/app">Back to overview</Link>
           </Button>
         </div>
       </div>
