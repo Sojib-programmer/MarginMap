@@ -76,7 +76,8 @@ function DataSourcesPage() {
                 {s.marketplace ? <Chip tone="neutral">{s.marketplace}</Chip> : null}
               </div>
               <p className="text-xs text-muted-foreground">
-                {s.source_type.replace(/_/g, " ")} · refresh {intervalLabel(s.refresh_interval_minutes)}
+                {s.source_type.replace(/_/g, " ")} · refresh{" "}
+                {intervalLabel(s.refresh_interval_minutes)}
                 {s.snapshot_date ? ` · snapshot dated ${s.snapshot_date}` : ""}
                 {s.last_refreshed_at
                   ? ` · last refreshed ${relativeTime(s.last_refreshed_at)}`

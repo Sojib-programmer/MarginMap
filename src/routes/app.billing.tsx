@@ -96,9 +96,7 @@ function BillingPage() {
         </div>
         <div>
           <p className="label-meta">Your seat</p>
-          <p className="mt-1 font-medium">
-            {membership ? ROLE_LABEL[membership.role] : "—"}
-          </p>
+          <p className="mt-1 font-medium">{membership ? ROLE_LABEL[membership.role] : "—"}</p>
         </div>
         <div>
           <p className="label-meta">Catalog</p>
