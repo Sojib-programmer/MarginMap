@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ResellerPlanGate } from "@/components/plan-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -47,7 +48,11 @@ export const Route = createFileRoute("/app/evaluate")({
     offer: typeof search["offer"] === "string" ? (search["offer"] as string) : undefined,
   }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
-  component: EvaluatePage,
+  component: () => (
+    <ResellerPlanGate feature="The deal calculator">
+      <EvaluatePage />
+    </ResellerPlanGate>
+  ),
 });
 
 function EvaluatePage() {
