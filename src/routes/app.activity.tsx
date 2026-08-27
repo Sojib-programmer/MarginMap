@@ -89,8 +89,12 @@ function ActivityPage() {
                 {row.action}
               </Chip>
               <p className="min-w-0 flex-1 truncate text-sm">
-                {typeof row.metadata?.["label"] === "string" ? (row.metadata["label"] as string) : null}
-                {typeof row.metadata?.["query"] === "string" ? (row.metadata["query"] as string) : null}
+                {typeof row.metadata?.["label"] === "string"
+                  ? (row.metadata["label"] as string)
+                  : null}
+                {typeof row.metadata?.["query"] === "string"
+                  ? (row.metadata["query"] as string)
+                  : null}
                 {row.target_type ? (
                   <span className="text-muted-foreground"> · {row.target_type}</span>
                 ) : null}
@@ -98,9 +102,7 @@ function ActivityPage() {
               <p className="text-xs text-muted-foreground">
                 {row.actor_id ? (profiles.data?.get(row.actor_id) ?? "Former member") : "System"}
               </p>
-              <p className="num text-xs text-muted-foreground">
-                {relativeTime(row.created_at)}
-              </p>
+              <p className="num text-xs text-muted-foreground">{relativeTime(row.created_at)}</p>
             </div>
           ))}
         </section>
