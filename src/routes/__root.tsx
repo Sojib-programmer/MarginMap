@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MarginMap — Product intelligence for buyers and resellers" },
+      { title: "MarginMap" },
       {
         name: "description",
         content:
@@ -87,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "MarginMap" },
       {
         property: "og:title",
-        content: "MarginMap — Product intelligence for buyers and resellers",
+        content: "MarginMap",
       },
       {
         property: "og:description",
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "MarginMap — Product intelligence for buyers and resellers",
+        content: "MarginMap",
       },
       {
         name: "twitter:description",
