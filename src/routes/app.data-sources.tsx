@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { FreshnessChip, SourceStamp } from "@/components/freshness";
+import { FreshnessChip } from "@/components/freshness";
 import { Chip, Disclaimer } from "@/components/primitives";
 import { PanelSkeleton, RouteError } from "@/components/states";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,8 +76,8 @@ function DataSourcesPage() {
                 {s.marketplace ? <Chip tone="neutral">{s.marketplace}</Chip> : null}
               </div>
               <p className="text-xs text-muted-foreground">
-                {s.source_type.replace(/_/g, " ")} · refresh{" "}
-                {intervalLabel(s.refresh_interval_minutes)}
+                {s.source_type.replace(/_/g, " ")}
+                {s.is_live ? ` · refresh ${intervalLabel(s.refresh_interval_minutes)}` : " · no automatic refresh (frozen snapshot)"}
                 {s.snapshot_date ? ` · snapshot dated ${s.snapshot_date}` : ""}
                 {s.last_refreshed_at
                   ? ` · last refreshed ${relativeTime(s.last_refreshed_at)}`
@@ -104,12 +104,11 @@ function DataSourcesPage() {
               ) : null}
             </div>
             <div className="sm:text-right">
-              <SourceStamp
-                source=""
-                iso={s.last_refreshed_at ?? s.snapshot_date}
-                isLive={s.is_live}
-                refreshMinutes={s.refresh_interval_minutes}
-              />
+              <p className="num text-[11px] text-muted-foreground">
+                {s.last_refreshed_at
+                  ? new Date(s.last_refreshed_at).toLocaleString()
+                  : (s.snapshot_date ?? "no retrieval timestamp")}
+              </p>
               <FreshnessChip iso={s.last_refreshed_at ?? s.snapshot_date} className="mt-2" />
             </div>
           </article>
