@@ -77,7 +77,9 @@ function DataSourcesPage() {
               </div>
               <p className="text-xs text-muted-foreground">
                 {s.source_type.replace(/_/g, " ")}
-                {s.is_live ? ` · refresh ${intervalLabel(s.refresh_interval_minutes)}` : " · no automatic refresh (frozen snapshot)"}
+                {s.is_live
+                  ? ` · refresh ${intervalLabel(s.refresh_interval_minutes)}`
+                  : " · no automatic refresh (frozen snapshot)"}
                 {s.snapshot_date ? ` · snapshot dated ${s.snapshot_date}` : ""}
                 {s.last_refreshed_at
                   ? ` · last refreshed ${relativeTime(s.last_refreshed_at)}`
