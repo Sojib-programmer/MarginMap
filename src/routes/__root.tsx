@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "author", content: "MarginMap" },
       {
+        name: "google-site-verification",
+        content: "h2evjOGWBg3kmG7l3GeaVBY8s6R-DQpZEXsXy4Cjc9o",
+      },
+      {
         property: "og:title",
         content: "MarginMap",
       },
