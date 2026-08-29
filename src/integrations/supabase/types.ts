@@ -1159,6 +1159,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_workspace_invitation: {
+        Args: { _invitation_id: string }
+        Returns: string
+      }
       can_write: {
         Args: { _user_id: string; _workspace_id: string }
         Returns: boolean
@@ -1166,6 +1170,10 @@ export type Database = {
       current_plan: {
         Args: { _workspace_id: string }
         Returns: Database["public"]["Enums"]["plan_tier"]
+      }
+      decline_workspace_invitation: {
+        Args: { _invitation_id: string }
+        Returns: undefined
       }
       has_workspace_role: {
         Args: {
