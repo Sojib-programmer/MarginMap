@@ -39,54 +39,95 @@ export const canManageBilling = (m: Membership | null) => !!m && m.role === "own
 export const hasResellerPlan = (m: Membership | null) =>
   !!m && (m.plan === "reseller" || m.plan === "team");
 
+const ACTIVE_KEY = "marginmap.active_workspace";
+
+function readActive(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(ACTIVE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Every workspace the signed-in user belongs to, oldest first. */
+export const membershipsQuery = queryOptions({
+  queryKey: ["memberships"],
+  staleTime: 30_000,
+  queryFn: async (): Promise<Membership[]> => {
+    const { data, error } = await supabase
+      .from("workspace_members")
+      .select("role,workspace_id,workspaces(id,name,plan,owner_id)")
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    const rows = (data ?? []) as unknown as {
+      role: WorkspaceRole;
+      workspace_id: string;
+      workspaces: { id: string; name: string; plan: PlanTier; owner_id: string } | null;
+    }[];
+    return rows
+      .filter((r) => !!r.workspaces)
+      .map((r) => ({
+        workspaceId: r.workspace_id,
+        workspaceName: r.workspaces!.name,
+        plan: r.workspaces!.plan,
+        role: r.role,
+        ownerId: r.workspaces!.owner_id,
+      }));
+  },
+});
+
+/** Back-compat single-membership accessor (the first workspace). */
 export const membershipQuery = queryOptions({
   queryKey: ["membership"],
   staleTime: 30_000,
   queryFn: async (): Promise<Membership | null> => {
-    const { data, error } = await supabase
-      .from("workspace_members")
-      .select("role,workspace_id,workspaces(id,name,plan,owner_id)")
-      .order("created_at", { ascending: true })
-      .limit(1);
-    if (error) throw new Error(error.message);
-    const row = data?.[0] as
-      | {
-          role: WorkspaceRole;
-          workspace_id: string;
-          workspaces: {
-            id: string;
-            name: string;
-            plan: PlanTier;
-            owner_id: string;
-          } | null;
-        }
-      | undefined;
-    if (!row?.workspaces) return null;
-    return {
-      workspaceId: row.workspace_id,
-      workspaceName: row.workspaces.name,
-      plan: row.workspaces.plan,
-      role: row.role,
-      ownerId: row.workspaces.owner_id,
-    };
+    const list = await membershipsQuery.queryFn!({} as never);
+    return (list as Membership[])[0] ?? null;
   },
 });
 
-const MembershipContext = createContext<{ membership: Membership | null; loading: boolean }>({
+const MembershipContext = createContext<{
+  membership: Membership | null;
+  memberships: Membership[];
+  loading: boolean;
+  setActiveWorkspace: (id: string) => void;
+}>({
   membership: null,
+  memberships: [],
   loading: true,
+  setActiveWorkspace: () => {},
 });
 
 export function MembershipProvider({ children }: { children: ReactNode }) {
-  const q = useQuery(membershipQuery);
+  const q = useQuery(membershipsQuery);
+  const qc = useQueryClient();
+  const [activeId, setActiveId] = useState<string | null>(() => readActive());
+
+  const memberships = q.data ?? [];
+  const membership = memberships.find((m) => m.workspaceId === activeId) ?? memberships[0] ?? null;
+
+  const setActiveWorkspace = (id: string) => {
+    setActiveId(id);
+    try {
+      window.localStorage.setItem(ACTIVE_KEY, id);
+    } catch {
+      /* storage unavailable — selection stays in memory */
+    }
+    void qc.invalidateQueries();
+  };
+
   return (
-    <MembershipContext.Provider value={{ membership: q.data ?? null, loading: q.isLoading }}>
+    <MembershipContext.Provider
+      value={{ membership, memberships, loading: q.isLoading, setActiveWorkspace }}
+    >
       {children}
     </MembershipContext.Provider>
   );
 }
 
 export const useMembership = () => useContext(MembershipContext);
+
 
 /**
  * Returns a guard that throws when the caller has no writable workspace.
