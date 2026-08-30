@@ -42,6 +42,7 @@ import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
+import { Route as ApiPublicRefreshSourceRouteImport } from './routes/api/public/refresh.$source'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
@@ -214,6 +215,11 @@ const AppVariantIdRoute = AppVariantIdRouteImport.update({
   path: '/variant/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiPublicRefreshSourceRoute = ApiPublicRefreshSourceRouteImport.update({
+  id: '/api/public/refresh/$source',
+  path: '/api/public/refresh/$source',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/app/watchlists': typeof AppWatchlistsRoute
   '/app/': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
+  '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
 }
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/': typeof MarketingIndexRoute
   '/app': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
+  '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/_marketing/': typeof MarketingIndexRoute
   '/app/': typeof AppIndexRoute
   '/app/variant/$id': typeof AppVariantIdRoute
+  '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -353,6 +362,7 @@ export interface FileRouteTypes {
     | '/app/watchlists'
     | '/app/'
     | '/app/variant/$id'
+    | '/api/public/refresh/$source'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/$'
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/app/variant/$id'
+    | '/api/public/refresh/$source'
   id:
     | '__root__'
     | '/$'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/_marketing/'
     | '/app/'
     | '/app/variant/$id'
+    | '/api/public/refresh/$source'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -429,6 +441,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicRefreshSourceRoute: typeof ApiPublicRefreshSourceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -664,6 +677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVariantIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/public/refresh/$source': {
+      id: '/api/public/refresh/$source'
+      path: '/api/public/refresh/$source'
+      fullPath: '/api/public/refresh/$source'
+      preLoaderRoute: typeof ApiPublicRefreshSourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -749,6 +769,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicRefreshSourceRoute: ApiPublicRefreshSourceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

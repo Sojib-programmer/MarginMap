@@ -1,4 +1,5 @@
 import { BrandLogo } from "@/components/brand-logo";
+import { InvitationBanner } from "@/components/invitation-banner";
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
@@ -17,6 +18,13 @@ import {
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
 import { useAlertHits } from "@/hooks/use-alert-hits";
@@ -26,6 +34,7 @@ import { useCompare } from "@/lib/compare-store";
 import { hasResellerPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
+
 
 type NavItem = {
   to: string;
