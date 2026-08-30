@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { MembersPanel } from "@/components/members-panel";
 import { CatalogNote, Disclaimer } from "@/components/primitives";
 import { RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -138,6 +139,8 @@ function SettingsPage() {
           </Button>
         </div>
       </section>
+
+      <MembersPanel />
 
       <section className="panel p-4">
         <h2 className="text-sm font-semibold">Registered data sources</h2>
