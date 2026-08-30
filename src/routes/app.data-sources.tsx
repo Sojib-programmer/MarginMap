@@ -35,7 +35,23 @@ type SourceRow = {
   snapshot_date: string | null;
 };
 
+type RunRow = {
+  id: string;
+  data_source_id: string;
+  status: string;
+  rows_upserted: number;
+  error_text: string | null;
+  started_at: string;
+  finished_at: string | null;
+};
+
 function DataSourcesPage() {
+  const qc = useQueryClient();
+  const { membership } = useMembership();
+  const canRefresh = canManageMembers(membership);
+  const runRefresh = useServerFn(refreshSource);
+  const connectorStatus = useServerFn(getConnectorStatus);
+
   const sources = useQuery({
     queryKey: ["data_sources_detail"],
     queryFn: async () => {
@@ -50,10 +66,46 @@ function DataSourcesPage() {
     },
   });
 
+  const runs = useQuery({
+    queryKey: ["source_refresh_runs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("source_refresh_runs")
+        .select("id,data_source_id,status,rows_upserted,error_text,started_at,finished_at")
+        .order("started_at", { ascending: false })
+        .limit(50);
+      if (error) throw new Error(error.message);
+      return (data ?? []) as RunRow[];
+    },
+  });
+
+  const connectors = useQuery({
+    queryKey: ["connector_status"],
+    staleTime: 60_000,
+    queryFn: () => connectorStatus(),
+  });
+
+  const refresh = useMutation({
+    mutationFn: (sourceId: string) => runRefresh({ data: { sourceId } }),
+    onSuccess: (res) => {
+      if (res.status === "success") toast.success(res.message);
+      else if (res.status === "skipped") toast.warning(res.message);
+      else toast.error(res.message);
+      void qc.invalidateQueries({ queryKey: ["data_sources_detail"] });
+      void qc.invalidateQueries({ queryKey: ["source_refresh_runs"] });
+      void qc.invalidateQueries({ queryKey: ["catalog"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (sources.isLoading) return <PanelSkeleton rows={6} />;
   if (sources.error) return <RouteError error={sources.error as Error} />;
 
   const rows = sources.data ?? [];
+  const statusFor = (marketplace: string | null) =>
+    (connectors.data ?? []).find((c) => c.marketplace === (marketplace ?? "other"));
+  const runsFor = (id: string) => (runs.data ?? []).filter((r) => r.data_source_id === id);
+
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
