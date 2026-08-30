@@ -87,6 +87,28 @@ export function AppShell() {
           <BrandLogo size={26} priority />
         </Link>
 
+        {memberships.length > 1 ? (
+          <div className="px-3 pb-3">
+            <Select
+              value={membership?.workspaceId ?? ""}
+              onValueChange={(v) => setActiveWorkspace(v)}
+            >
+              <SelectTrigger className="h-8 text-xs" aria-label="Active workspace">
+                <SelectValue placeholder="Workspace" />
+              </SelectTrigger>
+              <SelectContent>
+                {memberships.map((m) => (
+                  <SelectItem key={m.workspaceId} value={m.workspaceId}>
+                    {m.workspaceName} · {ROLE_LABEL[m.role]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
+
+
+
         <div className="px-3 pb-3">
           <div
             role="radiogroup"
