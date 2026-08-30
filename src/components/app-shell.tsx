@@ -62,7 +62,7 @@ const NAV: NavItem[] = [
 export function AppShell() {
   const { mode, setMode } = useRoleMode();
   const { user } = useSession();
-  const { membership } = useMembership();
+  const { membership, memberships, setActiveWorkspace } = useMembership();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { selected } = useCompare();
