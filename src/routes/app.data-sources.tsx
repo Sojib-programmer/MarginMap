@@ -162,6 +162,43 @@ function DataSourcesPage() {
                   Source terms of use
                 </a>
               ) : null}
+
+              {(() => {
+                const st = statusFor(s.marketplace);
+                if (!st) return null;
+                if (!st.registered)
+                  return (
+                    <p className="text-xs text-muted-foreground">
+                      No live connector registered — snapshot only.
+                    </p>
+                  );
+                return st.ready ? (
+                  <p className="text-xs text-verified">
+                    Connector registered and credentialed — refresh will pull live listings.
+                  </p>
+                ) : (
+                  <p className="text-xs text-caution">
+                    Connector registered, credentials missing ({st.missing.join(", ")}). Refresh
+                    records a skipped run and changes no data.
+                  </p>
+                );
+              })()}
+
+              {runsFor(s.id).length > 0 ? (
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer">Refresh history</summary>
+                  <ul className="mt-1 space-y-1">
+                    {runsFor(s.id)
+                      .slice(0, 5)
+                      .map((r) => (
+                        <li key={r.id}>
+                          {relativeTime(r.started_at)} · {r.status} · {r.rows_upserted} rows
+                          {r.error_text ? ` · ${r.error_text}` : ""}
+                        </li>
+                      ))}
+                  </ul>
+                </details>
+              ) : null}
             </div>
             <div className="sm:text-right">
               <p className="num text-[11px] text-muted-foreground">
@@ -170,10 +207,22 @@ function DataSourcesPage() {
                   : (s.snapshot_date ?? "no retrieval timestamp")}
               </p>
               <FreshnessChip iso={s.last_refreshed_at ?? s.snapshot_date} className="mt-2" />
+              {canRefresh ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 h-8 text-xs"
+                  disabled={refresh.isPending}
+                  onClick={() => refresh.mutate(s.id)}
+                >
+                  {refresh.isPending && refresh.variables === s.id ? "Refreshing…" : "Refresh now"}
+                </Button>
+              ) : null}
             </div>
           </article>
         ))}
       </section>
+
 
       <p className="text-xs text-muted-foreground">
         Recommendations on evidence older than 7 days are automatically downgraded from Buy to
