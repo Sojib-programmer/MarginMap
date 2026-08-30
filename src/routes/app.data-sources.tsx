@@ -1,17 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 
 import { FreshnessChip } from "@/components/freshness";
 import { Chip, Disclaimer } from "@/components/primitives";
 import { PanelSkeleton, RouteError } from "@/components/states";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { intervalLabel } from "@/lib/freshness";
 import { relativeTime } from "@/lib/format";
+import { canManageMembers, useMembership } from "@/lib/membership";
+import { getConnectorStatus, refreshSource } from "@/lib/sources.functions";
 
 export const Route = createFileRoute("/app/data-sources")({
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: DataSourcesPage,
 });
+
 
 type SourceRow = {
   id: string;
@@ -29,7 +35,23 @@ type SourceRow = {
   snapshot_date: string | null;
 };
 
+type RunRow = {
+  id: string;
+  data_source_id: string;
+  status: string;
+  rows_upserted: number;
+  error_text: string | null;
+  started_at: string;
+  finished_at: string | null;
+};
+
 function DataSourcesPage() {
+  const qc = useQueryClient();
+  const { membership } = useMembership();
+  const canRefresh = canManageMembers(membership);
+  const runRefresh = useServerFn(refreshSource);
+  const connectorStatus = useServerFn(getConnectorStatus);
+
   const sources = useQuery({
     queryKey: ["data_sources_detail"],
     queryFn: async () => {
@@ -44,10 +66,46 @@ function DataSourcesPage() {
     },
   });
 
+  const runs = useQuery({
+    queryKey: ["source_refresh_runs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("source_refresh_runs")
+        .select("id,data_source_id,status,rows_upserted,error_text,started_at,finished_at")
+        .order("started_at", { ascending: false })
+        .limit(50);
+      if (error) throw new Error(error.message);
+      return (data ?? []) as RunRow[];
+    },
+  });
+
+  const connectors = useQuery({
+    queryKey: ["connector_status"],
+    staleTime: 60_000,
+    queryFn: () => connectorStatus(),
+  });
+
+  const refresh = useMutation({
+    mutationFn: (sourceId: string) => runRefresh({ data: { sourceId } }),
+    onSuccess: (res) => {
+      if (res.status === "success") toast.success(res.message);
+      else if (res.status === "skipped") toast.warning(res.message);
+      else toast.error(res.message);
+      void qc.invalidateQueries({ queryKey: ["data_sources_detail"] });
+      void qc.invalidateQueries({ queryKey: ["source_refresh_runs"] });
+      void qc.invalidateQueries({ queryKey: ["catalog"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (sources.isLoading) return <PanelSkeleton rows={6} />;
   if (sources.error) return <RouteError error={sources.error as Error} />;
 
   const rows = sources.data ?? [];
+  const statusFor = (marketplace: string | null) =>
+    (connectors.data ?? []).find((c) => c.marketplace === (marketplace ?? "other"));
+  const runsFor = (id: string) => (runs.data ?? []).filter((r) => r.data_source_id === id);
+
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
@@ -104,6 +162,43 @@ function DataSourcesPage() {
                   Source terms of use
                 </a>
               ) : null}
+
+              {(() => {
+                const st = statusFor(s.marketplace);
+                if (!st) return null;
+                if (!st.registered)
+                  return (
+                    <p className="text-xs text-muted-foreground">
+                      No live connector registered — snapshot only.
+                    </p>
+                  );
+                return st.ready ? (
+                  <p className="text-xs text-verified">
+                    Connector registered and credentialed — refresh will pull live listings.
+                  </p>
+                ) : (
+                  <p className="text-xs text-caution">
+                    Connector registered, credentials missing ({st.missing.join(", ")}). Refresh
+                    records a skipped run and changes no data.
+                  </p>
+                );
+              })()}
+
+              {runsFor(s.id).length > 0 ? (
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer">Refresh history</summary>
+                  <ul className="mt-1 space-y-1">
+                    {runsFor(s.id)
+                      .slice(0, 5)
+                      .map((r) => (
+                        <li key={r.id}>
+                          {relativeTime(r.started_at)} · {r.status} · {r.rows_upserted} rows
+                          {r.error_text ? ` · ${r.error_text}` : ""}
+                        </li>
+                      ))}
+                  </ul>
+                </details>
+              ) : null}
             </div>
             <div className="sm:text-right">
               <p className="num text-[11px] text-muted-foreground">
@@ -112,10 +207,22 @@ function DataSourcesPage() {
                   : (s.snapshot_date ?? "no retrieval timestamp")}
               </p>
               <FreshnessChip iso={s.last_refreshed_at ?? s.snapshot_date} className="mt-2" />
+              {canRefresh ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 h-8 text-xs"
+                  disabled={refresh.isPending}
+                  onClick={() => refresh.mutate(s.id)}
+                >
+                  {refresh.isPending && refresh.variables === s.id ? "Refreshing…" : "Refresh now"}
+                </Button>
+              ) : null}
             </div>
           </article>
         ))}
       </section>
+
 
       <p className="text-xs text-muted-foreground">
         Recommendations on evidence older than 7 days are automatically downgraded from Buy to

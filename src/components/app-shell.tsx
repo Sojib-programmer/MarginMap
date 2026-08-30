@@ -1,4 +1,5 @@
 import { BrandLogo } from "@/components/brand-logo";
+import { InvitationBanner } from "@/components/invitation-banner";
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
@@ -17,6 +18,13 @@ import {
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
 import { useAlertHits } from "@/hooks/use-alert-hits";
@@ -26,6 +34,7 @@ import { useCompare } from "@/lib/compare-store";
 import { hasResellerPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
+
 
 type NavItem = {
   to: string;
@@ -53,7 +62,7 @@ const NAV: NavItem[] = [
 export function AppShell() {
   const { mode, setMode } = useRoleMode();
   const { user } = useSession();
-  const { membership } = useMembership();
+  const { membership, memberships, setActiveWorkspace } = useMembership();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { selected } = useCompare();
@@ -77,6 +86,28 @@ export function AppShell() {
         <Link to="/" className="flex items-center gap-2 px-4 py-4">
           <BrandLogo size={26} priority />
         </Link>
+
+        {memberships.length > 1 ? (
+          <div className="px-3 pb-3">
+            <Select
+              value={membership?.workspaceId ?? ""}
+              onValueChange={(v) => setActiveWorkspace(v)}
+            >
+              <SelectTrigger className="h-8 text-xs" aria-label="Active workspace">
+                <SelectValue placeholder="Workspace" />
+              </SelectTrigger>
+              <SelectContent>
+                {memberships.map((m) => (
+                  <SelectItem key={m.workspaceId} value={m.workspaceId}>
+                    {m.workspaceName} · {ROLE_LABEL[m.role]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
+
+
 
         <div className="px-3 pb-3">
           <div
@@ -213,7 +244,10 @@ export function AppShell() {
           </Link>
         </header>
 
+        <InvitationBanner />
+
         <main className="min-w-0 flex-1 px-4 py-6">
+
           <Outlet />
         </main>
       </div>
