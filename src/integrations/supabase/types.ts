@@ -1170,29 +1170,9 @@ export type Database = {
         Args: { _invitation_id: string }
         Returns: string
       }
-      can_write: {
-        Args: { _user_id: string; _workspace_id: string }
-        Returns: boolean
-      }
-      current_plan: {
-        Args: { _workspace_id: string }
-        Returns: Database["public"]["Enums"]["plan_tier"]
-      }
       decline_workspace_invitation: {
         Args: { _invitation_id: string }
         Returns: undefined
-      }
-      has_workspace_role: {
-        Args: {
-          _roles: Database["public"]["Enums"]["workspace_role"][]
-          _user_id: string
-          _workspace_id: string
-        }
-        Returns: boolean
-      }
-      is_workspace_member: {
-        Args: { _user_id: string; _workspace_id: string }
-        Returns: boolean
       }
       log_activity: {
         Args: {
@@ -1204,7 +1184,6 @@ export type Database = {
         }
         Returns: string
       }
-      shares_workspace: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
       pipeline_status:
