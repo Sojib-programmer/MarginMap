@@ -61,7 +61,9 @@ export function myInvitationsQuery(email: string | undefined) {
         .gt("expires_at", new Date().toISOString())
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
-      return ((data ?? []) as unknown as (InvitationRow & { workspaces: { name: string } | null })[])
+      return (
+        (data ?? []) as unknown as (InvitationRow & { workspaces: { name: string } | null })[]
+      )
         .filter((r) => r.email.toLowerCase() === email!.toLowerCase())
         .map((r) => ({ ...r, workspace_name: r.workspaces?.name ?? "Workspace" }));
     },
@@ -79,9 +81,11 @@ export function workspaceMembersQuery(workspaceId: string | undefined) {
         .eq("workspace_id", workspaceId!)
         .order("created_at", { ascending: true });
       if (error) throw new Error(error.message);
-      return ((data ?? []) as unknown as (Omit<MemberRow, "display_name"> & {
-        profiles: { display_name: string | null } | null;
-      })[]).map((r) => ({
+      return (
+        (data ?? []) as unknown as (Omit<MemberRow, "display_name"> & {
+          profiles: { display_name: string | null } | null;
+        })[]
+      ).map((r) => ({
         id: r.id,
         user_id: r.user_id,
         role: r.role,
@@ -98,7 +102,9 @@ export const INVITABLE_ROLES: { value: WorkspaceRole; help: string }[] = [
   { value: "auditor", help: "Read-only across the workspace." },
 ];
 
-export function invitationState(inv: InvitationRow): "pending" | "accepted" | "revoked" | "expired" {
+export function invitationState(
+  inv: InvitationRow,
+): "pending" | "accepted" | "revoked" | "expired" {
   if (inv.accepted_at) return "accepted";
   if (inv.revoked_at) return "revoked";
   if (+new Date(inv.expires_at) < Date.now()) return "expired";

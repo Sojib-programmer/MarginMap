@@ -18,7 +18,6 @@ export const Route = createFileRoute("/app/data-sources")({
   component: DataSourcesPage,
 });
 
-
 type SourceRow = {
   id: string;
   name: string;
@@ -105,7 +104,6 @@ function DataSourcesPage() {
   const statusFor = (marketplace: string | null) =>
     (connectors.data ?? []).find((c) => c.marketplace === (marketplace ?? "other"));
   const runsFor = (id: string) => (runs.data ?? []).filter((r) => r.data_source_id === id);
-
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
@@ -222,7 +220,6 @@ function DataSourcesPage() {
           </article>
         ))}
       </section>
-
 
       <p className="text-xs text-muted-foreground">
         Recommendations on evidence older than 7 days are automatically downgraded from Buy to

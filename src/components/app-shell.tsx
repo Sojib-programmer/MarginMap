@@ -35,7 +35,6 @@ import { hasResellerPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/me
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
 
-
 type NavItem = {
   to: string;
   label: string;
@@ -106,8 +105,6 @@ export function AppShell() {
             </Select>
           </div>
         ) : null}
-
-
 
         <div className="px-3 pb-3">
           <div
@@ -247,7 +244,6 @@ export function AppShell() {
         <InvitationBanner />
 
         <main className="min-w-0 flex-1 px-4 py-6">
-
           <Outlet />
         </main>
       </div>
