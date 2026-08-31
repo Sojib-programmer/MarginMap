@@ -113,7 +113,10 @@ export function MembersPanel() {
   const changeRole = useMutation({
     mutationFn: async ({ id, next }: { id: string; next: WorkspaceRole }) => {
       if (!membership) throw new Error("No workspace");
-      const { error } = await supabase.from("workspace_members").update({ role: next }).eq("id", id);
+      const { error } = await supabase
+        .from("workspace_members")
+        .update({ role: next })
+        .eq("id", id);
       if (error) throw new Error(error.message);
       await logActivity(membership.workspaceId, "member.role_changed", {
         type: "workspace_member",
@@ -181,7 +184,9 @@ export function MembersPanel() {
                   <>
                     <Select
                       value={m.role}
-                      onValueChange={(v) => changeRole.mutate({ id: m.id, next: v as WorkspaceRole })}
+                      onValueChange={(v) =>
+                        changeRole.mutate({ id: m.id, next: v as WorkspaceRole })
+                      }
                     >
                       <SelectTrigger className="h-8 w-[150px] text-xs">
                         <SelectValue />
