@@ -1119,6 +1119,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "workspace_members_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "workspace_members_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
@@ -1197,6 +1204,7 @@ export type Database = {
         }
         Returns: string
       }
+      shares_workspace: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
       pipeline_status:
