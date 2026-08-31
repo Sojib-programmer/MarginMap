@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { submitContactMessage } from "@/lib/contact.functions";
+
 
 import { PageHero } from "@/components/marketing";
 import { Button } from "@/components/ui/button";
@@ -38,14 +42,16 @@ const TOPICS = [
 ];
 
 function ContactPage() {
+  const send = useServerFn(submitContactMessage);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [topic, setTopic] = useState("product");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: Errors = {};
     if (name.trim().length < 2) next.name = "Tell us who you are.";
@@ -58,9 +64,28 @@ function ContactPage() {
       toast.error("Check the highlighted fields.");
       return;
     }
-    setSent(true);
-    toast.success("Message ready to send — we'll reply to " + email.trim() + ".");
+
+    setSending(true);
+    try {
+      await send({
+        data: {
+          name: name.trim(),
+          email: email.trim(),
+          topic: topic as "product" | "data" | "billing" | "team" | "security",
+          message: message.trim(),
+        },
+      });
+      setSent(true);
+      setMessage("");
+      toast.success("Message received — we'll reply to " + email.trim() + ".");
+    } catch (err) {
+      console.error(err);
+      toast.error("We couldn't send that. Try again, or email us directly.");
+    } finally {
+      setSending(false);
+    }
   };
+
 
   return (
     <>
@@ -130,13 +155,14 @@ function ContactPage() {
               ) : null}
             </div>
 
-            <Button type="submit" className="w-full">
-              {sent ? "Send another message" : "Send message"}
+            <Button type="submit" className="w-full" disabled={sending}>
+              {sending ? "Sending…" : sent ? "Send another message" : "Send message"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              This form validates in your browser and does not transmit anything yet — email
-              delivery is not wired up.
+              Your message is delivered to the MarginMap team inbox. We use the address you provide
+              only to reply.
             </p>
+
           </form>
 
           <aside className="space-y-4">
