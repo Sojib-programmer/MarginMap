@@ -155,13 +155,14 @@ function ContactPage() {
               ) : null}
             </div>
 
-            <Button type="submit" className="w-full">
-              {sent ? "Send another message" : "Send message"}
+            <Button type="submit" className="w-full" disabled={sending}>
+              {sending ? "Sending…" : sent ? "Send another message" : "Send message"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              This form validates in your browser and does not transmit anything yet — email
-              delivery is not wired up.
+              Your message is delivered to the MarginMap team inbox. We use the address you provide
+              only to reply.
             </p>
+
           </form>
 
           <aside className="space-y-4">
