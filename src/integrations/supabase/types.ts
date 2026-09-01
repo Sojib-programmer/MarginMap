@@ -522,6 +522,30 @@ export type Database = {
           },
         ]
       }
+      mfa_backup_codes: {
+        Row: {
+          code_hash: string
+          created_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           availability: string
@@ -978,6 +1002,44 @@ export type Database = {
           },
         ]
       }
+      usage_counters: {
+        Row: {
+          created_at: string
+          id: string
+          metric: string
+          period_start: string
+          updated_at: string
+          used: number
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric: string
+          period_start: string
+          updated_at?: string
+          used?: number
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric?: string
+          period_start?: string
+          updated_at?: string
+          used?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_counters_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       watchlist_items: {
         Row: {
           created_at: string
@@ -1169,27 +1231,45 @@ export type Database = {
       }
       workspaces: {
         Row: {
+          billing_cycle_end: string | null
+          billing_cycle_start: string | null
+          billing_interval: string
           created_at: string
           id: string
           name: string
           owner_id: string
           plan: Database["public"]["Enums"]["plan_tier"]
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tier_expires_at: string | null
           updated_at: string
         }
         Insert: {
+          billing_cycle_end?: string | null
+          billing_cycle_start?: string | null
+          billing_interval?: string
           created_at?: string
           id?: string
           name: string
           owner_id: string
           plan?: Database["public"]["Enums"]["plan_tier"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier_expires_at?: string | null
           updated_at?: string
         }
         Update: {
+          billing_cycle_end?: string | null
+          billing_cycle_start?: string | null
+          billing_interval?: string
           created_at?: string
           id?: string
           name?: string
           owner_id?: string
           plan?: Database["public"]["Enums"]["plan_tier"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier_expires_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1203,6 +1283,11 @@ export type Database = {
         Args: { _invitation_id: string }
         Returns: string
       }
+      consume_quota: {
+        Args: { _amount?: number; _metric: string; _workspace_id: string }
+        Returns: Json
+      }
+      current_tier_limits: { Args: { _workspace_id: string }; Returns: Json }
       decline_workspace_invitation: {
         Args: { _invitation_id: string }
         Returns: undefined
@@ -1227,7 +1312,7 @@ export type Database = {
         | "listed"
         | "sold"
         | "passed"
-      plan_tier: "research" | "reseller" | "team"
+      plan_tier: "free" | "pro" | "business" | "enterprise"
       record_source_type:
         | "affiliate_api"
         | "partner_api"
@@ -1372,7 +1457,7 @@ export const Constants = {
         "sold",
         "passed",
       ],
-      plan_tier: ["research", "reseller", "team"],
+      plan_tier: ["free", "pro", "business", "enterprise"],
       record_source_type: [
         "affiliate_api",
         "partner_api",
