@@ -29,9 +29,9 @@ async function requireWritableWorkspace(qc: ReturnType<typeof useQueryClient>) {
 }
 
 function requireResellerPlan(m: Membership) {
-  if (m.plan === "research") {
+  if (m.plan === "free") {
     throw new Error(
-      "Saving deal evaluations and pipeline items requires the Reseller plan. See Billing.",
+      "Saving deal evaluations and pipeline items requires the Pro plan. See Billing.",
     );
   }
 }

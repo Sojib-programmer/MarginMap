@@ -31,7 +31,7 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
-import { hasResellerPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
+import { hasPaidPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
 
@@ -140,7 +140,7 @@ export function AppShell() {
           {NAV.filter(
             (n) =>
               (!n.reseller || mode === "reseller") &&
-              (!n.resellerPlan || hasResellerPlan(membership)),
+              (!n.resellerPlan || hasPaidPlan(membership)),
           ).map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             return (
@@ -183,7 +183,7 @@ export function AppShell() {
               ) : null}
             </p>
             <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-              {membership && !hasResellerPlan(membership)
+              {membership && !hasPaidPlan(membership)
                 ? "Unlock the deal calculator, pipeline and unlimited alerts — see Billing."
                 : "Plan, seat and workspace details."}
             </p>

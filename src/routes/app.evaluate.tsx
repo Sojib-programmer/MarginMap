@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ResellerPlanGate } from "@/components/plan-gate";
+import { PlanGate } from "@/components/plan-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -49,9 +49,9 @@ export const Route = createFileRoute("/app/evaluate")({
   }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: () => (
-    <ResellerPlanGate feature="The deal calculator">
+    <PlanGate feature="The deal calculator">
       <EvaluatePage />
-    </ResellerPlanGate>
+    </PlanGate>
   ),
 });
 
@@ -144,8 +144,8 @@ function EvaluatePage() {
   const addToPipeline = useMutation({
     mutationFn: async () => {
       const ws = requireWrite();
-      if (ws.plan === "research")
-        throw new Error("The pipeline requires the Reseller plan. See Billing.");
+      if (ws.plan === "free")
+        throw new Error("The pipeline requires the Pro plan. See Billing.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
       const { data: row, error } = await supabase
