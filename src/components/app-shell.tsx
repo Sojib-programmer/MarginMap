@@ -10,12 +10,14 @@ import {
   GitCompareArrows,
   History,
   LayoutGrid,
+  Lock,
   LogOut,
   Search,
   Settings,
   Star,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +33,8 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
-import { hasPaidPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
+import { hasPaidPlan, limitsOf, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
+import { isUnlimited, usageQuery } from "@/lib/entitlements";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
 
@@ -67,6 +70,8 @@ export function AppShell() {
   const { selected } = useCompare();
   const { hits } = useAlertHits();
   const [q, setQ] = useState("");
+  const limits = limitsOf(membership);
+  const usage = useQuery(usageQuery(membership?.workspaceId ?? null));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
