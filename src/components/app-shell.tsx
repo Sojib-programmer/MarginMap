@@ -10,12 +10,14 @@ import {
   GitCompareArrows,
   History,
   LayoutGrid,
+  Lock,
   LogOut,
   Search,
   Settings,
   Star,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +33,8 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompare } from "@/lib/compare-store";
-import { hasResellerPlan, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
+import { hasPaidPlan, limitsOf, PLAN_LABEL, ROLE_LABEL, useMembership } from "@/lib/membership";
+import { isUnlimited, usageQuery } from "@/lib/entitlements";
 import { cn } from "@/lib/utils";
 import { useRoleMode } from "@/lib/role-mode";
 
@@ -67,6 +70,8 @@ export function AppShell() {
   const { selected } = useCompare();
   const { hits } = useAlertHits();
   const [q, setQ] = useState("");
+  const limits = limitsOf(membership);
+  const usage = useQuery(usageQuery(membership?.workspaceId ?? null));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -112,35 +117,51 @@ export function AppShell() {
             aria-label="Role mode"
             className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-background p-1"
           >
-            {(["buyer", "reseller"] as const).map((m) => (
-              <button
-                key={m}
-                role="radio"
-                aria-checked={mode === m}
-                onClick={() => setMode(m)}
-                className={cn(
-                  "rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors",
-                  mode === m
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {m}
-              </button>
-            ))}
+            {(["buyer", "reseller"] as const).map((m) => {
+              const locked = m === "reseller" && !limits.resellerMode;
+              return (
+                <button
+                  key={m}
+                  role="radio"
+                  aria-checked={mode === m}
+                  disabled={locked}
+                  title={locked ? "Reseller mode requires the Pro plan" : undefined}
+                  onClick={() => (locked ? navigate({ to: "/app/billing" }) : setMode(m))}
+                  className={cn(
+                    "flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors",
+                    mode === m && !locked
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                    locked && "cursor-not-allowed opacity-60",
+                  )}
+                >
+                  {m}
+                  {locked ? <Lock className="size-3" aria-hidden /> : null}
+                </button>
+              );
+            })}
           </div>
           <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-            {mode === "buyer"
-              ? "Optimizing for landed cost, fit and trust."
-              : "Optimizing for net proceeds, ROI and liquidity."}
+            {!limits.resellerMode
+              ? "Reseller mode — margin, ROI and liquidity — unlocks on Pro."
+              : mode === "buyer"
+                ? "Optimizing for landed cost, fit and trust."
+                : "Optimizing for net proceeds, ROI and liquidity."}
           </p>
+          {!isUnlimited(limits.searchesPerDay) ? (
+            <p className="num mt-2 text-[11px] text-muted-foreground">
+              {Math.max(0, limits.searchesPerDay - (usage.data?.searchesUsed ?? 0))} of{" "}
+              {limits.searchesPerDay} searches left today
+            </p>
+          ) : null}
         </div>
+
 
         <nav className="flex-1 space-y-0.5 px-2">
           {NAV.filter(
             (n) =>
               (!n.reseller || mode === "reseller") &&
-              (!n.resellerPlan || hasResellerPlan(membership)),
+              (!n.resellerPlan || hasPaidPlan(membership)),
           ).map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             return (
@@ -183,7 +204,7 @@ export function AppShell() {
               ) : null}
             </p>
             <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-              {membership && !hasResellerPlan(membership)
+              {membership && !hasPaidPlan(membership)
                 ? "Unlock the deal calculator, pipeline and unlimited alerts — see Billing."
                 : "Plan, seat and workspace details."}
             </p>

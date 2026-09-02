@@ -3,8 +3,11 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
+import { atLeast, limitsFor, PLAN_LABEL, type PlanTier } from "@/lib/entitlements";
+
 export type WorkspaceRole = "owner" | "admin" | "editor" | "auditor";
-export type PlanTier = "research" | "reseller" | "team";
+export type { PlanTier };
+export { PLAN_LABEL };
 
 export type Membership = {
   workspaceId: string;
@@ -12,12 +15,6 @@ export type Membership = {
   plan: PlanTier;
   role: WorkspaceRole;
   ownerId: string;
-};
-
-export const PLAN_LABEL: Record<PlanTier, string> = {
-  research: "Research",
-  reseller: "Reseller",
-  team: "Team",
 };
 
 export const ROLE_LABEL: Record<WorkspaceRole, string> = {
@@ -36,8 +33,13 @@ export const canWrite = (m: Membership | null) =>
 export const canManageMembers = (m: Membership | null) =>
   !!m && (m.role === "owner" || m.role === "admin");
 export const canManageBilling = (m: Membership | null) => !!m && m.role === "owner";
-export const hasResellerPlan = (m: Membership | null) =>
-  !!m && (m.plan === "reseller" || m.plan === "team");
+
+/** Plan entitlement mirrors — see `src/lib/entitlements.ts`. */
+export const planOf = (m: Membership | null): PlanTier => m?.plan ?? "free";
+export const limitsOf = (m: Membership | null) => limitsFor(planOf(m));
+export const hasTier = (m: Membership | null, required: PlanTier) => atLeast(planOf(m), required);
+export const hasPaidPlan = (m: Membership | null) => hasTier(m, "pro");
+
 
 const ACTIVE_KEY = "marginmap.active_workspace";
 
