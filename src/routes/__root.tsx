@@ -78,38 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MarginMap — Product Intelligence Workspace" },
-      {
-        name: "description",
-        content:
-          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
-      },
       { name: "author", content: "MarginMap" },
       {
         name: "google-site-verification",
         content: "h2evjOGWBg3kmG7l3GeaVBY8s6R-DQpZEXsXy4Cjc9o",
       },
-      {
-        property: "og:title",
-        content: "MarginMap — Product Intelligence Workspace",
-      },
-      {
-        property: "og:description",
-        content:
-          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
-      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "MarginMap" },
       { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: "MarginMap",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Search products in plain language, see landed cost against real completed sales, and check resale margin before you buy. Every number shows its evidence.",
-      },
     ],
     links: [
       {
