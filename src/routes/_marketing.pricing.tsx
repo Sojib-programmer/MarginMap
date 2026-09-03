@@ -106,7 +106,7 @@ function PricingPage() {
                 t.highlight ? "panel border-border-strong p-6 ring-1 ring-primary/40" : "panel p-6"
               }
             >
-              <p className="label-meta">{t.name}</p>
+              <h2 className="label-meta">{t.name}</h2>
               <p className="num mt-2 text-3xl font-semibold tracking-tight">{t.price}</p>
               <p className="text-xs text-muted-foreground">{t.cadence}</p>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.body}</p>
