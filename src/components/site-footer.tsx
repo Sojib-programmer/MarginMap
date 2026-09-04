@@ -18,6 +18,7 @@ const COLUMNS: { title: string; links: { to: string; label: string }[] }[] = [
     links: [
       { to: "/about", label: "About" },
       { to: "/pricing", label: "Pricing" },
+      { to: "/fee-calculator", label: "Fee calculator" },
       { to: "/methodology", label: "Methodology" },
       { to: "/faq", label: "FAQ" },
       { to: "/contact", label: "Contact" },

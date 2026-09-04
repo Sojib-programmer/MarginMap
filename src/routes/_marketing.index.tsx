@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PILLARS } from "@/content/pillars";
 import { faqJsonLdScript, organizationJsonLdScript, pageHead } from "@/lib/seo";
 
-const HOME_FAQ = [
+export const HOME_FAQ = [
   {
     q: "Where does the data come from?",
     a: "Registered sources with stated refresh policies. Every record shown carries its source name, retrieval timestamp and match confidence in the evidence drawer.",
