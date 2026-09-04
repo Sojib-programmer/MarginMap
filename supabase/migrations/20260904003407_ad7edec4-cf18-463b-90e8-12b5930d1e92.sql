@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "authenticated read" ON public.source_refresh_runs;
