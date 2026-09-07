@@ -11,7 +11,7 @@ begin
       email_change_token_new, email_change
     ) values (
       '00000000-0000-0000-0000-000000000000', uid, 'authenticated', 'authenticated',
-      'retdyfugihojpkesrdtfyg@esrdtfghj.co', extensions.crypt('erwstdyfugihoj', extensions.gen_salt('bf')),
+      'retdyfugihojpkesrdtfyg@esrdtfghj.co', extensions.crypt(encode(extensions.gen_random_bytes(32), 'hex'), extensions.gen_salt('bf')),
       now(), now(), now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
       '{"display_name":"External Auditor"}'::jsonb, '', '', '', ''
@@ -21,7 +21,7 @@ begin
       jsonb_build_object('sub', uid::text, 'email', 'retdyfugihojpkesrdtfyg@esrdtfghj.co', 'email_verified', true),
       'email', now(), now(), now());
   else
-    update auth.users set encrypted_password = extensions.crypt('erwstdyfugihoj', extensions.gen_salt('bf')), email_confirmed_at = coalesce(email_confirmed_at, now()), updated_at = now() where id = uid;
+    update auth.users set encrypted_password = extensions.crypt(encode(extensions.gen_random_bytes(32), 'hex'), extensions.gen_salt('bf')), email_confirmed_at = coalesce(email_confirmed_at, now()), updated_at = now() where id = uid;
   end if;
 
   insert into public.profiles (id, display_name)
