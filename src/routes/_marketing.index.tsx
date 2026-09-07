@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { CTABand, FaqBlock, StatStrip } from "@/components/marketing";
 import { Button } from "@/components/ui/button";
 import { PILLARS } from "@/content/pillars";
+import { POSTS } from "@/content/posts";
 import { faqJsonLdScript, organizationJsonLdScript, pageHead } from "@/lib/seo";
 
 export const HOME_FAQ = [
@@ -215,6 +216,29 @@ function Landing() {
                 <Link to="/pricing">See what is included</Link>
               </Button>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-10">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="text-2xl font-semibold tracking-tight">From the blog</h2>
+          <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground">
+            All articles <ArrowRight className="inline size-3.5" />
+          </Link>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {POSTS.slice(0, 3).map((p) => (
+            <Link
+              key={p.slug}
+              to="/blog/$slug"
+              params={{ slug: p.slug }}
+              className="panel block p-5 transition-colors hover:border-border-strong"
+            >
+              <span className="label-meta">{p.category}</span>
+              <h3 className="mt-2 text-sm font-semibold leading-snug">{p.title}</h3>
+              <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{p.excerpt}</p>
+            </Link>
           ))}
         </div>
       </section>

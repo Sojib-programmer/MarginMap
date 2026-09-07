@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
+import { Route as MarketingBlogRouteImport } from './routes/_marketing.blog'
 import { Route as MarketingCanonicalProductIdentityRouteImport } from './routes/_marketing.canonical-product-identity'
 import { Route as MarketingConditionGradingRouteImport } from './routes/_marketing.condition-grading'
 import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
@@ -42,6 +43,7 @@ import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
 import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
+import { Route as MarketingBlogSlugRouteImport } from './routes/_marketing.blog.$slug'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 import { Route as ApiPublicRefreshSourceRouteImport } from './routes/api/public/refresh.$source'
 
@@ -77,6 +79,11 @@ const MarketingIndexRoute = MarketingIndexRouteImport.update({
 const MarketingAboutRoute = MarketingAboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingBlogRoute = MarketingBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingCanonicalProductIdentityRoute =
@@ -216,6 +223,11 @@ const AppWatchlistsRoute = AppWatchlistsRouteImport.update({
   path: '/watchlists',
   getParentRoute: () => AppRoute,
 } as any)
+const MarketingBlogSlugRoute = MarketingBlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MarketingBlogRoute,
+} as any)
 const AppVariantIdRoute = AppVariantIdRouteImport.update({
   id: '/variant/$id',
   path: '/variant/$id',
@@ -234,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof MarketingAboutRoute
+  '/blog': typeof MarketingBlogRouteWithChildren
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
   '/contact': typeof MarketingContactRoute
@@ -260,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
   '/app/': typeof AppIndexRoute
+  '/blog/$slug': typeof MarketingBlogSlugRoute
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
 }
@@ -268,6 +282,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof MarketingAboutRoute
+  '/blog': typeof MarketingBlogRouteWithChildren
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
   '/contact': typeof MarketingContactRoute
@@ -295,6 +310,7 @@ export interface FileRoutesByTo {
   '/app/watchlists': typeof AppWatchlistsRoute
   '/': typeof MarketingIndexRoute
   '/app': typeof AppIndexRoute
+  '/blog/$slug': typeof MarketingBlogSlugRoute
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
 }
@@ -306,6 +322,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_marketing/about': typeof MarketingAboutRoute
+  '/_marketing/blog': typeof MarketingBlogRouteWithChildren
   '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/_marketing/condition-grading': typeof MarketingConditionGradingRoute
   '/_marketing/contact': typeof MarketingContactRoute
@@ -333,6 +350,7 @@ export interface FileRoutesById {
   '/app/watchlists': typeof AppWatchlistsRoute
   '/_marketing/': typeof MarketingIndexRoute
   '/app/': typeof AppIndexRoute
+  '/_marketing/blog/$slug': typeof MarketingBlogSlugRoute
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
 }
@@ -345,6 +363,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/about'
+    | '/blog'
     | '/canonical-product-identity'
     | '/condition-grading'
     | '/contact'
@@ -371,6 +390,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/watchlists'
     | '/app/'
+    | '/blog/$slug'
     | '/app/variant/$id'
     | '/api/public/refresh/$source'
   fileRoutesByTo: FileRoutesByTo
@@ -379,6 +399,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/about'
+    | '/blog'
     | '/canonical-product-identity'
     | '/condition-grading'
     | '/contact'
@@ -406,6 +427,7 @@ export interface FileRouteTypes {
     | '/app/watchlists'
     | '/'
     | '/app'
+    | '/blog/$slug'
     | '/app/variant/$id'
     | '/api/public/refresh/$source'
   id:
@@ -416,6 +438,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/_marketing/about'
+    | '/_marketing/blog'
     | '/_marketing/canonical-product-identity'
     | '/_marketing/condition-grading'
     | '/_marketing/contact'
@@ -443,6 +466,7 @@ export interface FileRouteTypes {
     | '/app/watchlists'
     | '/_marketing/'
     | '/app/'
+    | '/_marketing/blog/$slug'
     | '/app/variant/$id'
     | '/api/public/refresh/$source'
   fileRoutesById: FileRoutesById
@@ -505,6 +529,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof MarketingAboutRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/blog': {
+      id: '/_marketing/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof MarketingBlogRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/_marketing/canonical-product-identity': {
@@ -689,6 +720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWatchlistsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_marketing/blog/$slug': {
+      id: '/_marketing/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof MarketingBlogSlugRouteImport
+      parentRoute: typeof MarketingBlogRoute
+    }
     '/app/variant/$id': {
       id: '/app/variant/$id'
       path: '/variant/$id'
@@ -706,8 +744,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MarketingBlogRouteChildren {
+  MarketingBlogSlugRoute: typeof MarketingBlogSlugRoute
+}
+
+const MarketingBlogRouteChildren: MarketingBlogRouteChildren = {
+  MarketingBlogSlugRoute: MarketingBlogSlugRoute,
+}
+
+const MarketingBlogRouteWithChildren = MarketingBlogRoute._addFileChildren(
+  MarketingBlogRouteChildren,
+)
+
 interface MarketingRouteChildren {
   MarketingAboutRoute: typeof MarketingAboutRoute
+  MarketingBlogRoute: typeof MarketingBlogRouteWithChildren
   MarketingCanonicalProductIdentityRoute: typeof MarketingCanonicalProductIdentityRoute
   MarketingConditionGradingRoute: typeof MarketingConditionGradingRoute
   MarketingContactRoute: typeof MarketingContactRoute
@@ -728,6 +779,7 @@ interface MarketingRouteChildren {
 
 const MarketingRouteChildren: MarketingRouteChildren = {
   MarketingAboutRoute: MarketingAboutRoute,
+  MarketingBlogRoute: MarketingBlogRouteWithChildren,
   MarketingCanonicalProductIdentityRoute:
     MarketingCanonicalProductIdentityRoute,
   MarketingConditionGradingRoute: MarketingConditionGradingRoute,
