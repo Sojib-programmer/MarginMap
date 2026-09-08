@@ -72,12 +72,34 @@ Absolute rules:
 
 export const runResearch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: unknown) => Input.parse(input))
+  .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data, context }) => {
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("AI is not configured for this project.");
 
+    // AI analysis is a paid capability: prove membership, plan, and budget
+    // before a single token is spent.
+    const ws = await requireWorkspace(context.supabase, context.userId, data.workspaceId, {
+      write: true,
+      minPlan: "pro",
+    });
+    await enforceRateLimit(
+      context.supabase,
+      `ai:user:${context.userId}`,
+      10,
+      3600,
+      "You have reached the hourly limit for AI analysis. Try again later.",
+    );
+    await enforceRateLimit(
+      context.supabase,
+      `ai:ws:${ws.workspaceId}`,
+      200,
+      86400,
+      "This workspace has reached its daily AI analysis limit.",
+    );
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
 
     const [{ data: variant }, { data: offers }, { data: comps }, { data: snapshot }] =
       await Promise.all([
