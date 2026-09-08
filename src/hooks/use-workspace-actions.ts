@@ -3,8 +3,18 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, membershipQuery, type Membership } from "@/lib/membership";
+import { recordSearch } from "@/lib/search.functions";
 import type { RoleMode } from "@/lib/role-mode";
 import type { OfferEconomics, Recommendation } from "@/lib/scoring";
+
+/**
+ * Strips the machine-readable prefix the server functions use to signal
+ * 402 / 403 / 429 semantics, leaving human copy for the toast.
+ */
+export function planMessage(e: Error) {
+  return e.message.replace(/^(FORBIDDEN|PAYMENT_REQUIRED|TOO_MANY_REQUESTS):\s*/, "");
+}
+
 
 /**
  * Authenticated workspace mutations. Every insert stamps the caller's user id
@@ -45,35 +55,28 @@ export function useSaveSearch() {
       intent: unknown;
       silent?: boolean;
     }) => {
-      const userId = await requireUserId();
       const ws = await requireWritableWorkspace(qc);
-      const { data, error } = await supabase
-        .from("searches")
-        .insert({
-          user_id: userId,
-          workspace_id: ws.workspaceId,
-          raw_query: vars.query,
-          role_mode: vars.mode,
-          parsed_intent: (vars.intent ?? {}) as never,
-        })
-        .select("id")
-        .single();
-      if (error) throw new Error(error.message);
-      await logActivity(ws.workspaceId, "search.saved", {
-        type: "search",
-        id: data.id,
-        metadata: { query: vars.query, analysis_mode: vars.mode },
+      // Server function: it charges the daily search quota before writing.
+      await recordSearch({
+        data: {
+          workspaceId: ws.workspaceId,
+          query: vars.query,
+          roleMode: vars.mode,
+          intent: (vars.intent ?? {}) as Record<string, unknown>,
+        },
       });
       return vars;
     },
     onSuccess: (vars) => {
       qc.invalidateQueries({ queryKey: ["searches"] });
+      qc.invalidateQueries({ queryKey: ["usage"] });
       qc.invalidateQueries({ queryKey: ["activity"] });
       if (!vars.silent) toast.success("Search saved to your workspace");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(planMessage(e)),
   });
 }
+
 
 export function useCreateWatchlist() {
   const qc = useQueryClient();

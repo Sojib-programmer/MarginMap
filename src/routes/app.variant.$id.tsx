@@ -27,6 +27,8 @@ import { ageInDays } from "@/lib/freshness";
 import { runResearch } from "@/lib/research.functions";
 import { useRoleMode } from "@/lib/role-mode";
 import { offerEconomics, recommend } from "@/lib/scoring";
+import { useMembership } from "@/lib/membership";
+import { planMessage } from "@/hooks/use-workspace-actions";
 import { reportsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/variant/$id")({
@@ -42,6 +44,7 @@ function VariantPage() {
   const catalog = useQuery(catalogQuery);
   const reports = useQuery(reportsQuery);
   const research = useServerFn(runResearch);
+  const { membership } = useMembership();
   const addToWatchlist = useAddToWatchlist();
   const saveEvaluation = useSaveEvaluation();
 
@@ -54,14 +57,17 @@ function VariantPage() {
     mutationFn: async () => {
       const q =
         question.trim() || `Should I ${mode === "buyer" ? "buy" : "source"} this right now?`;
-      return research({ data: { variantId: id, query: q, roleMode: mode } });
+      if (!membership) throw new Error("No workspace found for this account.");
+      return research({
+        data: { workspaceId: membership.workspaceId, variantId: id, query: q, roleMode: mode },
+      });
     },
     onSuccess: () => {
       toast.success("Analyst report ready");
       setQuestion("");
       qc.invalidateQueries({ queryKey: ["research_reports"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(planMessage(e)),
   });
 
   if (catalog.isLoading) return <PanelSkeleton rows={8} />;

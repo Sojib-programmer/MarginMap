@@ -4,8 +4,10 @@ import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { z } from "zod";
 
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { enforceRateLimit, paymentRequired, rateLimited, requireWorkspace } from "./quota.server";
 
 const Input = z.object({
+  workspaceId: z.string().uuid(),
   variantId: z.string().uuid(),
   query: z.string().min(3).max(400),
   roleMode: z.enum(["buyer", "reseller"]),
@@ -21,6 +23,41 @@ const ReportSchema = z.object({
 
 type Report = z.infer<typeof ReportSchema>;
 
+/** Hard ceiling on a single gateway call so a hung upstream cannot pin a worker. */
+const AI_TIMEOUT_MS = 45_000;
+
+/**
+ * Maps Lovable AI Gateway HTTP statuses onto the error vocabulary the UI
+ * understands. Only 429 and 5xx are transient; everything else is terminal.
+ */
+function translateGatewayError(error: unknown): Error | null {
+  const status =
+    error && typeof error === "object" && "statusCode" in error
+      ? Number((error as { statusCode?: unknown }).statusCode)
+      : undefined;
+  if (!status) return null;
+
+  if (status === 402) {
+    return paymentRequired(
+      "The workspace AI credit balance is exhausted. Top up AI credits to run analysis.",
+    );
+  }
+  if (status === 403) {
+    return paymentRequired("AI analysis is disabled for this workspace by an administrator.");
+  }
+  if (status === 429) {
+    return rateLimited("The AI service is rate limited right now. Try again in a minute.");
+  }
+  if (status >= 500) {
+    return new Error("The AI service is temporarily unavailable. Try again shortly.");
+  }
+  if (status === 400) {
+    return new Error("The analysis request was rejected. Try a shorter question.");
+  }
+  return null;
+}
+
+
 const SYSTEM = `You are MarginMap's product-intelligence analyst.
 
 Absolute rules:
@@ -35,12 +72,34 @@ Absolute rules:
 
 export const runResearch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: unknown) => Input.parse(input))
+  .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data, context }) => {
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("AI is not configured for this project.");
 
+    // AI analysis is a paid capability: prove membership, plan, and budget
+    // before a single token is spent.
+    const ws = await requireWorkspace(context.supabase, context.userId, data.workspaceId, {
+      write: true,
+      minPlan: "pro",
+    });
+    await enforceRateLimit(
+      context.supabase,
+      `ai:user:${context.userId}`,
+      10,
+      3600,
+      "You have reached the hourly limit for AI analysis. Try again later.",
+    );
+    await enforceRateLimit(
+      context.supabase,
+      `ai:ws:${ws.workspaceId}`,
+      200,
+      86400,
+      "This workspace has reached its daily AI analysis limit.",
+    );
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
 
     const [{ data: variant }, { data: offers }, { data: comps }, { data: snapshot }] =
       await Promise.all([
@@ -93,14 +152,21 @@ export const runResearch = createServerFn({ method: "POST" })
         system: SYSTEM,
         prompt: `Role mode: ${data.roleMode}\nUser question: ${data.query}\n\nEvidence records (JSON):\n${JSON.stringify(evidence)}`,
         providerOptions: { lovable: { reasoningEffort: "none" } },
+        abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS),
       });
       report = output;
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
         throw new Error("The analyst could not produce a structured answer. Try rephrasing.");
       }
+      if (error instanceof Error && error.name === "TimeoutError") {
+        throw new Error("The analysis timed out. Try a narrower question.");
+      }
+      const translated = translateGatewayError(error);
+      if (translated) throw translated;
       throw error;
     }
+
 
     const markdown = [
       `## Recommendation\n\n${report.recommendation}`,
@@ -126,6 +192,7 @@ export const runResearch = createServerFn({ method: "POST" })
       .from("research_reports")
       .insert({
         user_id: context.userId,
+        workspace_id: ws.workspaceId,
         variant_id: data.variantId,
         query: data.query,
         role_mode: data.roleMode,
@@ -142,6 +209,7 @@ export const runResearch = createServerFn({ method: "POST" })
       ...(offers ?? []).map((o) => ({
         research_report_id: saved.id,
         user_id: context.userId,
+        workspace_id: ws.workspaceId,
         url: o.listing_url,
         title: o.title,
         excerpt: `Asking ${o.item_price} + ${o.shipping_price} shipping · ${o.condition_grade}`,
@@ -152,6 +220,7 @@ export const runResearch = createServerFn({ method: "POST" })
       ...(comps ?? []).slice(0, 10).map((c) => ({
         research_report_id: saved.id,
         user_id: context.userId,
+        workspace_id: ws.workspaceId,
         url: c.sale_url,
         title: c.title,
         excerpt: `Sold ${c.sold_price} on ${new Date(c.sold_at).toISOString().slice(0, 10)} · ${c.condition_grade}`,
