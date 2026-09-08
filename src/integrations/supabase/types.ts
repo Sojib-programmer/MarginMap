@@ -758,6 +758,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          bucket_key: string
+          count: number
+          window_start: string
+        }
+        Insert: {
+          bucket_key: string
+          count?: number
+          window_start: string
+        }
+        Update: {
+          bucket_key?: string
+          count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       research_evidence: {
         Row: {
           evidence_type: string | null
@@ -1292,6 +1310,10 @@ export type Database = {
         Args: { _invitation_id: string }
         Returns: undefined
       }
+      hit_rate_limit: {
+        Args: { _key: string; _limit: number; _window_seconds: number }
+        Returns: boolean
+      }
       log_activity: {
         Args: {
           _action: string
@@ -1301,6 +1323,10 @@ export type Database = {
           _workspace_id: string
         }
         Returns: string
+      }
+      transfer_workspace_ownership: {
+        Args: { _new_owner: string; _workspace_id: string }
+        Returns: undefined
       }
     }
     Enums: {
