@@ -192,6 +192,7 @@ export const runResearch = createServerFn({ method: "POST" })
       .from("research_reports")
       .insert({
         user_id: context.userId,
+        workspace_id: ws.workspaceId,
         variant_id: data.variantId,
         query: data.query,
         role_mode: data.roleMode,
@@ -208,6 +209,7 @@ export const runResearch = createServerFn({ method: "POST" })
       ...(offers ?? []).map((o) => ({
         research_report_id: saved.id,
         user_id: context.userId,
+        workspace_id: ws.workspaceId,
         url: o.listing_url,
         title: o.title,
         excerpt: `Asking ${o.item_price} + ${o.shipping_price} shipping · ${o.condition_grade}`,
@@ -218,6 +220,7 @@ export const runResearch = createServerFn({ method: "POST" })
       ...(comps ?? []).slice(0, 10).map((c) => ({
         research_report_id: saved.id,
         user_id: context.userId,
+        workspace_id: ws.workspaceId,
         url: c.sale_url,
         title: c.title,
         excerpt: `Sold ${c.sold_price} on ${new Date(c.sold_at).toISOString().slice(0, 10)} · ${c.condition_grade}`,
