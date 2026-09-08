@@ -152,14 +152,21 @@ export const runResearch = createServerFn({ method: "POST" })
         system: SYSTEM,
         prompt: `Role mode: ${data.roleMode}\nUser question: ${data.query}\n\nEvidence records (JSON):\n${JSON.stringify(evidence)}`,
         providerOptions: { lovable: { reasoningEffort: "none" } },
+        abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS),
       });
       report = output;
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
         throw new Error("The analyst could not produce a structured answer. Try rephrasing.");
       }
+      if (error instanceof Error && error.name === "TimeoutError") {
+        throw new Error("The analysis timed out. Try a narrower question.");
+      }
+      const translated = translateGatewayError(error);
+      if (translated) throw translated;
       throw error;
     }
+
 
     const markdown = [
       `## Recommendation\n\n${report.recommendation}`,
