@@ -4,8 +4,10 @@ import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { z } from "zod";
 
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { enforceRateLimit, paymentRequired, rateLimited, requireWorkspace } from "./quota.server";
 
 const Input = z.object({
+  workspaceId: z.string().uuid(),
   variantId: z.string().uuid(),
   query: z.string().min(3).max(400),
   roleMode: z.enum(["buyer", "reseller"]),
@@ -20,6 +22,41 @@ const ReportSchema = z.object({
 });
 
 type Report = z.infer<typeof ReportSchema>;
+
+/** Hard ceiling on a single gateway call so a hung upstream cannot pin a worker. */
+const AI_TIMEOUT_MS = 45_000;
+
+/**
+ * Maps Lovable AI Gateway HTTP statuses onto the error vocabulary the UI
+ * understands. Only 429 and 5xx are transient; everything else is terminal.
+ */
+function translateGatewayError(error: unknown): Error | null {
+  const status =
+    error && typeof error === "object" && "statusCode" in error
+      ? Number((error as { statusCode?: unknown }).statusCode)
+      : undefined;
+  if (!status) return null;
+
+  if (status === 402) {
+    return paymentRequired(
+      "The workspace AI credit balance is exhausted. Top up AI credits to run analysis.",
+    );
+  }
+  if (status === 403) {
+    return paymentRequired("AI analysis is disabled for this workspace by an administrator.");
+  }
+  if (status === 429) {
+    return rateLimited("The AI service is rate limited right now. Try again in a minute.");
+  }
+  if (status >= 500) {
+    return new Error("The AI service is temporarily unavailable. Try again shortly.");
+  }
+  if (status === 400) {
+    return new Error("The analysis request was rejected. Try a shorter question.");
+  }
+  return null;
+}
+
 
 const SYSTEM = `You are MarginMap's product-intelligence analyst.
 
