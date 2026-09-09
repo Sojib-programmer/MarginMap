@@ -30,12 +30,15 @@ const SECTIONS: { heading: string; body: string[] }[] = [
     ],
   },
   {
-    heading: "Your account",
+    heading: "Your account and your workspace",
     body: [
-      "You are responsible for activity under your account and for keeping your sign-in credentials secure. Accounts are for a named individual; team plans provide one seat per person rather than shared credentials.",
+      "You are responsible for activity under your account and for keeping your sign-in credentials secure. Accounts are for a named individual; paid plans provide one seat per person rather than shared credentials.",
+      "Records you create — searches, evaluations, watchlists, pipeline items, alerts and analyst reports — belong to the workspace they were created in, not to you personally, and are visible to the other members of that workspace under their assigned role. Workspace owners and admins control membership and can see an append-only log of member actions.",
+      "Plan, billing and ownership state is set by our billing system. Attempting to alter plan entitlements directly is a breach of the acceptable-use section below.",
       "Notify us promptly if you believe your account has been accessed without authorisation.",
     ],
   },
+
   {
     heading: "Acceptable use",
     body: [

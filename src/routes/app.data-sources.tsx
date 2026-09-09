@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { intervalLabel } from "@/lib/freshness";
 import { relativeTime } from "@/lib/format";
+import { planMessage } from "@/hooks/use-workspace-actions";
 import { canManageMembers, useMembership } from "@/lib/membership";
 import { getConnectorStatus, refreshSource } from "@/lib/sources.functions";
 
@@ -85,7 +86,10 @@ function DataSourcesPage() {
   });
 
   const refresh = useMutation({
-    mutationFn: (sourceId: string) => runRefresh({ data: { sourceId } }),
+    mutationFn: (sourceId: string) => {
+      if (!membership) throw new Error("No workspace found for this account.");
+      return runRefresh({ data: { workspaceId: membership.workspaceId, sourceId } });
+    },
     onSuccess: (res) => {
       if (res.status === "success") toast.success(res.message);
       else if (res.status === "skipped") toast.warning(res.message);
@@ -94,7 +98,7 @@ function DataSourcesPage() {
       void qc.invalidateQueries({ queryKey: ["source_refresh_runs"] });
       void qc.invalidateQueries({ queryKey: ["catalog"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(planMessage(e)),
   });
 
   if (sources.isLoading) return <PanelSkeleton rows={6} />;
