@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { submitContactMessage } from "@/lib/contact.functions";
@@ -50,6 +50,9 @@ function ContactPage() {
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  // Anti-spam: an invisible field bots fill in, and a minimum time on form.
+  const [company, setCompany] = useState("");
+  const mountedAt = useRef(Date.now());
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +76,8 @@ function ContactPage() {
           email: email.trim(),
           topic: topic as "product" | "data" | "billing" | "team" | "security",
           message: message.trim(),
+          company,
+          elapsedMs: Date.now() - mountedAt.current,
         },
       });
       setSent(true);
@@ -80,7 +85,12 @@ function ContactPage() {
       toast.success("Message received — we'll reply to " + email.trim() + ".");
     } catch (err) {
       console.error(err);
-      toast.error("We couldn't send that. Try again, or email us directly.");
+      const detail = err instanceof Error ? err.message : "";
+      toast.error(
+        /Too many|unusually fast/.test(detail)
+          ? detail
+          : "We couldn't send that. Try again, or email us directly.",
+      );
     } finally {
       setSending(false);
     }
@@ -98,6 +108,17 @@ function ContactPage() {
       <div className="mx-auto max-w-4xl px-4 py-14">
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_16rem]">
           <form onSubmit={submit} noValidate className="panel space-y-4 p-6">
+            <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+              <label htmlFor="company">Company (leave blank)</label>
+              <input
+                id="company"
+                name="company"
+                tabIndex={-1}
+                autoComplete="off"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+              />
+            </div>
             <div>
               <Label htmlFor="name">Name</Label>
               <Input
