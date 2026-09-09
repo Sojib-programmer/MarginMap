@@ -85,7 +85,10 @@ function DataSourcesPage() {
   });
 
   const refresh = useMutation({
-    mutationFn: (sourceId: string) => runRefresh({ data: { sourceId } }),
+    mutationFn: (sourceId: string) => {
+      if (!membership) throw new Error("No workspace found for this account.");
+      return runRefresh({ data: { workspaceId: membership.workspaceId, sourceId } });
+    },
     onSuccess: (res) => {
       if (res.status === "success") toast.success(res.message);
       else if (res.status === "skipped") toast.warning(res.message);
