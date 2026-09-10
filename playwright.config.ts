@@ -14,7 +14,19 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Sandboxes that ship a preinstalled Chromium can point at it instead
+        // of downloading a second copy; CI leaves this unset.
+        launchOptions: process.env["PW_CHROMIUM_PATH"]
+          ? { executablePath: process.env["PW_CHROMIUM_PATH"] }
+          : {},
+      },
+    },
+  ],
   webServer: process.env["E2E_BASE_URL"]
     ? undefined
     : {
