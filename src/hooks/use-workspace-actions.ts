@@ -15,7 +15,6 @@ export function planMessage(e: Error) {
   return e.message.replace(/^(FORBIDDEN|PAYMENT_REQUIRED|TOO_MANY_REQUESTS):\s*/, "");
 }
 
-
 /**
  * Authenticated workspace mutations. Every insert stamps the caller's user id
  * and workspace id; the database decides whether the write is allowed (role +
@@ -76,7 +75,6 @@ export function useSaveSearch() {
     onError: (e: Error) => toast.error(planMessage(e)),
   });
 }
-
 
 export function useCreateWatchlist() {
   const qc = useQueryClient();

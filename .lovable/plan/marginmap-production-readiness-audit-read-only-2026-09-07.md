@@ -12,13 +12,13 @@ Security posture is genuinely good (RLS everywhere, private-schema helpers, no a
 
 ## 1. Build, typecheck, lint, format, CI
 
-| Check | Result |
-| --- | --- |
-| `bunx tsgo --noEmit` | PASS — clean |
-| `bunx eslint . --max-warnings=0` | **BLOCKER** — 53 problems (39 errors, 14 warnings) |
-| `bunx prettier --check .` | **BLOCKER** — 12 files unformatted |
+| Check                                                | Result                                                                                                          |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `bunx tsgo --noEmit`                                 | PASS — clean                                                                                                    |
+| `bunx eslint . --max-warnings=0`                     | **BLOCKER** — 53 problems (39 errors, 14 warnings)                                                              |
+| `bunx prettier --check .`                            | **BLOCKER** — 12 files unformatted                                                                              |
 | CI (`.github/workflows/ci.yml`, `quality-gates.yml`) | **BLOCKER** — both run `npm run check`, which runs typecheck + lint + `format:check`; the current tree fails it |
-| Tests | **WARNING** — no test runner, no test files, zero automated regression coverage |
+| Tests                                                | **WARNING** — no test runner, no test files, zero automated regression coverage                                 |
 
 Offending files include `src/routes/_marketing.blog.$slug.tsx`, `_marketing.contact.tsx`, `_marketing.fee-calculator.tsx`, `src/routes/app.evaluate.tsx`, `src/content/posts.ts`, `src/components/app-shell.tsx`, `src/lib/membership.tsx`. All errors are `prettier/prettier` (auto-fixable); the 14 warnings are `react-refresh/only-export-components` (cosmetic).
 
@@ -34,7 +34,7 @@ Curled all public routes plus `/app` and `/auth` on the dev server: `/`, `/prici
 
 - `_authenticated`-style gating plus `requireSupabaseAuth` middleware on `runResearch` and `refreshSource`. PASS.
 - `submitContactMessage` is deliberately public and Zod-validated (`src/lib/contact.functions.ts`). Correct by design.
-- **WARNING — over-broad authorization on `refreshSource`** (`src/lib/sources.functions.ts:19-33`): it checks that the caller is `owner`/`admin` of *any* workspace, not of one entitled to that source. Since `handle_new_user()` makes every new signup the owner of their own workspace, **every signed-in user can trigger connector refreshes** on global `data_sources`. That is an outbound-API cost and rate-limit abuse vector.
+- **WARNING — over-broad authorization on `refreshSource`** (`src/lib/sources.functions.ts:19-33`): it checks that the caller is `owner`/`admin` of _any_ workspace, not of one entitled to that source. Since `handle_new_user()` makes every new signup the owner of their own workspace, **every signed-in user can trigger connector refreshes** on global `data_sources`. That is an outbound-API cost and rate-limit abuse vector.
 - `supabaseAdmin` in `research.functions.ts` is imported lazily inside the handler after auth. PASS.
 
 ## 4. Database security
@@ -59,7 +59,7 @@ Labeling is honest — `src/lib/freshness.ts` classifies anything over 7 days as
 
 ## 6. AI, quotas, billing, payments
 
-- **BLOCKER — plan limits are not enforced on searches.** `consumeQuota()` exists in `src/lib/entitlements.ts:256` and the `consume_quota()` RPC is correct and fail-closed, but **nothing calls it**. Only `usageQuery` (read-only display) is used, in `app-shell.tsx` and `app.billing.tsx`. The advertised Free limit of 5 searches/day is decorative; watchlist/alert/seat caps *are* enforced by triggers, and Pro-gated writes *are* enforced in RLS `WITH CHECK`.
+- **BLOCKER — plan limits are not enforced on searches.** `consumeQuota()` exists in `src/lib/entitlements.ts:256` and the `consume_quota()` RPC is correct and fail-closed, but **nothing calls it**. Only `usageQuery` (read-only display) is used, in `app-shell.tsx` and `app.billing.tsx`. The advertised Free limit of 5 searches/day is decorative; watchlist/alert/seat caps _are_ enforced by triggers, and Pro-gated writes _are_ enforced in RLS `WITH CHECK`.
 - **WARNING — AI gateway error semantics not handled.** `src/lib/research.functions.ts` catches only `NoObjectGeneratedError`; there is no branching on 402 (out of credits), 403 (blocked), 429 (`Retry-After`), or 5xx. Users will see raw errors; a credit exhaustion looks like a generic crash.
 - **WARNING — payments not wired.** `stripe_customer_id` / `stripe_subscription_id` columns exist, `upgrade-button.tsx` honestly routes owners to `/contact`, and there is no checkout, no webhook endpoint, no subscription lifecycle. Honest, but there is no way to actually collect money — so nothing gates revenue today.
 

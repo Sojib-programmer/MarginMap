@@ -7,12 +7,12 @@ Phases 1–4 of the spec. Growth/email (Phase 5) is out of scope.
 Current live model is `research / reseller / team` at $0 / $29 / $79, gated in three
 places only (evaluate, pipeline, sidebar nav). It gets replaced by:
 
-| Tier | Price | Searches/day | Watchlists | Alerts | Sources | Modes | Export | History |
-|---|---|---|---|---|---|---|---|---|
-| Free | $0 | 5 | 3 | 0 | 2 of 3 | Buyer only | none | — |
-| Pro | $9.99/mo, $99/yr | unlimited | 50 | 10 | all 3 | Buyer + Reseller | CSV | 30d |
-| Business | $49.99/mo, $449/yr | unlimited | unlimited | unlimited | all 3 | both | CSV + PDF | 90d |
-| Enterprise | contact sales | unlimited | unlimited | unlimited | all 3 | both | all | full |
+| Tier       | Price              | Searches/day | Watchlists | Alerts    | Sources | Modes            | Export    | History |
+| ---------- | ------------------ | ------------ | ---------- | --------- | ------- | ---------------- | --------- | ------- |
+| Free       | $0                 | 5            | 3          | 0         | 2 of 3  | Buyer only       | none      | —       |
+| Pro        | $9.99/mo, $99/yr   | unlimited    | 50         | 10        | all 3   | Buyer + Reseller | CSV       | 30d     |
+| Business   | $49.99/mo, $449/yr | unlimited    | unlimited  | unlimited | all 3   | both             | CSV + PDF | 90d     |
+| Enterprise | contact sales      | unlimited    | unlimited  | unlimited | all 3   | both             | all       | full    |
 
 Business adds: up to 5 seats, bulk CSV price checker, 1,000 API calls/month,
 analytics dashboard, margin benchmarking. Enterprise adds: unlimited seats and API,

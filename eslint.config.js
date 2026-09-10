@@ -51,6 +51,8 @@ export default tseslint.config(
       "src/lib/role-mode.tsx",
       "src/components/marketing.tsx",
       "src/components/result-table.tsx",
+      "src/lib/membership.tsx",
+      "src/routes/_marketing.index.tsx",
     ],
     rules: {
       // shadcn/ui components and React context/util files intentionally export

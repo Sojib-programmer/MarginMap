@@ -15,10 +15,7 @@ export const Route = createFileRoute("/_marketing/blog/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [
-          { title: "Article not found — MarginMap" },
-          { name: "robots", content: "noindex" },
-        ],
+        meta: [{ title: "Article not found — MarginMap" }, { name: "robots", content: "noindex" }],
       };
     }
     const base = pageHead({
@@ -120,9 +117,7 @@ function BlogPostPage() {
                             <td
                               key={ci}
                               className={
-                                ci === 0
-                                  ? "px-4 py-2.5 text-muted-foreground"
-                                  : "num px-4 py-2.5"
+                                ci === 0 ? "px-4 py-2.5 text-muted-foreground" : "num px-4 py-2.5"
                               }
                             >
                               {cell}
@@ -161,9 +156,7 @@ function BlogPostPage() {
                     <Check className="mt-0.5 size-4 shrink-0 text-verified" />
                     <span>
                       <span className="block text-sm font-medium">{rel.nav}</span>
-                      <span className="mt-1 block text-xs text-muted-foreground">
-                        {rel.kicker}
-                      </span>
+                      <span className="mt-1 block text-xs text-muted-foreground">{rel.kicker}</span>
                     </span>
                   </span>
                 </Link>
