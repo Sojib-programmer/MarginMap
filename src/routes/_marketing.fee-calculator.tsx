@@ -47,8 +47,7 @@ const MARKETPLACES: MarketplacePreset[] = [
   },
 ];
 
-const fmt = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+const fmt = (n: number) => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
 function CalculatorCard({ preset }: { preset: MarketplacePreset }) {
   const [salePrice, setSalePrice] = useState("100");

@@ -57,7 +57,6 @@ function translateGatewayError(error: unknown): Error | null {
   return null;
 }
 
-
 const SYSTEM = `You are MarginMap's product-intelligence analyst.
 
 Absolute rules:
@@ -99,7 +98,6 @@ export const runResearch = createServerFn({ method: "POST" })
     );
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
 
     const [{ data: variant }, { data: offers }, { data: comps }, { data: snapshot }] =
       await Promise.all([
@@ -166,7 +164,6 @@ export const runResearch = createServerFn({ method: "POST" })
       if (translated) throw translated;
       throw error;
     }
-
 
     const markdown = [
       `## Recommendation\n\n${report.recommendation}`,

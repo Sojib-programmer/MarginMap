@@ -156,12 +156,10 @@ export function AppShell() {
           ) : null}
         </div>
 
-
         <nav className="flex-1 space-y-0.5 px-2">
           {NAV.filter(
             (n) =>
-              (!n.reseller || mode === "reseller") &&
-              (!n.resellerPlan || hasPaidPlan(membership)),
+              (!n.reseller || mode === "reseller") && (!n.resellerPlan || hasPaidPlan(membership)),
           ).map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             return (

@@ -13,7 +13,10 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run typecheck && npm run lint && npm run format:check"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.17",
@@ -93,5 +96,9 @@
     "typescript-eslint": "^8.56.1",
     "vite": "^8.1.5",
     "vitest": "^5.0.0"
-  }
+  },
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "packageManager": "npm@10.9.2"
 }

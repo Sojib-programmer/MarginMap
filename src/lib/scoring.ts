@@ -629,6 +629,15 @@ export function recommend(
         `Landed cost is ${(vsMarket * 100).toFixed(0)}% under the comp median at a ${score} value score.`,
       );
     }
+    // A composite score alone can stay mid-band on a grossly overpriced
+    // listing, because seller quality and availability still score well.
+    // Price is the point of the product: material overpayment is a Pass.
+    if (vsMarket <= -0.15) {
+      return say(
+        "Pass",
+        `Landed cost is ${(Math.abs(vsMarket) * 100).toFixed(0)}% above the comp median for this condition.`,
+      );
+    }
     if (score >= 45) {
       return say(
         "Watch",

@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import { submitContactMessage } from "@/lib/contact.functions";
 
-
 import { PageHero } from "@/components/marketing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,7 +95,6 @@ function ContactPage() {
     }
   };
 
-
   return (
     <>
       <PageHero
@@ -183,7 +181,6 @@ function ContactPage() {
               Your message is delivered to the MarginMap team inbox. We use the address you provide
               only to reply.
             </p>
-
           </form>
 
           <aside className="space-y-4">

@@ -1,11 +1,13 @@
 # Add Project Knowledge for MarginMap
 
 ## Context
+
 Settings → Knowledge is empty. That field is user-edited only — the agent cannot write to it directly. The repo-level equivalent, a root `AGENTS.md`, is read by the Lovable agent on every request and is version-controlled with the project. We do both: create `AGENTS.md` and provide paste-ready text for the Knowledge panel.
 
 ## Changes
 
 ### 1. Create `AGENTS.md` at repo root
+
 A concise, durable knowledge file covering:
 
 - **Product**: MarginMap — AI-assisted product-intelligence workspace. Users search products in plain language, get parsed intent, compared offers with landed cost, sold-comps economics (median/range, expected resale, profit, ROI), and a Buy/Watch/Pass recommendation.
@@ -20,8 +22,10 @@ A concise, durable knowledge file covering:
 - **Rules for the agent**: never link to routes that don't exist; every public route needs its own `head()` metadata; `GRANT`s required on every new public table; keep build passing (`bunx tsgo --noEmit`).
 
 ### 2. Knowledge-panel text
+
 Deliver a shortened paste-ready version of the above in chat for the user to drop into Settings → Knowledge.
 
 ## Verification
+
 - `AGENTS.md` exists at repo root and is picked up by the agent (verifiable next session).
 - No code behavior changes; typecheck unaffected.

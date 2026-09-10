@@ -163,7 +163,11 @@ export const POSTS: Post[] = [
         a: "It depends on the item's price velocity. For fast-moving electronics, comps older than 30–45 days can be materially stale. For stable collectibles, 90-day windows are reasonable. Always check the timestamp on the comp set, and discount estimates built on old data.",
       },
     ],
-    relatedPillars: ["sold-comps-vs-asking-price", "evidence-and-data-confidence", "canonical-product-identity"],
+    relatedPillars: [
+      "sold-comps-vs-asking-price",
+      "evidence-and-data-confidence",
+      "canonical-product-identity",
+    ],
   },
   {
     slug: "ebay-vs-amazon-selling-fees",
@@ -275,13 +279,25 @@ export const POSTS: Post[] = [
           "Fashion, furniture, and unbranded goods fail filter four — identity confidence — which corrupts filter three, because your comp set is apples-to-oranges. Beginners are often drawn to these categories by high apparent margins; the margins are apparent precisely because the comps cannot be trusted.",
         ],
         table: {
-          headers: ["Category", "Velocity", "Comp depth", "Identity confidence", "Typical net margin"],
+          headers: [
+            "Category",
+            "Velocity",
+            "Comp depth",
+            "Identity confidence",
+            "Typical net margin",
+          ],
           rows: [
             ["Smartphones & tablets", "Very high", "Deep", "High (model + storage)", "15–30%"],
             ["Camera bodies & lenses", "High", "Deep", "High (model codes)", "20–40%"],
             ["Game consoles", "High", "Deep", "Medium–high (revisions matter)", "20–35%"],
             ["Power tools (branded)", "Medium", "Good", "High (MPN)", "25–45%"],
-            ["Sneakers & streetwear", "High", "Deep for hyped SKUs", "Medium (authentication risk)", "15–40%"],
+            [
+              "Sneakers & streetwear",
+              "High",
+              "Deep for hyped SKUs",
+              "Medium (authentication risk)",
+              "15–40%",
+            ],
             ["Vintage clothing", "Low–medium", "Thin", "Low", "High when it works — unverifiable"],
           ],
         },
@@ -312,7 +328,11 @@ export const POSTS: Post[] = [
         a: "Look at the recency and depth of completed sales: many recent comps at a tight price range means a liquid market. Few, old, or scattered comps mean the median is a guess and you should demand a wider margin of safety.",
       },
     ],
-    relatedPillars: ["reseller-margin-and-roi", "sold-comps-vs-asking-price", "canonical-product-identity"],
+    relatedPillars: [
+      "reseller-margin-and-roi",
+      "sold-comps-vs-asking-price",
+      "canonical-product-identity",
+    ],
   },
   {
     slug: "how-to-calculate-reselling-profit",
@@ -455,6 +475,4 @@ export const POSTS: Post[] = [
   },
 ];
 
-export const POST_BY_SLUG: Record<string, Post> = Object.fromEntries(
-  POSTS.map((p) => [p.slug, p]),
-);
+export const POST_BY_SLUG: Record<string, Post> = Object.fromEntries(POSTS.map((p) => [p.slug, p]));

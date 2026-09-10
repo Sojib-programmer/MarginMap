@@ -40,7 +40,6 @@ export const limitsOf = (m: Membership | null) => limitsFor(planOf(m));
 export const hasTier = (m: Membership | null, required: PlanTier) => atLeast(planOf(m), required);
 export const hasPaidPlan = (m: Membership | null) => hasTier(m, "pro");
 
-
 const ACTIVE_KEY = "marginmap.active_workspace";
 
 function readActive(): string | null {

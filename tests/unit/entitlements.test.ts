@@ -61,12 +61,7 @@ describe("plan error translation", () => {
 
 describe("pricing table", () => {
   it("advertises only the four current tiers", () => {
-    expect(Object.keys(PRICING_BY_TIER).sort()).toEqual([
-      "business",
-      "enterprise",
-      "free",
-      "pro",
-    ]);
+    expect(Object.keys(PRICING_BY_TIER).sort()).toEqual(["business", "enterprise", "free", "pro"]);
   });
 
   it("prices Pro at 9.99 monthly and 99 annually", () => {

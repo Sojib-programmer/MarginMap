@@ -1,8 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/$")({
+  // Returning HTTP 200 for a missing page is a soft 404: crawlers index the
+  // error page and monitoring never sees the failure. Throwing notFound()
+  // makes Start emit a real 404 status with this page as the body.
+  loader: () => {
+    throw notFound();
+  },
   head: () => ({
     meta: [
       { title: "Page not found — MarginMap" },
@@ -14,6 +20,8 @@ export const Route = createFileRoute("/$")({
     ],
   }),
   component: CatchAll,
+  errorComponent: CatchAll,
+  notFoundComponent: CatchAll,
 });
 
 function CatchAll() {

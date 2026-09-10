@@ -144,8 +144,7 @@ function EvaluatePage() {
   const addToPipeline = useMutation({
     mutationFn: async () => {
       const ws = requireWrite();
-      if (ws.plan === "free")
-        throw new Error("The pipeline requires the Pro plan. See Billing.");
+      if (ws.plan === "free") throw new Error("The pipeline requires the Pro plan. See Billing.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
       const { data: row, error } = await supabase
