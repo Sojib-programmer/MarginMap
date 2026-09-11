@@ -26,23 +26,10 @@ export const submitContactMessage = createServerFn({ method: "POST" })
       throw new Error("That was submitted unusually fast. Please try again.");
     }
 
-    const { createClient } = await import("@supabase/supabase-js");
-    const url = process.env["SUPABASE_URL"] ?? process.env["VITE_SUPABASE_URL"]!;
-    const key =
-      process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["VITE_SUPABASE_PUBLISHABLE_KEY"]!;
-    const supabase = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: {
-        fetch: (input, init) => {
-          const headers = new Headers(init?.headers);
-          if (key.startsWith("sb_") && headers.get("Authorization") === "Bearer " + key) {
-            headers.delete("Authorization");
-          }
-          headers.set("apikey", key);
-          return fetch(input, { ...init, headers });
-        },
-      },
-    });
+    // The rate limiter is a privileged internal helper: signed-out callers must
+    // not be able to reach it directly, so this runs with the server-side
+    // client after the honeypot and timing checks above have passed.
+    const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
 
     // Rate limit by caller IP and by email address. The IP is hashed so the
     // limiter never stores a raw network identifier.
