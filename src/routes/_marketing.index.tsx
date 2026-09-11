@@ -91,7 +91,6 @@ const HOME_TIERS = [
   },
 ];
 
-
 function Landing() {
   return (
     <>
@@ -209,7 +208,6 @@ function Landing() {
           optimistic numbers.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-
           {HOME_TIERS.map((t) => (
             <div key={t.name} className={`panel p-5 ${t.highlight ? "border-border-strong" : ""}`}>
               <p className="label-meta">{t.name}</p>
