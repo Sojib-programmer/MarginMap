@@ -62,27 +62,35 @@ const STEPS = [
 
 const HOME_TIERS = [
   {
-    name: "Research",
-    price: "Free",
-    cadence: "for individual buyers",
-    body: "Search, canonical variant pages, landed cost and completed-sale comparables.",
+    name: "Free",
+    price: "$0",
+    cadence: "forever",
+    body: "5 searches a day, 3 watchlists, landed cost and completed-sale comparables.",
     highlight: false,
   },
   {
-    name: "Reseller",
-    price: "$29",
+    name: "Pro",
+    price: "$9.99",
     cadence: "per seat / month",
-    body: "Deal calculator, pipeline, unlimited watchlists and landed-cost alerts.",
+    body: "Unlimited searches, reseller mode, deal calculator, alerts and CSV export.",
     highlight: true,
   },
   {
-    name: "Team",
-    price: "$79",
+    name: "Business",
+    price: "$49.99",
     cadence: "per seat / month",
-    body: "Shared watchlists and pipeline with per-seat attribution and exports.",
+    body: "Up to 5 seats with roles, unlimited alerts, API access and 90-day history.",
+    highlight: false,
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    cadence: "contact sales",
+    body: "Unlimited seats and API, custom integrations, SSO and an uptime SLA.",
     highlight: false,
   },
 ];
+
 
 function Landing() {
   return (
