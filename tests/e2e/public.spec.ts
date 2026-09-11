@@ -93,6 +93,11 @@ test.describe("pricing", () => {
 test.describe("contact form", () => {
   test("rejects an incomplete submission client-side", async ({ page }) => {
     await page.goto("/contact");
+    // The form is server-rendered first; only click once React has hydrated,
+    // otherwise the submit handler is not attached yet.
+    await page.waitForLoadState("networkidle");
+    await page.locator("#name").fill("a");
+    await page.locator("#name").fill("");
     await page.getByRole("button", { name: /send/i }).click();
     await expect(page.locator("#name")).toHaveAttribute("aria-invalid", "true");
     await expect(page.locator("#email")).toHaveAttribute("aria-invalid", "true");
