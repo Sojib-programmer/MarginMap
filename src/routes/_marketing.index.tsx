@@ -208,7 +208,8 @@ function Landing() {
           Flat per-seat pricing. We never take a percentage of your margin — that would reward
           optimistic numbers.
         </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
           {HOME_TIERS.map((t) => (
             <div key={t.name} className={`panel p-5 ${t.highlight ? "border-border-strong" : ""}`}>
               <p className="label-meta">{t.name}</p>
