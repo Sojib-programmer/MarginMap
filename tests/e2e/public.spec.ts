@@ -50,7 +50,7 @@ test.describe("public routes", () => {
     const response = await page.goto("/this-page-does-not-exist");
     expect(response?.status()).toBe(404);
     await expect(page.getByText(/find that page/i)).toBeVisible();
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(/.*/, /noindex/);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   });
 
   test("robots and sitemap are served", async ({ request }) => {
@@ -94,11 +94,15 @@ test.describe("contact form", () => {
   test("rejects an incomplete submission client-side", async ({ page }) => {
     await page.goto("/contact");
     await page.getByRole("button", { name: /send/i }).click();
-    await expect(page.getByText(/Tell us who you are|highlighted fields/i).first()).toBeVisible();
+    await expect(page.locator("#name")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.locator("#email")).toHaveAttribute("aria-invalid", "true");
   });
 
-  test("hides a honeypot field from real users", async ({ page }) => {
+  test("keeps the honeypot field out of the visible form", async ({ page }) => {
     await page.goto("/contact");
-    await expect(page.locator("#company")).toBeHidden();
+    const honeypot = page.locator("#company");
+    await expect(honeypot).toHaveAttribute("tabindex", "-1");
+    const box = await honeypot.boundingBox();
+    expect(box === null || box.x < 0).toBeTruthy();
   });
 });
