@@ -51,9 +51,10 @@ export function brokeredPreviewStorage() {
     new Promise((resolve) => {
       const requestId = newId();
       let done = false;
-      // Declared before `finish`, assigned after it: prefer-const misreads this.
+      // Declared before `finish` reads it, assigned after: prefer-const misfires.
       // eslint-disable-next-line prefer-const
       let timer: ReturnType<typeof setTimeout>;
+
       const finish = (r: { ok: boolean; value?: string | null } | null) => {
         if (done) return;
         done = true;
