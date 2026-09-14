@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Lock } from "lucide-react";
+import { Check, ExternalLink, Lock } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
+import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
 import { Chip, Disclaimer } from "@/components/primitives";
 import { RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -18,9 +21,28 @@ import {
   usageQuery,
 } from "@/lib/entitlements";
 import { hasPaidPlan, limitsOf, ROLE_LABEL, useMembership } from "@/lib/membership";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment, paymentsConfigured } from "@/lib/stripe";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/billing")({
+  head: () => ({
+    meta: [
+      { title: "Billing & Plans | MarginMap" },
+      {
+        name: "description",
+        content: "Manage MarginMap workspace subscriptions, usage, invoices, and billing.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Billing & Plans | MarginMap" },
+      {
+        property: "og:description",
+        content: "Manage MarginMap workspace subscriptions, usage, invoices, and billing.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: BillingPage,
 });
@@ -30,6 +52,8 @@ function BillingPage() {
   const catalog = useQuery(catalogQuery);
   const usage = useQuery(usageQuery(membership?.workspaceId ?? null));
   const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
+  const [portalBusy, setPortalBusy] = useState(false);
+  const openPortal = useServerFn(createPortalSession);
 
   const limits = limitsOf(membership);
   const sources = catalog.data?.sources ?? [];
@@ -38,6 +62,7 @@ function BillingPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-5">
+      <PaymentTestModeBanner />
       <header>
         <p className="label-meta">Billing</p>
         <h1 className="text-2xl font-semibold tracking-tight">Plan &amp; workspace</h1>
@@ -68,6 +93,43 @@ function BillingPage() {
           <p className="mt-1 font-medium">{membership ? ROLE_LABEL[membership.role] : "—"}</p>
         </div>
       </section>
+
+      {membership && hasPaidPlan(membership) ? (
+        <section className="panel flex flex-wrap items-center justify-between gap-3 p-4">
+          <div>
+            <p className="label-meta">Subscription</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Update payment details, view invoices, or schedule cancellation in Stripe.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={portalBusy || !paymentsConfigured()}
+            onClick={async () => {
+              setPortalBusy(true);
+              try {
+                const result = await openPortal({
+                  data: {
+                    workspaceId: membership.workspaceId,
+                    environment: getStripeEnvironment(),
+                    returnUrl: window.location.href,
+                  },
+                });
+                if ("error" in result) throw new Error(result.error);
+                window.open(result.url, "_blank", "noopener,noreferrer");
+              } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Billing portal unavailable.");
+              } finally {
+                setPortalBusy(false);
+              }
+            }}
+          >
+            <ExternalLink className="size-3.5" aria-hidden />
+            {portalBusy ? "Opening…" : "Manage billing"}
+          </Button>
+        </section>
+      ) : null}
 
       <section className="panel p-4">
         <p className="label-meta">Usage this period</p>
