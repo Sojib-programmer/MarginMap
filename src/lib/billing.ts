@@ -8,10 +8,7 @@ export const PRICE_IDS: Record<PaidPlan, Record<BillingInterval, string>> = {
   business: { monthly: "business_monthly", annual: "business_annual" },
 };
 
-export const PRICE_ENTITLEMENTS: Record<
-  string,
-  { plan: PaidPlan; interval: BillingInterval }
-> = {
+export const PRICE_ENTITLEMENTS: Record<string, { plan: PaidPlan; interval: BillingInterval }> = {
   pro_monthly: { plan: "pro", interval: "monthly" },
   pro_annual: { plan: "pro", interval: "annual" },
   business_monthly: { plan: "business", interval: "monthly" },
@@ -30,7 +27,6 @@ export function subscriptionHasAccess(subscription: {
     subscription.current_period_end === null ||
     new Date(subscription.current_period_end).getTime() > Date.now();
   return (
-    periodIsCurrent &&
-    ["active", "trialing", "past_due", "canceled"].includes(subscription.status)
+    periodIsCurrent && ["active", "trialing", "past_due", "canceled"].includes(subscription.status)
   );
 }

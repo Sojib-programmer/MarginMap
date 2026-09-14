@@ -27,7 +27,7 @@ async function processSubscription(object: Json, env: PaymentEnv, eventType: str
   const customerId = stringValue(object["customer"]);
   const status =
     stringValue(object["status"]) ?? (eventType.includes("canceled") ? "canceled" : null);
-  const items = (((object["items"] as Json | undefined)?.["data"] as Json[] | undefined) ?? []);
+  const items = ((object["items"] as Json | undefined)?.["data"] as Json[] | undefined) ?? [];
   const item = items[0];
   const price = (item?.["price"] ?? {}) as Json;
   const priceMetadata = (price["metadata"] ?? {}) as Json;
