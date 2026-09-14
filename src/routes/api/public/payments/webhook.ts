@@ -20,30 +20,32 @@ async function processSubscription(object: Json, env: PaymentEnv, eventType: str
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { entitlementForPrice, subscriptionHasAccess } = await import("@/lib/billing");
 
-  const metadata = (object.metadata ?? {}) as Json;
-  const workspaceId = stringValue(metadata.workspaceId);
-  const userId = stringValue(metadata.userId);
-  const subscriptionId = stringValue(object.id);
-  const customerId = stringValue(object.customer);
-  const status = stringValue(object.status) ?? (eventType.includes("canceled") ? "canceled" : null);
-  const items = ((object.items as Json | undefined)?.data as Json[] | undefined) ?? [];
+  const metadata = (object["metadata"] ?? {}) as Json;
+  const workspaceId = stringValue(metadata["workspaceId"]);
+  const userId = stringValue(metadata["userId"]);
+  const subscriptionId = stringValue(object["id"]);
+  const customerId = stringValue(object["customer"]);
+  const status =
+    stringValue(object["status"]) ?? (eventType.includes("canceled") ? "canceled" : null);
+  const items = (((object["items"] as Json | undefined)?.["data"] as Json[] | undefined) ?? []);
   const item = items[0];
-  const price = (item?.price ?? {}) as Json;
-  const priceMetadata = (price.metadata ?? {}) as Json;
+  const price = (item?.["price"] ?? {}) as Json;
+  const priceMetadata = (price["metadata"] ?? {}) as Json;
   const priceId =
-    stringValue(price.lookup_key) ??
-    stringValue(priceMetadata.lovable_external_id) ??
-    stringValue(metadata.priceId);
+    stringValue(price["lookup_key"]) ??
+    stringValue(priceMetadata["lovable_external_id"]) ??
+    stringValue(metadata["priceId"]);
   const entitlement = priceId ? entitlementForPrice(priceId) : null;
   if (!workspaceId || !userId || !subscriptionId || !customerId || !status || !entitlement) {
     throw new Error("Subscription event is missing trusted workspace or price metadata");
   }
 
-  const periodStart = isoFromUnix(item?.current_period_start ?? object.current_period_start);
-  const periodEnd = isoFromUnix(item?.current_period_end ?? object.current_period_end);
-  const product = price.product;
-  const productId = typeof product === "string" ? product : stringValue((product as Json | null)?.id);
-  const cancelAtPeriodEnd = object.cancel_at_period_end === true;
+  const periodStart = isoFromUnix(item?.["current_period_start"] ?? object["current_period_start"]);
+  const periodEnd = isoFromUnix(item?.["current_period_end"] ?? object["current_period_end"]);
+  const product = price["product"];
+  const productId =
+    typeof product === "string" ? product : stringValue((product as Json | null)?.["id"]);
+  const cancelAtPeriodEnd = object["cancel_at_period_end"] === true;
 
   const { error: subscriptionError } = await supabaseAdmin.from("subscriptions").upsert(
     {
@@ -52,7 +54,7 @@ async function processSubscription(object: Json, env: PaymentEnv, eventType: str
       stripe_subscription_id: subscriptionId,
       stripe_customer_id: customerId,
       product_id: productId,
-      price_id: priceId,
+      price_id: priceId as string,
       plan: entitlement.plan,
       billing_interval: entitlement.interval,
       status,
@@ -103,13 +105,15 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           const { verifyWebhook } = await import("@/lib/stripe.server");
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const event = await verifyWebhook(request, rawEnv);
-          const { data: prior } = await supabaseAdmin
-            .from("payment_events")
-            .select("event_id")
-            .eq("event_id", event.id)
-            .eq("environment", rawEnv)
-            .maybeSingle();
-          if (prior) return Response.json({ received: true, duplicate: true });
+          const { error: claimError } = await supabaseAdmin.from("payment_events").insert({
+            event_id: event.id,
+            environment: rawEnv,
+            event_type: event.type,
+          });
+          if (claimError?.code === "23505") {
+            return Response.json({ received: true, duplicate: true });
+          }
+          if (claimError) throw claimError;
 
           if (
             [
@@ -123,12 +127,6 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           ) {
             await processSubscription(event.data.object, rawEnv, event.type);
           }
-          const { error } = await supabaseAdmin.from("payment_events").insert({
-            event_id: event.id,
-            environment: rawEnv,
-            event_type: event.type,
-          });
-          if (error && error.code !== "23505") throw error;
           return Response.json({ received: true });
         } catch (error) {
           console.error("Payment webhook failed", error);

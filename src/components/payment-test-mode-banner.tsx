@@ -1,5 +1,5 @@
 export function PaymentTestModeBanner() {
-  const clientToken = import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN;
+  const clientToken = import.meta.env["VITE_PAYMENTS_CLIENT_TOKEN"];
   if (!clientToken) {
     return (
       <div className="w-full border border-destructive/40 bg-destructive/10 px-4 py-2 text-center text-xs text-destructive">
