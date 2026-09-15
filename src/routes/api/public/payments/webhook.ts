@@ -101,6 +101,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
         if (rawEnv !== "sandbox" && rawEnv !== "live") {
           return new Response("Invalid payment environment", { status: 400 });
         }
+        let claimedEventId: string | null = null;
         try {
           const { verifyWebhook } = await import("@/lib/stripe.server");
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -114,6 +115,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
             return Response.json({ received: true, duplicate: true });
           }
           if (claimError) throw claimError;
+          claimedEventId = event.id;
 
           if (
             [
@@ -130,6 +132,14 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           return Response.json({ received: true });
         } catch (error) {
           console.error("Payment webhook failed", error);
+          if (claimedEventId) {
+            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+            await supabaseAdmin
+              .from("payment_events")
+              .delete()
+              .eq("event_id", claimedEventId)
+              .eq("environment", rawEnv);
+          }
           return new Response("Payment webhook failed", { status: 400 });
         }
       },
