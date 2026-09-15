@@ -1154,7 +1154,7 @@ export type Database = {
           user_id: string
           variant_id: string | null
           watchlist_id: string
-          workspace_id: string | null
+          workspace_id: string
         }
         Insert: {
           created_at?: string
@@ -1165,7 +1165,7 @@ export type Database = {
           user_id: string
           variant_id?: string | null
           watchlist_id: string
-          workspace_id?: string | null
+          workspace_id: string
         }
         Update: {
           created_at?: string
@@ -1176,7 +1176,7 @@ export type Database = {
           user_id?: string
           variant_id?: string | null
           watchlist_id?: string
-          workspace_id?: string | null
+          workspace_id?: string
         }
         Relationships: [
           {
