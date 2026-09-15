@@ -20,7 +20,7 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery } from "@/lib/catalog";
 import { money, relativeTime } from "@/lib/format";
-import { logActivity, useRequireWrite } from "@/lib/membership";
+import { logActivity, useMembership, useRequireWrite } from "@/lib/membership";
 import { alertsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/alerts")({
@@ -30,7 +30,8 @@ export const Route = createFileRoute("/app/alerts")({
 
 function AlertsPage() {
   const qc = useQueryClient();
-  const alerts = useQuery(alertsQuery);
+  const { membership } = useMembership();
+  const alerts = useQuery(alertsQuery(membership?.workspaceId ?? null));
   const catalog = useQuery(catalogQuery);
   const { rows: hitRows } = useAlertHits();
   const requireWrite = useRequireWrite();

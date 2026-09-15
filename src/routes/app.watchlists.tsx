@@ -26,11 +26,11 @@ export const Route = createFileRoute("/app/watchlists")({
 function WatchlistsPage() {
   const { mode } = useRoleMode();
   const qc = useQueryClient();
-  const lists = useQuery(watchlistsQuery);
-  const items = useQuery(watchlistItemsQuery);
+  const { membership } = useMembership();
+  const lists = useQuery(watchlistsQuery(membership?.workspaceId ?? null));
+  const items = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
   const catalog = useQuery(catalogQuery);
   const hits = useWatchlistHits();
-  const { membership } = useMembership();
   const [name, setName] = useState("");
 
   /** Mirrors the DB boundary so the UI fails loudly before the round trip. */
