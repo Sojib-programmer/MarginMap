@@ -28,7 +28,7 @@ import { useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery, liquidityOf } from "@/lib/catalog";
 import { money2, relativeTime } from "@/lib/format";
-import { logActivity, useRequireWrite } from "@/lib/membership";
+import { logActivity, useMembership, useRequireWrite } from "@/lib/membership";
 import { ageInDays, stalenessCaveat } from "@/lib/freshness";
 import { useRoleMode } from "@/lib/role-mode";
 import {
@@ -60,7 +60,8 @@ function EvaluatePage() {
   const { mode } = useRoleMode();
   const qc = useQueryClient();
   const catalog = useQuery(catalogQuery);
-  const saved = useQuery(evaluationsQuery);
+  const { membership } = useMembership();
+  const saved = useQuery(evaluationsQuery(membership?.workspaceId ?? null));
   const saveEvaluation = useSaveEvaluation();
   const requireWrite = useRequireWrite();
 

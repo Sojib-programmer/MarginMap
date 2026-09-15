@@ -42,9 +42,9 @@ function VariantPage() {
   const { mode } = useRoleMode();
   const qc = useQueryClient();
   const catalog = useQuery(catalogQuery);
-  const reports = useQuery(reportsQuery);
   const research = useServerFn(runResearch);
   const { membership } = useMembership();
+  const reports = useQuery(reportsQuery(membership?.workspaceId ?? null));
   const addToWatchlist = useAddToWatchlist();
   const saveEvaluation = useSaveEvaluation();
 

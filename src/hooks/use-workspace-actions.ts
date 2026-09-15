@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { logActivity, membershipQuery, type Membership } from "@/lib/membership";
+import { logActivity, useMembership, type Membership } from "@/lib/membership";
 import { recordSearch } from "@/lib/search.functions";
 import type { RoleMode } from "@/lib/role-mode";
 import type { OfferEconomics, Recommendation } from "@/lib/scoring";
@@ -28,13 +28,19 @@ async function requireUserId() {
   return data.user.id;
 }
 
-async function requireWritableWorkspace(qc: ReturnType<typeof useQueryClient>) {
-  const membership = await qc.ensureQueryData(membershipQuery);
-  if (!membership) throw new Error("No workspace found for this account.");
-  if (membership.role === "auditor") {
-    throw new Error("Auditor access is read-only. Ask an admin for Editor access.");
-  }
-  return membership as Membership;
+/**
+ * Resolves the *active* workspace (the one selected in the switcher), never the
+ * first membership: writes must land in the workspace the user is looking at.
+ */
+function useWritableWorkspace() {
+  const { membership } = useMembership();
+  return (): Membership => {
+    if (!membership) throw new Error("No workspace found for this account.");
+    if (membership.role === "auditor") {
+      throw new Error("Auditor access is read-only. Ask an admin for Editor access.");
+    }
+    return membership;
+  };
 }
 
 function requireResellerPlan(m: Membership) {
@@ -47,6 +53,7 @@ function requireResellerPlan(m: Membership) {
 
 export function useSaveSearch() {
   const qc = useQueryClient();
+  const requireWritableWorkspace = useWritableWorkspace();
   return useMutation({
     mutationFn: async (vars: {
       query: string;
@@ -54,7 +61,7 @@ export function useSaveSearch() {
       intent: unknown;
       silent?: boolean;
     }) => {
-      const ws = await requireWritableWorkspace(qc);
+      const ws = requireWritableWorkspace();
       // Server function: it charges the daily search quota before writing.
       await recordSearch({
         data: {
@@ -78,10 +85,11 @@ export function useSaveSearch() {
 
 export function useCreateWatchlist() {
   const qc = useQueryClient();
+  const requireWritableWorkspace = useWritableWorkspace();
   return useMutation({
     mutationFn: async (vars: { name: string; mode: RoleMode }) => {
       const userId = await requireUserId();
-      const ws = await requireWritableWorkspace(qc);
+      const ws = requireWritableWorkspace();
       const { data, error } = await supabase
         .from("watchlists")
         .insert({
@@ -111,6 +119,7 @@ export function useCreateWatchlist() {
 
 export function useAddToWatchlist() {
   const qc = useQueryClient();
+  const requireWritableWorkspace = useWritableWorkspace();
   return useMutation({
     mutationFn: async (vars: {
       variantId?: string | null;
@@ -121,12 +130,13 @@ export function useAddToWatchlist() {
       mode: RoleMode;
     }) => {
       const userId = await requireUserId();
-      const ws = await requireWritableWorkspace(qc);
+      const ws = requireWritableWorkspace();
       let listId = vars.watchlistId ?? null;
       if (!listId) {
         const { data: existing, error: listErr } = await supabase
           .from("watchlists")
           .select("id")
+          .eq("workspace_id", ws.workspaceId)
           .order("created_at", { ascending: true })
           .limit(1);
         if (listErr) throw new Error(listErr.message);
@@ -178,6 +188,7 @@ export function useAddToWatchlist() {
 
 export function useSaveEvaluation() {
   const qc = useQueryClient();
+  const requireWritableWorkspace = useWritableWorkspace();
   return useMutation({
     mutationFn: async (vars: {
       label: string;
@@ -189,7 +200,7 @@ export function useSaveEvaluation() {
       marketplace?: string;
     }) => {
       const userId = await requireUserId();
-      const ws = await requireWritableWorkspace(qc);
+      const ws = requireWritableWorkspace();
       requireResellerPlan(ws);
       const e = vars.economics;
       const { data, error } = await supabase

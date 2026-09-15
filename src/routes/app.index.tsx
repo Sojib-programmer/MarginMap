@@ -17,6 +17,7 @@ import { money, money2 } from "@/lib/format";
 import { ageInDays } from "@/lib/freshness";
 import { useRoleMode } from "@/lib/role-mode";
 import { landedCost, offerEconomics, recommend } from "@/lib/scoring";
+import { useMembership } from "@/lib/membership";
 import { searchesQuery, watchlistItemsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/")({
@@ -33,8 +34,9 @@ function bestOffer(v: VariantIntel) {
 function Overview() {
   const { mode } = useRoleMode();
   const catalog = useQuery(catalogQuery);
-  const searches = useQuery(searchesQuery);
-  const watched = useQuery(watchlistItemsQuery);
+  const { membership } = useMembership();
+  const searches = useQuery(searchesQuery(membership?.workspaceId ?? null));
+  const watched = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
 
   const variants = catalog.data?.variants ?? [];
 

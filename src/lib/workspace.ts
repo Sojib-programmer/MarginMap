@@ -72,49 +72,37 @@ export type ReportRow = {
   created_at: string;
 };
 
-async function rows<T>(table: string, order = "created_at") {
+/**
+ * Every workspace-scoped read is filtered by the *active* workspace id.
+ * RLS already blocks other tenants, but a member of two workspaces would
+ * otherwise see both sets of rows merged into one list.
+ */
+async function rows<T>(table: string, workspaceId: string, order = "created_at") {
   const { data, error } = await supabase
     .from(table as never)
     .select("*")
+    .eq("workspace_id", workspaceId)
     .order(order, { ascending: false });
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as T[];
 }
 
-export const watchlistsQuery = queryOptions({
-  queryKey: ["watchlists"],
-  queryFn: () => rows<WatchlistRow>("watchlists"),
-});
+function scoped<T>(table: string, key: string) {
+  return (workspaceId: string | null) =>
+    queryOptions({
+      queryKey: [key, workspaceId],
+      enabled: !!workspaceId,
+      queryFn: () => rows<T>(table, workspaceId!),
+    });
+}
 
-export const watchlistItemsQuery = queryOptions({
-  queryKey: ["watchlist_items"],
-  queryFn: () => rows<WatchlistItemRow>("watchlist_items"),
-});
-
-export const inventoryQuery = queryOptions({
-  queryKey: ["inventory_items"],
-  queryFn: () => rows<InventoryRow>("inventory_items"),
-});
-
-export const evaluationsQuery = queryOptions({
-  queryKey: ["deal_evaluations"],
-  queryFn: () => rows<EvaluationRow>("deal_evaluations"),
-});
-
-export const alertsQuery = queryOptions({
-  queryKey: ["alerts"],
-  queryFn: () => rows<AlertRow>("alerts"),
-});
-
-export const searchesQuery = queryOptions({
-  queryKey: ["searches"],
-  queryFn: () => rows<SearchRow>("searches"),
-});
-
-export const reportsQuery = queryOptions({
-  queryKey: ["research_reports"],
-  queryFn: () => rows<ReportRow>("research_reports"),
-});
+export const watchlistsQuery = scoped<WatchlistRow>("watchlists", "watchlists");
+export const watchlistItemsQuery = scoped<WatchlistItemRow>("watchlist_items", "watchlist_items");
+export const inventoryQuery = scoped<InventoryRow>("inventory_items", "inventory_items");
+export const evaluationsQuery = scoped<EvaluationRow>("deal_evaluations", "deal_evaluations");
+export const alertsQuery = scoped<AlertRow>("alerts", "alerts");
+export const searchesQuery = scoped<SearchRow>("searches", "searches");
+export const reportsQuery = scoped<ReportRow>("research_reports", "research_reports");
 
 export const PIPELINE_STATUSES = [
   "watch",

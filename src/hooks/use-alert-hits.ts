@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { bestLandedCost, catalogQuery, type VariantIntel } from "@/lib/catalog";
+import { useMembership } from "@/lib/membership";
 import { alertsQuery, watchlistItemsQuery, type AlertRow } from "@/lib/workspace";
 
 export type AlertHit = {
@@ -22,8 +23,9 @@ function thresholdOf(alert: AlertRow) {
  * data already loaded — no server job, no email.
  */
 export function useAlertHits() {
+  const { membership } = useMembership();
   const catalog = useQuery(catalogQuery);
-  const alerts = useQuery(alertsQuery);
+  const alerts = useQuery(alertsQuery(membership?.workspaceId ?? null));
 
   const variants = catalog.data?.variants ?? [];
   const rows: AlertHit[] = (alerts.data ?? []).map((alert) => {
@@ -53,8 +55,9 @@ export function useAlertHits() {
 
 /** Target-price hits for watchlist items, evaluated against best landed cost. */
 export function useWatchlistHits() {
+  const { membership } = useMembership();
   const catalog = useQuery(catalogQuery);
-  const items = useQuery(watchlistItemsQuery);
+  const items = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
   const variants = catalog.data?.variants ?? [];
 
   const map = new Map<string, { best: number | null; hit: boolean }>();

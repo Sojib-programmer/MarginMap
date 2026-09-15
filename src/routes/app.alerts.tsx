@@ -20,7 +20,7 @@ import { useAlertHits } from "@/hooks/use-alert-hits";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery } from "@/lib/catalog";
 import { money, relativeTime } from "@/lib/format";
-import { logActivity, useRequireWrite } from "@/lib/membership";
+import { logActivity, useMembership, useRequireWrite } from "@/lib/membership";
 import { alertsQuery } from "@/lib/workspace";
 
 export const Route = createFileRoute("/app/alerts")({
@@ -30,7 +30,8 @@ export const Route = createFileRoute("/app/alerts")({
 
 function AlertsPage() {
   const qc = useQueryClient();
-  const alerts = useQuery(alertsQuery);
+  const { membership } = useMembership();
+  const alerts = useQuery(alertsQuery(membership?.workspaceId ?? null));
   const catalog = useQuery(catalogQuery);
   const { rows: hitRows } = useAlertHits();
   const requireWrite = useRequireWrite();
@@ -78,7 +79,7 @@ function AlertsPage() {
   const toggle = useMutation({
     mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("alerts").update({ enabled }).eq("id", id);
+      const { error } = await supabase.from("alerts").update({ enabled }).eq("id", id).eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, enabled ? "alert.enabled" : "alert.disabled", {
         type: "alert",
@@ -91,7 +92,7 @@ function AlertsPage() {
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("alerts").delete().eq("id", id);
+      const { error } = await supabase.from("alerts").delete().eq("id", id).eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "alert.deleted", { type: "alert", id });
     },

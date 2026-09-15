@@ -26,11 +26,11 @@ export const Route = createFileRoute("/app/watchlists")({
 function WatchlistsPage() {
   const { mode } = useRoleMode();
   const qc = useQueryClient();
-  const lists = useQuery(watchlistsQuery);
-  const items = useQuery(watchlistItemsQuery);
+  const { membership } = useMembership();
+  const lists = useQuery(watchlistsQuery(membership?.workspaceId ?? null));
+  const items = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
   const catalog = useQuery(catalogQuery);
   const hits = useWatchlistHits();
-  const { membership } = useMembership();
   const [name, setName] = useState("");
 
   /** Mirrors the DB boundary so the UI fails loudly before the round trip. */
@@ -52,7 +52,7 @@ function WatchlistsPage() {
   const removeItem = useMutation({
     mutationFn: async (id: string) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("watchlist_items").delete().eq("id", id);
+      const { error } = await supabase.from("watchlist_items").delete().eq("id", id).eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "watchlist.item_removed", {
         type: "watchlist_item",
@@ -84,7 +84,8 @@ function WatchlistsPage() {
       const { error } = await supabase
         .from("watchlist_items")
         .update({ target_price: target })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "watchlist.target_price_changed", {
         type: "watchlist_item",
@@ -96,19 +97,21 @@ function WatchlistsPage() {
       const { data: existing } = await supabase
         .from("alerts")
         .select("id")
+        .eq("workspace_id", ws.workspaceId)
         .eq("variant_id", variantId)
         .eq("rule_type", "landed_cost_below")
         .limit(1);
 
       if (target == null) {
-        if (existing?.[0]) await supabase.from("alerts").delete().eq("id", existing[0].id);
+        if (existing?.[0]) await supabase.from("alerts").delete().eq("id", existing[0].id).eq("workspace_id", ws.workspaceId);
         return;
       }
       if (existing?.[0]) {
         const { error: upErr } = await supabase
           .from("alerts")
           .update({ rule_config: { threshold: target } as never, enabled: true })
-          .eq("id", existing[0].id);
+          .eq("id", existing[0].id)
+          .eq("workspace_id", ws.workspaceId);
         if (upErr) throw new Error(upErr.message);
       } else {
         const { error: insErr } = await supabase.from("alerts").insert({
@@ -132,7 +135,7 @@ function WatchlistsPage() {
   const deleteList = useMutation({
     mutationFn: async (id: string) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("watchlists").delete().eq("id", id);
+      const { error } = await supabase.from("watchlists").delete().eq("id", id).eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "watchlist.deleted", { type: "watchlist", id });
     },
