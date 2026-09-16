@@ -7,12 +7,14 @@ import { requireWorkspace } from "@/lib/quota.server";
 
 const input = z.object({ workspaceId: z.string().uuid() });
 
+type Json = Record<string, unknown>;
+
 export type RawCatalog = {
-  variants: unknown[];
-  offers: unknown[];
-  comps: unknown[];
-  snapshots: unknown[];
-  sources: unknown[];
+  variants: Json[];
+  offers: Json[];
+  comps: Json[];
+  snapshots: Json[];
+  sources: Json[];
 };
 
 /**
@@ -59,10 +61,10 @@ export const loadWorkspaceCatalog = createServerFn({ method: "POST" })
     );
 
     return {
-      variants: variantsRes.data ?? [],
-      offers,
-      comps,
-      snapshots: snapsRes.data ?? [],
-      sources: sources.filter((s) => allowed.has(s.marketplace ?? "other")),
+      variants: (variantsRes.data ?? []) as unknown as Json[],
+      offers: offers as unknown as Json[],
+      comps: comps as unknown as Json[],
+      snapshots: (snapsRes.data ?? []) as unknown as Json[],
+      sources: sources.filter((s) => allowed.has(s.marketplace ?? "other")) as unknown as Json[],
     };
   });
