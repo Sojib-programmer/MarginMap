@@ -11,7 +11,15 @@ const email = process.env["E2E_USER"];
 const password = process.env["E2E_PASS"];
 
 test.describe("workspace", () => {
+  // Locally the suite skips without credentials; in CI a missing test account
+  // is a release-gate failure, not a silent pass.
+  if (process.env["CI"]) {
+    test("workspace credentials are configured", () => {
+      expect(Boolean(email && password), "E2E_USER / E2E_PASS must be set in CI").toBe(true);
+    });
+  }
   test.skip(!email || !password, "E2E_USER / E2E_PASS not configured");
+
 
   test.beforeEach(async ({ page }) => {
     await page.goto("/auth");
