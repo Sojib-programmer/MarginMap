@@ -20,7 +20,6 @@ test.describe("workspace", () => {
   }
   test.skip(!email || !password, "E2E_USER / E2E_PASS not configured");
 
-
   test.beforeEach(async ({ page }) => {
     await page.goto("/auth");
     await page.getByLabel(/email/i).fill(email!);
