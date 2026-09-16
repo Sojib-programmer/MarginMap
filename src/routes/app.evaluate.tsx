@@ -59,7 +59,7 @@ function EvaluatePage() {
   const { offer: offerId } = Route.useSearch();
   const { mode } = useRoleMode();
   const qc = useQueryClient();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const { membership } = useMembership();
   const saved = useQuery(evaluationsQuery(membership?.workspaceId ?? null));
   const saveEvaluation = useSaveEvaluation();

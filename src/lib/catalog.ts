@@ -2,7 +2,6 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { loadWorkspaceCatalog } from "@/lib/catalog.functions";
 
-import { supabase } from "@/integrations/supabase/client";
 import { marketStats, type CompLike, type MarketStats, type OfferLike } from "./scoring";
 
 export type Offer = {

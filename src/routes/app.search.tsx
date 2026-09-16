@@ -56,7 +56,7 @@ function SearchPage() {
 
   const navigate = useNavigate({ from: "/app/search" });
   const { mode } = useRoleMode();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const logged = useRef<string | null>(null);
   const [view, setView] = useState<"table" | "cards">("table");
 

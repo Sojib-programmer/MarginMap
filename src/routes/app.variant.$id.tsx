@@ -41,7 +41,7 @@ function VariantPage() {
   const { id } = Route.useParams();
   const { mode } = useRoleMode();
   const qc = useQueryClient();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const research = useServerFn(runResearch);
   const { membership } = useMembership();
   const reports = useQuery(reportsQuery(membership?.workspaceId ?? null));

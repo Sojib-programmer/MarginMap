@@ -32,7 +32,7 @@ function AlertsPage() {
   const qc = useQueryClient();
   const { membership } = useMembership();
   const alerts = useQuery(alertsQuery(membership?.workspaceId ?? null));
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const { rows: hitRows } = useAlertHits();
   const requireWrite = useRequireWrite();
   const [variantId, setVariantId] = useState("");

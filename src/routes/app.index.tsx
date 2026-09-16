@@ -33,7 +33,7 @@ function bestOffer(v: VariantIntel) {
 
 function Overview() {
   const { mode } = useRoleMode();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const { membership } = useMembership();
   const searches = useQuery(searchesQuery(membership?.workspaceId ?? null));
   const watched = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));

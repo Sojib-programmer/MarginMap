@@ -39,7 +39,7 @@ function SettingsPage() {
   const { mode, setMode } = useRoleMode();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
 
   const profile = useQuery({
     queryKey: ["profile", user?.id],

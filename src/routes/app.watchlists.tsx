@@ -29,7 +29,7 @@ function WatchlistsPage() {
   const { membership } = useMembership();
   const lists = useQuery(watchlistsQuery(membership?.workspaceId ?? null));
   const items = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const hits = useWatchlistHits();
   const [name, setName] = useState("");
 
