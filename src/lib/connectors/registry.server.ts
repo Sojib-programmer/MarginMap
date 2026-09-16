@@ -45,6 +45,37 @@ export class AdapterUnavailableError extends Error {
   }
 }
 
+/**
+ * Bounded upstream call with retry/backoff. A hung marketplace API must not hold
+ * a worker open, and a transient 5xx/429 must not fail the whole refresh.
+ */
+export async function fetchWithRetry(
+  url: string,
+  init: RequestInit = {},
+  { timeoutMs = 10_000, attempts = 3 } = {},
+): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...init, signal: controller.signal });
+      if (res.status === 429 || res.status >= 500) {
+        if (attempt === attempts) return res;
+        throw new Error(`retryable status ${res.status}`);
+      }
+      return res;
+    } catch (e) {
+      lastError = e;
+      if (attempt === attempts) break;
+      await new Promise((r) => setTimeout(r, 2 ** (attempt - 1) * 500));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
 function requireSecrets(names: string[]): Record<string, string> {
   const out: Record<string, string> = {};
   const missing: string[] = [];
