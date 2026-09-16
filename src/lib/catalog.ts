@@ -1,5 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
+import { loadWorkspaceCatalog } from "@/lib/catalog.functions";
+
 import { supabase } from "@/integrations/supabase/client";
 import { marketStats, type CompLike, type MarketStats, type OfferLike } from "./scoring";
 
@@ -92,28 +94,14 @@ export type CatalogData = {
   sources: DataSource[];
 };
 
-async function loadCatalog(): Promise<CatalogData> {
-  const [variantsRes, offersRes, compsRes, snapsRes, sourcesRes] = await Promise.all([
-    supabase
-      .from("product_variants")
-      .select(
-        "id,title,canonical_key,attributes,gtin,sku_or_mpn,product_id,products(id,canonical_name,slug,description,specs,identity_confidence,brands(name),categories(name,slug))",
-      ),
-    supabase.from("offers").select("*").eq("is_active", true),
-    supabase.from("sale_comps").select("*"),
-    supabase.from("market_snapshots").select("*"),
-    supabase.from("data_sources").select("*"),
-  ]);
+async function loadCatalog(workspaceId: string): Promise<CatalogData> {
+  const raw = await loadWorkspaceCatalog({ data: { workspaceId } });
 
-  const err =
-    variantsRes.error || offersRes.error || compsRes.error || snapsRes.error || sourcesRes.error;
-  if (err) throw new Error(err.message);
+  const offers = raw.offers as unknown as Offer[];
+  const comps = raw.comps as unknown as Comp[];
+  const snaps = raw.snapshots as unknown as Snapshot[];
 
-  const offers = (offersRes.data ?? []) as unknown as Offer[];
-  const comps = (compsRes.data ?? []) as unknown as Comp[];
-  const snaps = (snapsRes.data ?? []) as unknown as Snapshot[];
-
-  const variants: VariantIntel[] = (variantsRes.data ?? []).map((row) => {
+  const variants: VariantIntel[] = (raw.variants ?? []).map((row) => {
     const r = row as unknown as {
       id: string;
       title: string;
@@ -159,14 +147,21 @@ async function loadCatalog(): Promise<CatalogData> {
     };
   });
 
-  return { variants, sources: (sourcesRes.data ?? []) as unknown as DataSource[] };
+  return { variants, sources: raw.sources as unknown as DataSource[] };
 }
 
-export const catalogQuery = queryOptions({
-  queryKey: ["catalog"],
-  queryFn: loadCatalog,
-  staleTime: 60_000,
-});
+/**
+ * Catalog is workspace-scoped: the server applies the plan's marketplace
+ * allowance, so the query key includes the workspace and the query stays
+ * disabled until one is active.
+ */
+export const catalogQuery = (workspaceId: string | null) =>
+  queryOptions({
+    queryKey: ["catalog", workspaceId],
+    queryFn: () => loadCatalog(workspaceId!),
+    enabled: !!workspaceId,
+    staleTime: 60_000,
+  });
 
 export function liquidityOf(v: VariantIntel) {
   return {
