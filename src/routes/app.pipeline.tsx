@@ -61,7 +61,11 @@ function PipelinePage() {
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("inventory_items").delete().eq("id", id).eq("workspace_id", ws.workspaceId);
+      const { error } = await supabase
+        .from("inventory_items")
+        .delete()
+        .eq("id", id)
+        .eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "pipeline.item_removed", { type: "inventory_item", id });
     },
