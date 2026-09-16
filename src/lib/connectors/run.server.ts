@@ -4,13 +4,29 @@ import { AdapterUnavailableError, adapterFor } from "@/lib/connectors/registry.s
 export type RefreshResult = {
   status: "success" | "skipped" | "error";
   rowsUpserted: number;
+  deactivated: number;
   message: string;
 };
 
+/** Upstream errors can echo back credentials or signed URLs — never store them raw. */
+export function redactError(input: unknown): string {
+  const raw = input instanceof Error ? input.message : String(input);
+  return raw
+    .replace(/(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+/gi, "$1 [redacted]")
+    .replace(/([?&](?:access_token|token|key|api[_-]?key|signature)=)[^&\s]+/gi, "$1[redacted]")
+    .replace(/eyJ[A-Za-z0-9._-]{20,}/g, "[redacted-token]")
+    .slice(0, 500);
+}
+
+/** Offers not seen in this run are retired rather than left to rot as "current". */
+const STALE_AFTER_HOURS = 24;
+
 /**
- * Executes one refresh for a data source and records the attempt. A source is
- * only marked live after a run actually returns rows — a missing adapter or
- * missing credentials produces a recorded "skipped" run and changes no data.
+ * Executes one refresh for a data source and records the attempt.
+ *
+ * Guarantees: at most one in-flight run per source, idempotent writes keyed on
+ * (data_source_id, external_url), bounded runtime, stale-offer deactivation and
+ * redacted error text. A source is only marked live after a run returns rows.
  */
 export async function runSourceRefresh(sourceId: string): Promise<RefreshResult> {
   const { data: source, error: srcErr } = await supabaseAdmin
@@ -20,6 +36,24 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
     .maybeSingle();
   if (srcErr) throw new Error(srcErr.message);
   if (!source) throw new Error("Unknown data source");
+
+  // Concurrency guard: a run started in the last 10 minutes and never finished
+  // is treated as still in flight, so a retrying scheduler cannot double-write.
+  const { data: inFlight } = await supabaseAdmin
+    .from("source_refresh_runs")
+    .select("id,started_at")
+    .eq("data_source_id", sourceId)
+    .is("finished_at", null)
+    .gte("started_at", new Date(Date.now() - 10 * 60_000).toISOString())
+    .limit(1);
+  if (inFlight && inFlight.length > 0) {
+    return {
+      status: "skipped",
+      rowsUpserted: 0,
+      deactivated: 0,
+      message: "A refresh for this source is already running.",
+    };
+  }
 
   const { data: run, error: runErr } = await supabaseAdmin
     .from("source_refresh_runs")
@@ -46,9 +80,12 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
     return finish({
       status: "skipped",
       rowsUpserted: 0,
+      deactivated: 0,
       message: `No live connector is registered for ${source.name}. This source remains a frozen snapshot.`,
     });
   }
+
+  const startedAt = new Date().toISOString();
 
   try {
     const { data: variants, error: varErr } = await supabaseAdmin
@@ -62,16 +99,12 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
       limit: 10,
     });
 
-    let upserted = 0;
-    for (const r of rows) {
-      const { data: existing } = await supabaseAdmin
-        .from("offers")
-        .select("id")
-        .eq("data_source_id", sourceId)
-        .eq("external_url", r.external_url)
-        .maybeSingle();
-
-      const payload = {
+    // Idempotent write: the unique (data_source_id, external_url) index makes a
+    // replayed run update the same rows instead of duplicating the catalog.
+    const seen = new Set<string>();
+    const payloads = rows
+      .filter((r) => r.external_url && !seen.has(r.external_url) && seen.add(r.external_url))
+      .map((r) => ({
         data_source_id: sourceId,
         external_url: r.external_url,
         title: r.title,
@@ -86,19 +119,37 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
         match_confidence: r.match_confidence,
         retrieved_at: new Date().toISOString(),
         is_active: true,
-      };
+      }));
 
-      const { error: writeErr } = existing
-        ? await supabaseAdmin.from("offers").update(payload).eq("id", existing.id)
-        : await supabaseAdmin.from("offers").insert(payload);
+    let upserted = 0;
+    for (let i = 0; i < payloads.length; i += 100) {
+      const chunk = payloads.slice(i, i + 100);
+      const { error: writeErr } = await supabaseAdmin
+        .from("offers")
+        .upsert(chunk, { onConflict: "data_source_id,external_url" });
       if (writeErr) throw new Error(writeErr.message);
-      upserted += 1;
+      upserted += chunk.length;
+    }
+
+    // Retire listings this source stopped returning.
+    let deactivated = 0;
+    if (upserted > 0) {
+      const cutoff = new Date(Date.now() - STALE_AFTER_HOURS * 3_600_000).toISOString();
+      const { data: stale, error: staleErr } = await supabaseAdmin
+        .from("offers")
+        .update({ is_active: false })
+        .eq("data_source_id", sourceId)
+        .eq("is_active", true)
+        .lt("retrieved_at", cutoff)
+        .select("id");
+      if (staleErr) throw new Error(staleErr.message);
+      deactivated = stale?.length ?? 0;
     }
 
     await supabaseAdmin
       .from("data_sources")
       .update({
-        last_refreshed_at: new Date().toISOString(),
+        last_refreshed_at: startedAt,
         last_error_at: null,
         last_error_text: null,
         is_live: upserted > 0,
@@ -108,10 +159,11 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
     return finish({
       status: "success",
       rowsUpserted: upserted,
-      message: `${adapter.label}: ${upserted} offers refreshed.`,
+      deactivated,
+      message: `${adapter.label}: ${upserted} offers refreshed${deactivated ? `, ${deactivated} retired` : ""}.`,
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
+    const message = redactError(e);
     await supabaseAdmin
       .from("data_sources")
       .update({ last_error_at: new Date().toISOString(), last_error_text: message })
@@ -119,6 +171,7 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
     return finish({
       status: e instanceof AdapterUnavailableError ? "skipped" : "error",
       rowsUpserted: 0,
+      deactivated: 0,
       message,
     });
   }
