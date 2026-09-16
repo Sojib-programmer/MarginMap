@@ -21,6 +21,7 @@ import {
   type Offer,
   type VariantIntel,
 } from "@/lib/catalog";
+import { useMembership } from "@/lib/membership";
 import { downloadCsv } from "@/lib/csv";
 import { OFFER_CSV_HEADERS, offerCsvRows } from "@/lib/export-rows";
 import { useCompare } from "@/lib/compare-store";
