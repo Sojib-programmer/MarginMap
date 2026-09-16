@@ -7,7 +7,8 @@ import { requireWorkspace } from "@/lib/quota.server";
 
 const input = z.object({ workspaceId: z.string().uuid() });
 
-type Json = Record<string, unknown>;
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type Json = Record<string, JsonValue>;
 
 export type RawCatalog = {
   variants: Json[];
