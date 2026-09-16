@@ -49,7 +49,7 @@ export const Route = createFileRoute("/app/billing")({
 
 function BillingPage() {
   const { membership } = useMembership();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const usage = useQuery(usageQuery(membership?.workspaceId ?? null));
   const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
   const [portalBusy, setPortalBusy] = useState(false);

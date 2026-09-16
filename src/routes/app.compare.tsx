@@ -21,6 +21,7 @@ import {
   type Offer,
   type VariantIntel,
 } from "@/lib/catalog";
+import { useMembership } from "@/lib/membership";
 import { downloadCsv } from "@/lib/csv";
 import { OFFER_CSV_HEADERS, offerCsvRows } from "@/lib/export-rows";
 import { useCompare } from "@/lib/compare-store";
@@ -37,7 +38,8 @@ export const Route = createFileRoute("/app/compare")({
 function ComparePage() {
   const { selected, clear, toggle } = useCompare();
   const { mode } = useRoleMode();
-  const catalog = useQuery(catalogQuery);
+  const { membership } = useMembership();
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const addToWatchlist = useAddToWatchlist();
   const saveEvaluation = useSaveEvaluation();
 

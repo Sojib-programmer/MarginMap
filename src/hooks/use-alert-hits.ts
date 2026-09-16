@@ -24,7 +24,7 @@ function thresholdOf(alert: AlertRow) {
  */
 export function useAlertHits() {
   const { membership } = useMembership();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const alerts = useQuery(alertsQuery(membership?.workspaceId ?? null));
 
   const variants = catalog.data?.variants ?? [];
@@ -56,7 +56,7 @@ export function useAlertHits() {
 /** Target-price hits for watchlist items, evaluated against best landed cost. */
 export function useWatchlistHits() {
   const { membership } = useMembership();
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const items = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
   const variants = catalog.data?.variants ?? [];
 

@@ -29,7 +29,7 @@ function WatchlistsPage() {
   const { membership } = useMembership();
   const lists = useQuery(watchlistsQuery(membership?.workspaceId ?? null));
   const items = useQuery(watchlistItemsQuery(membership?.workspaceId ?? null));
-  const catalog = useQuery(catalogQuery);
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const hits = useWatchlistHits();
   const [name, setName] = useState("");
 
@@ -52,7 +52,11 @@ function WatchlistsPage() {
   const removeItem = useMutation({
     mutationFn: async (id: string) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("watchlist_items").delete().eq("id", id).eq("workspace_id", ws.workspaceId);
+      const { error } = await supabase
+        .from("watchlist_items")
+        .delete()
+        .eq("id", id)
+        .eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "watchlist.item_removed", {
         type: "watchlist_item",
@@ -103,7 +107,12 @@ function WatchlistsPage() {
         .limit(1);
 
       if (target == null) {
-        if (existing?.[0]) await supabase.from("alerts").delete().eq("id", existing[0].id).eq("workspace_id", ws.workspaceId);
+        if (existing?.[0])
+          await supabase
+            .from("alerts")
+            .delete()
+            .eq("id", existing[0].id)
+            .eq("workspace_id", ws.workspaceId);
         return;
       }
       if (existing?.[0]) {
@@ -135,7 +144,11 @@ function WatchlistsPage() {
   const deleteList = useMutation({
     mutationFn: async (id: string) => {
       const ws = requireWrite();
-      const { error } = await supabase.from("watchlists").delete().eq("id", id).eq("workspace_id", ws.workspaceId);
+      const { error } = await supabase
+        .from("watchlists")
+        .delete()
+        .eq("id", id)
+        .eq("workspace_id", ws.workspaceId);
       if (error) throw new Error(error.message);
       await logActivity(ws.workspaceId, "watchlist.deleted", { type: "watchlist", id });
     },

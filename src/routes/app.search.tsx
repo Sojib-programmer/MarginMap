@@ -26,6 +26,7 @@ import {
   marketplaceOptions,
   sourceNameIndex,
 } from "@/lib/catalog";
+import { useMembership } from "@/lib/membership";
 import { downloadCsv } from "@/lib/csv";
 import { OFFER_CSV_HEADERS, offerCsvRows } from "@/lib/export-rows";
 import { money, money2 } from "@/lib/format";
@@ -56,7 +57,8 @@ function SearchPage() {
 
   const navigate = useNavigate({ from: "/app/search" });
   const { mode } = useRoleMode();
-  const catalog = useQuery(catalogQuery);
+  const { membership } = useMembership();
+  const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const logged = useRef<string | null>(null);
   const [view, setView] = useState<"table" | "cards">("table");
 
