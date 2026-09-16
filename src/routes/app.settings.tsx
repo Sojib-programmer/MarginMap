@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
+import { useMembership } from "@/lib/membership";
 import { catalogQuery } from "@/lib/catalog";
 import { useRoleMode } from "@/lib/role-mode";
 
@@ -39,6 +40,7 @@ function SettingsPage() {
   const { mode, setMode } = useRoleMode();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { membership } = useMembership();
   const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
 
   const profile = useQuery({

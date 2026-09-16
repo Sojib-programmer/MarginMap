@@ -37,6 +37,7 @@ export const Route = createFileRoute("/app/compare")({
 function ComparePage() {
   const { selected, clear, toggle } = useCompare();
   const { mode } = useRoleMode();
+  const { membership } = useMembership();
   const catalog = useQuery(catalogQuery(membership?.workspaceId ?? null));
   const addToWatchlist = useAddToWatchlist();
   const saveEvaluation = useSaveEvaluation();
