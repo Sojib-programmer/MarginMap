@@ -44,9 +44,18 @@ export const refreshSource = createServerFn({ method: "POST" })
     if (!source) throw forbidden("Unknown data source.");
     if (!source.active) throw forbidden("This data source is not active.");
 
+    // Two limiters: one bound to the authenticated caller (abuse), one to the
+    // source (upstream protection). Keys are derived server-side only.
     await enforceRateLimit(
       context.supabase,
-      `refresh:${data.sourceId}`,
+      `refresh:user:${context.userId}`,
+      10,
+      3600,
+      "You have triggered too many refreshes. Try again in an hour.",
+    );
+    await enforceRateLimit(
+      context.supabase,
+      `refresh:source:${data.sourceId}`,
       4,
       3600,
       "This source was refreshed recently. Connector refreshes are limited to 4 per hour.",

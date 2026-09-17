@@ -103,7 +103,7 @@ const ebayAdapter: SourceAdapter = {
     const basic = Buffer.from(
       `${secrets["EBAY_CLIENT_ID"]}:${secrets["EBAY_CLIENT_SECRET"]}`,
     ).toString("base64");
-    const tokenRes = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
+    const tokenRes = await fetchWithRetry("https://api.ebay.com/identity/v1/oauth2/token", {
       method: "POST",
       headers: {
         Authorization: `Basic ${basic}`,
@@ -112,16 +112,17 @@ const ebayAdapter: SourceAdapter = {
       body: "grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope",
     });
     if (!tokenRes.ok) {
-      throw new Error(`eBay token request failed [${tokenRes.status}]: ${await tokenRes.text()}`);
+      // Status only: upstream bodies can echo credentials back.
+      throw new Error(`eBay token request failed [${tokenRes.status}]`);
     }
     const token = ((await tokenRes.json()) as { access_token: string }).access_token;
 
     const rows: NormalizedOffer[] = [];
     for (const q of queries.slice(0, 20)) {
       const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(q)}&limit=${limit}`;
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetchWithRetry(url, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) {
-        throw new Error(`eBay search failed [${res.status}]: ${await res.text()}`);
+        throw new Error(`eBay search failed [${res.status}]`);
       }
       const body = (await res.json()) as {
         itemSummaries?: {
