@@ -55,14 +55,14 @@ function AuthPage() {
     setOauthBusy(provider);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: next ? `${window.location.origin}${next}` : window.location.origin,
       });
       if ("redirected" in result && result.redirected) return;
       if (result.error) {
         toast.error(result.error.message ?? "Sign-in failed.");
         return;
       }
-      navigate({ to: "/app" });
+      afterSignIn();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Sign-in failed.");
     } finally {
@@ -71,8 +71,11 @@ function AuthPage() {
   };
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app" });
-  }, [loading, session, navigate]);
+    if (!loading && session) {
+      if (next) window.location.href = next;
+      else navigate({ to: "/app" });
+    }
+  }, [loading, session, navigate, next]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +86,11 @@ function AuthPage() {
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/app` },
+            options: {
+              emailRedirectTo: next
+                ? `${window.location.origin}${next}`
+                : `${window.location.origin}/app`,
+            },
           });
     const { error } = await fn;
     setBusy(false);
