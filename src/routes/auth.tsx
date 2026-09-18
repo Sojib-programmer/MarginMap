@@ -11,7 +11,18 @@ import { useSession } from "@/hooks/use-session";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
+/** Only same-origin relative paths may be used as a post-sign-in destination. */
+function safeNext(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>): { next?: string } => {
+    const next = safeNext(s["next"]);
+    return next ? { next } : {};
+  },
   head: () => ({
     meta: [
       { title: "Sign in — MarginMap" },
@@ -26,7 +37,14 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const { session, loading } = useSession();
+  // A pending OAuth consent (or any other same-origin destination) wins over
+  // the default workspace landing, so an agent connection completes in one go.
+  const afterSignIn = () => {
+    if (next) window.location.href = next;
+    else navigate({ to: "/app" });
+  };
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,14 +55,14 @@ function AuthPage() {
     setOauthBusy(provider);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: next ? `${window.location.origin}${next}` : window.location.origin,
       });
       if ("redirected" in result && result.redirected) return;
       if (result.error) {
         toast.error(result.error.message ?? "Sign-in failed.");
         return;
       }
-      navigate({ to: "/app" });
+      afterSignIn();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Sign-in failed.");
     } finally {
@@ -53,8 +71,11 @@ function AuthPage() {
   };
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app" });
-  }, [loading, session, navigate]);
+    if (!loading && session) {
+      if (next) window.location.href = next;
+      else navigate({ to: "/app" });
+    }
+  }, [loading, session, navigate, next]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +86,11 @@ function AuthPage() {
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/app` },
+            options: {
+              emailRedirectTo: next
+                ? `${window.location.origin}${next}`
+                : `${window.location.origin}/app`,
+            },
           });
     const { error } = await fn;
     setBusy(false);
@@ -74,7 +99,7 @@ function AuthPage() {
       return;
     }
     if (mode === "signup") toast.success("Account created. You're signed in.");
-    navigate({ to: "/app" });
+    afterSignIn();
   };
 
   return (

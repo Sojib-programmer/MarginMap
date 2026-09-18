@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "sdk_version": "2.2.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://mzmeepgamxldfsksaxmu.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "marginmap",
+      "version": "0.1.0",
+      "title": "marginMap"
+    },
+    "tools": [
+      {
+        "name": "list_workspaces",
+        "title": "List workspaces",
+        "description": "List the MarginMap workspaces the signed-in user belongs to, with their role and plan. Workspace ids from here are the input for the other tools.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": null,
+        "outputSchema": null
+      },
+      {
+        "name": "list_watchlists",
+        "title": "List watchlists",
+        "description": "List the watchlists in one MarginMap workspace, including how many items each holds.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "workspace_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Workspace id from list_workspaces."
+            }
+          },
+          "required": [
+            "workspace_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_pipeline",
+        "title": "List sourcing pipeline",
+        "description": "List inventory / sourcing pipeline items in one MarginMap workspace, optionally filtered by status (watch, researching, source_now, acquired, listed, sold, passed).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "workspace_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Workspace id from list_workspaces."
+            },
+            "status": {
+              "description": "Optional pipeline status filter.",
+              "type": "string",
+              "enum": [
+                "watch",
+                "researching",
+                "source_now",
+                "acquired",
+                "listed",
+                "sold",
+                "passed"
+              ]
+            }
+          },
+          "required": [
+            "workspace_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_deal_evaluations",
+        "title": "List deal evaluations",
+        "description": "List saved deal evaluations in one MarginMap workspace with their expected resale range, profit, ROI and confidence.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "workspace_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Workspace id from list_workspaces."
+            },
+            "limit": {
+              "description": "How many rows to return (default 20, max 100).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "workspace_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_watchlist",
+        "title": "Create a watchlist",
+        "description": "Create a new watchlist in one MarginMap workspace. Requires write access in that workspace; auditors are rejected by the database.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "workspace_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Workspace id from list_workspaces."
+            },
+            "name": {
+              "type": "string",
+              "description": "Watchlist name as the user would read it."
+            },
+            "role_mode": {
+              "description": "Buyer or reseller lens for this list. Defaults to buyer.",
+              "type": "string",
+              "enum": [
+                "buyer",
+                "reseller"
+              ]
+            }
+          },
+          "required": [
+            "workspace_id",
+            "name"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

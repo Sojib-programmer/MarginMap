@@ -13,7 +13,9 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing.index'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing.about'
 import { Route as MarketingBlogRouteImport } from './routes/_marketing.blog'
@@ -43,6 +45,7 @@ import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
 import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as MarketingBlogSlugRouteImport } from './routes/_marketing.blog.$slug'
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -67,11 +70,22 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MarketingIndexRoute = MarketingIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -224,6 +238,11 @@ const AppWatchlistsRoute = AppWatchlistsRouteImport.update({
   path: '/watchlists',
   getParentRoute: () => AppRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketingBlogSlugRoute = MarketingBlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -251,7 +270,9 @@ export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/about': typeof MarketingAboutRoute
   '/blog': typeof MarketingBlogRouteWithChildren
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
@@ -280,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
   '/app/': typeof AppIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/blog/$slug': typeof MarketingBlogSlugRoute
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -288,7 +310,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/about': typeof MarketingAboutRoute
   '/blog': typeof MarketingBlogRouteWithChildren
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
@@ -318,6 +342,7 @@ export interface FileRoutesByTo {
   '/app/watchlists': typeof AppWatchlistsRoute
   '/': typeof MarketingIndexRoute
   '/app': typeof AppIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/blog/$slug': typeof MarketingBlogSlugRoute
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -329,7 +354,9 @@ export interface FileRoutesById {
   '/_marketing': typeof MarketingRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/blog': typeof MarketingBlogRouteWithChildren
   '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
@@ -359,6 +386,7 @@ export interface FileRoutesById {
   '/app/watchlists': typeof AppWatchlistsRoute
   '/_marketing/': typeof MarketingIndexRoute
   '/app/': typeof AppIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_marketing/blog/$slug': typeof MarketingBlogSlugRoute
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -371,7 +399,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/mcp'
     | '/sitemap.xml'
+    | '/.well-known/oauth-protected-resource'
     | '/about'
     | '/blog'
     | '/canonical-product-identity'
@@ -400,6 +430,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/watchlists'
     | '/app/'
+    | '/.lovable/oauth/consent'
     | '/blog/$slug'
     | '/app/variant/$id'
     | '/api/public/payments/webhook'
@@ -408,7 +439,9 @@ export interface FileRouteTypes {
   to:
     | '/$'
     | '/auth'
+    | '/mcp'
     | '/sitemap.xml'
+    | '/.well-known/oauth-protected-resource'
     | '/about'
     | '/blog'
     | '/canonical-product-identity'
@@ -438,6 +471,7 @@ export interface FileRouteTypes {
     | '/app/watchlists'
     | '/'
     | '/app'
+    | '/.lovable/oauth/consent'
     | '/blog/$slug'
     | '/app/variant/$id'
     | '/api/public/payments/webhook'
@@ -448,7 +482,9 @@ export interface FileRouteTypes {
     | '/_marketing'
     | '/app'
     | '/auth'
+    | '/mcp'
     | '/sitemap.xml'
+    | '/.well-known/oauth-protected-resource'
     | '/_marketing/about'
     | '/_marketing/blog'
     | '/_marketing/canonical-product-identity'
@@ -478,6 +514,7 @@ export interface FileRouteTypes {
     | '/app/watchlists'
     | '/_marketing/'
     | '/app/'
+    | '/.lovable/oauth/consent'
     | '/_marketing/blog/$slug'
     | '/app/variant/$id'
     | '/api/public/payments/webhook'
@@ -489,7 +526,10 @@ export interface RootRouteChildren {
   MarketingRoute: typeof MarketingRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  McpRoute: typeof McpRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicRefreshSourceRoute: typeof ApiPublicRefreshSourceRoute
 }
@@ -524,11 +564,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_marketing/': {
@@ -734,6 +788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWatchlistsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_marketing/blog/$slug': {
       id: '/_marketing/blog/$slug'
       path: '/$slug'
@@ -862,7 +923,11 @@ const rootRouteChildren: RootRouteChildren = {
   MarketingRoute: MarketingRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  McpRoute: McpRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicRefreshSourceRoute: ApiPublicRefreshSourceRoute,
 }
