@@ -99,7 +99,7 @@ function AuthPage() {
       return;
     }
     if (mode === "signup") toast.success("Account created. You're signed in.");
-    navigate({ to: "/app" });
+    afterSignIn();
   };
 
   return (
