@@ -50,10 +50,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     return data;
   },
   head: () => ({
-    meta: [
-      { title: "Authorize access — MarginMap" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Authorize access — MarginMap" }, { name: "robots", content: "noindex" }],
   }),
   component: Consent,
   errorComponent: ({ error }) => (
