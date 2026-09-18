@@ -11,7 +11,15 @@ import { useSession } from "@/hooks/use-session";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
+/** Only same-origin relative paths may be used as a post-sign-in destination. */
+function safeNext(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s["next"]) }),
   head: () => ({
     meta: [
       { title: "Sign in — MarginMap" },
