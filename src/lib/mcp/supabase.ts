@@ -1,4 +1,4 @@
-import type { ToolContext } from "@lovable.dev/mcp-js";
+import type { JsonValueInput, ToolContext } from "@lovable.dev/mcp-js";
 import { createClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
