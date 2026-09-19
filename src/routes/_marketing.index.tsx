@@ -30,9 +30,9 @@ export const Route = createFileRoute("/_marketing/")({
   head: () => {
     const base = pageHead({
       path: "/",
-      title: "MarginMap — Landed cost, sold comps & resale margin",
+      title: "MarginMap — Product intelligence for buyers and resellers",
       description:
-        "Compare landed cost against completed sales, check resale margin and ROI before you buy, and see the evidence behind every number.",
+        "Search products in plain language, compare landed cost against completed sales, and check resale margin before you buy. Every number opens its evidence.",
     });
     return {
       ...base,
