@@ -199,6 +199,23 @@ function EvaluatePage() {
         ) : null}
       </header>
 
+      {found ? null : (
+        <ListingLookup
+          onResolved={(p) => {
+            setPasted(p);
+            setInput((prev) => ({
+              ...prev,
+              purchasePrice: p.itemPrice,
+              inboundShipping: p.shippingPrice,
+              ...(p.conditionGrade ? { conditionGrade: p.conditionGrade } : {}),
+              ...(p.marketplace && FEE_SCHEDULES.some((f) => f.marketplace === p.marketplace)
+                ? { marketplace: p.marketplace }
+                : {}),
+            }));
+          }}
+        />
+      )}
+
       <QueryBoundary
         isLoading={catalog.isLoading}
         error={catalog.error}
