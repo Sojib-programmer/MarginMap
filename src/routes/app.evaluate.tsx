@@ -12,6 +12,7 @@ import {
   ValueCell,
 } from "@/components/primitives";
 import { StalenessWarning } from "@/components/freshness";
+import { ListingLookup, type ListingPrefill } from "@/components/listing-lookup";
 import { ScoreGauge } from "@/components/score-gauge";
 import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,7 @@ function EvaluatePage() {
   }, [catalog.data, offerId]);
 
   const [input, setInput] = useState<DealInput>(DEFAULT_DEAL_INPUT);
+  const [pasted, setPasted] = useState<ListingPrefill | null>(null);
   const [seeded, setSeeded] = useState<string | null>(null);
 
   if (found && seeded !== found.offer.id) {
@@ -181,7 +183,7 @@ function EvaluatePage() {
       <header>
         <p className="label-meta">Reseller · deal calculator</p>
         <h1 className="text-2xl font-semibold tracking-tight">
-          {found ? found.variant.productName : "Evaluate a deal"}
+          {found ? found.variant.productName : (pasted?.title ?? "Evaluate a deal")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Every assumption is editable and shown. Expected sale comes from completed comps, not
@@ -196,8 +198,39 @@ function EvaluatePage() {
               url={found.offer.listing_url}
             />
           </div>
+        ) : pasted ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Evaluating{" "}
+            <a
+              className="underline underline-offset-2"
+              href={pasted.listingUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              the listing you pasted
+            </a>
+            . Comparable completed sales only appear when this item matches something in the
+            catalogue.
+          </p>
         ) : null}
       </header>
+
+      {found ? null : (
+        <ListingLookup
+          onResolved={(p) => {
+            setPasted(p);
+            setInput((prev) => ({
+              ...prev,
+              purchasePrice: p.itemPrice,
+              inboundShipping: p.shippingPrice,
+              ...(p.conditionGrade ? { conditionGrade: p.conditionGrade } : {}),
+              ...(p.marketplace && FEE_SCHEDULES.some((f) => f.marketplace === p.marketplace)
+                ? { marketplace: p.marketplace }
+                : {}),
+            }));
+          }}
+        />
+      )}
 
       <QueryBoundary
         isLoading={catalog.isLoading}
