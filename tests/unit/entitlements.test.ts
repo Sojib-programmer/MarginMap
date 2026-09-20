@@ -14,11 +14,11 @@ import {
 describe("plan limits", () => {
   it("defaults an unknown plan to Free", () => {
     expect(limitsFor(null).searchesPerDay).toBe(5);
-    expect(limitsFor(undefined).resellerMode).toBe(false);
+    expect(limitsFor(undefined).alerts).toBe(0);
   });
 
-  it("gates reseller mode behind Pro", () => {
-    expect(limitsFor("free").resellerMode).toBe(false);
+  it("opens reseller mode to every plan during early access", () => {
+    expect(limitsFor("free").resellerMode).toBe(true);
     expect(limitsFor("pro").resellerMode).toBe(true);
     expect(limitsFor("business").resellerMode).toBe(true);
   });
