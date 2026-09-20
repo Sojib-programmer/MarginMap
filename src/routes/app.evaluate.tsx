@@ -183,7 +183,7 @@ function EvaluatePage() {
       <header>
         <p className="label-meta">Reseller · deal calculator</p>
         <h1 className="text-2xl font-semibold tracking-tight">
-          {found ? found.variant.productName : "Evaluate a deal"}
+          {found ? found.variant.productName : (pasted?.title ?? "Evaluate a deal")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Every assumption is editable and shown. Expected sale comes from completed comps, not
@@ -198,6 +198,20 @@ function EvaluatePage() {
               url={found.offer.listing_url}
             />
           </div>
+        ) : pasted ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Evaluating{" "}
+            <a
+              className="underline underline-offset-2"
+              href={pasted.listingUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              the listing you pasted
+            </a>
+            . Comparable completed sales only appear when this item matches something in the
+            catalogue.
+          </p>
         ) : null}
       </header>
 
