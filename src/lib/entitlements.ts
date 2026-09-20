@@ -41,6 +41,8 @@ export type Limits = {
 const UNLIMITED = -1;
 
 export const LIMITS: Record<PlanTier, Limits> = {
+  // Early access: reseller mode, CSV export and 30-day history are open to Free
+  // until the first 100 users. Mirrors private.tier_limits() in the database.
   free: {
     searchesPerDay: 5,
     watchlists: 3,
@@ -48,9 +50,9 @@ export const LIMITS: Record<PlanTier, Limits> = {
     seats: 1,
     apiCallsPerMonth: 0,
     marketplaces: 2,
-    historyDays: 0,
-    resellerMode: false,
-    csvExport: false,
+    historyDays: 30,
+    resellerMode: true,
+    csvExport: true,
     pdfExport: false,
   },
   pro: {

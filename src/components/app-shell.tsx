@@ -148,6 +148,11 @@ export function AppShell() {
                 ? "Optimizing for landed cost, fit and trust."
                 : "Optimizing for net proceeds, ROI and liquidity."}
           </p>
+          {membership?.plan === "free" ? (
+            <p className="mt-1 text-[11px] leading-snug text-primary">
+              Early access: reseller mode is free while we onboard our first 100 users.
+            </p>
+          ) : null}
           {!isUnlimited(limits.searchesPerDay) ? (
             <p className="num mt-2 text-[11px] text-muted-foreground">
               {Math.max(0, limits.searchesPerDay - (usage.data?.searchesUsed ?? 0))} of{" "}
@@ -158,8 +163,7 @@ export function AppShell() {
 
         <nav className="flex-1 space-y-0.5 px-2">
           {NAV.filter(
-            (n) =>
-              (!n.reseller || mode === "reseller") && (!n.resellerPlan || hasPaidPlan(membership)),
+            (n) => (!n.reseller || mode === "reseller") && (!n.resellerPlan || limits.resellerMode),
           ).map((item) => {
             const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
             return (

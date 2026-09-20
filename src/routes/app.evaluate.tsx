@@ -49,11 +49,7 @@ export const Route = createFileRoute("/app/evaluate")({
     offer: typeof search["offer"] === "string" ? (search["offer"] as string) : undefined,
   }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
-  component: () => (
-    <PlanGate feature="The deal calculator">
-      <EvaluatePage />
-    </PlanGate>
-  ),
+  component: EvaluatePage,
 });
 
 function EvaluatePage() {
