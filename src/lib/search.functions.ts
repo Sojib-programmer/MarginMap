@@ -21,9 +21,10 @@ export const recordSearch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data, context }) => {
+    // Early access: reseller-mode searches are open to every plan until the
+    // first 100 users, so no minimum plan is required here.
     const ws = await requireWorkspace(context.supabase, context.userId, data.workspaceId, {
       write: true,
-      ...(data.roleMode === "reseller" ? { minPlan: "pro" as const } : {}),
     });
 
     await enforceRateLimit(

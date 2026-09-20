@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlanGate } from "@/components/plan-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -21,11 +20,7 @@ import { inventoryQuery, PIPELINE_STATUSES, STATUS_LABEL } from "@/lib/workspace
 
 export const Route = createFileRoute("/app/pipeline")({
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
-  component: () => (
-    <PlanGate feature="The sourcing pipeline">
-      <PipelinePage />
-    </PlanGate>
-  ),
+  component: PipelinePage,
 });
 
 function PipelinePage() {
