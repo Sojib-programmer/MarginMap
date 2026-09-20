@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlanGate } from "@/components/plan-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
