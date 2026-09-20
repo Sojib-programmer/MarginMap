@@ -231,7 +231,9 @@ function SearchPage() {
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button asChild size="sm">
-                  <Link to="/app/evaluate">Evaluate a listing you found</Link>
+                  <Link to="/app/evaluate" search={{ offer: undefined }}>
+                    Evaluate a listing you found
+                  </Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
                   <Link to="/app/search" search={{ q: "" }}>
