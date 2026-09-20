@@ -226,15 +226,19 @@ function SearchPage() {
         skeleton={<TableSkeleton rows={6} />}
         empty={
           <EmptyState
-            title="No canonical products matched"
-            body="Try fewer words, drop the price bound, or clear the marketplace and category filters. The catalog covers cameras, laptops, consoles, collectibles and guitars."
-
+            title="Not in the catalogue yet"
+            body="The catalogue is still a small curated set covering cameras, laptops, consoles, collectibles and guitars, so most searches will miss. You do not have to wait for it: paste the listing you are looking at and MarginMap evaluates that item directly."
             action={
-              <Button asChild size="sm" variant="outline">
-                <Link to="/app/search" search={{ q: "" }}>
-                  Reset search
-                </Link>
-              </Button>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Button asChild size="sm">
+                  <Link to="/app/evaluate">Evaluate a listing you found</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/app/search" search={{ q: "" }}>
+                    Reset search
+                  </Link>
+                </Button>
+              </div>
             }
           />
         }
