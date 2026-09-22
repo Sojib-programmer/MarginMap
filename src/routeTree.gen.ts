@@ -25,6 +25,7 @@ import { Route as MarketingContactRouteImport } from './routes/_marketing.contac
 import { Route as MarketingEvidenceAndDataConfidenceRouteImport } from './routes/_marketing.evidence-and-data-confidence'
 import { Route as MarketingFaqRouteImport } from './routes/_marketing.faq'
 import { Route as MarketingFeeCalculatorRouteImport } from './routes/_marketing.fee-calculator'
+import { Route as MarketingJoinRouteImport } from './routes/_marketing.join'
 import { Route as MarketingLandedCostRouteImport } from './routes/_marketing.landed-cost'
 import { Route as MarketingMarketplaceFeesRouteImport } from './routes/_marketing.marketplace-fees'
 import { Route as MarketingMethodologyRouteImport } from './routes/_marketing.methodology'
@@ -132,6 +133,11 @@ const MarketingFaqRoute = MarketingFaqRouteImport.update({
 const MarketingFeeCalculatorRoute = MarketingFeeCalculatorRouteImport.update({
   id: '/fee-calculator',
   path: '/fee-calculator',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingJoinRoute = MarketingJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingLandedCostRoute = MarketingLandedCostRouteImport.update({
@@ -281,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
   '/faq': typeof MarketingFaqRoute
   '/fee-calculator': typeof MarketingFeeCalculatorRoute
+  '/join': typeof MarketingJoinRoute
   '/landed-cost': typeof MarketingLandedCostRoute
   '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
   '/faq': typeof MarketingFaqRoute
   '/fee-calculator': typeof MarketingFeeCalculatorRoute
+  '/join': typeof MarketingJoinRoute
   '/landed-cost': typeof MarketingLandedCostRoute
   '/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/methodology': typeof MarketingMethodologyRoute
@@ -365,6 +373,7 @@ export interface FileRoutesById {
   '/_marketing/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
   '/_marketing/faq': typeof MarketingFaqRoute
   '/_marketing/fee-calculator': typeof MarketingFeeCalculatorRoute
+  '/_marketing/join': typeof MarketingJoinRoute
   '/_marketing/landed-cost': typeof MarketingLandedCostRoute
   '/_marketing/marketplace-fees': typeof MarketingMarketplaceFeesRoute
   '/_marketing/methodology': typeof MarketingMethodologyRoute
@@ -410,6 +419,7 @@ export interface FileRouteTypes {
     | '/evidence-and-data-confidence'
     | '/faq'
     | '/fee-calculator'
+    | '/join'
     | '/landed-cost'
     | '/marketplace-fees'
     | '/methodology'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/evidence-and-data-confidence'
     | '/faq'
     | '/fee-calculator'
+    | '/join'
     | '/landed-cost'
     | '/marketplace-fees'
     | '/methodology'
@@ -493,6 +504,7 @@ export interface FileRouteTypes {
     | '/_marketing/evidence-and-data-confidence'
     | '/_marketing/faq'
     | '/_marketing/fee-calculator'
+    | '/_marketing/join'
     | '/_marketing/landed-cost'
     | '/_marketing/marketplace-fees'
     | '/_marketing/methodology'
@@ -646,6 +658,13 @@ declare module '@tanstack/react-router' {
       path: '/fee-calculator'
       fullPath: '/fee-calculator'
       preLoaderRoute: typeof MarketingFeeCalculatorRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/join': {
+      id: '/_marketing/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof MarketingJoinRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/_marketing/landed-cost': {
@@ -847,6 +866,7 @@ interface MarketingRouteChildren {
   MarketingEvidenceAndDataConfidenceRoute: typeof MarketingEvidenceAndDataConfidenceRoute
   MarketingFaqRoute: typeof MarketingFaqRoute
   MarketingFeeCalculatorRoute: typeof MarketingFeeCalculatorRoute
+  MarketingJoinRoute: typeof MarketingJoinRoute
   MarketingLandedCostRoute: typeof MarketingLandedCostRoute
   MarketingMarketplaceFeesRoute: typeof MarketingMarketplaceFeesRoute
   MarketingMethodologyRoute: typeof MarketingMethodologyRoute
@@ -870,6 +890,7 @@ const MarketingRouteChildren: MarketingRouteChildren = {
     MarketingEvidenceAndDataConfidenceRoute,
   MarketingFaqRoute: MarketingFaqRoute,
   MarketingFeeCalculatorRoute: MarketingFeeCalculatorRoute,
+  MarketingJoinRoute: MarketingJoinRoute,
   MarketingLandedCostRoute: MarketingLandedCostRoute,
   MarketingMarketplaceFeesRoute: MarketingMarketplaceFeesRoute,
   MarketingMethodologyRoute: MarketingMethodologyRoute,
