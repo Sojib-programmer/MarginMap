@@ -97,15 +97,51 @@ function AuthPage() {
                 : `${window.location.origin}/app`,
             },
           });
-    const { error } = await fn;
+    const { data, error } = await fn;
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    if (mode === "signup") toast.success("Account created. You're signed in.");
+    if (mode === "signup") {
+      trackSignUp("email");
+      if (!data.session) {
+        // Email confirmation is on: there is no session yet, so /app would
+        // bounce straight back here. Tell the visitor what to do instead.
+        setPendingVerification(email);
+        toast.success("Check your inbox to confirm your email.");
+        return;
+      }
+      toast.success("Account created. You're signed in.");
+    } else {
+      trackLogin("email");
+    }
     afterSignIn();
   };
+
+  if (pendingVerification) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-4">
+        <div className="w-full max-w-sm">
+          <BrandLogo size={36} priority />
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">Confirm your email</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We sent a confirmation link to{" "}
+            <span className="text-foreground">{pendingVerification}</span>. Open it and you&apos;ll
+            land straight in your workspace. No email after a minute? Check spam, or try again.
+          </p>
+          <Button
+            variant="outline"
+            className="mt-6 w-full"
+            onClick={() => setPendingVerification(null)}
+          >
+            Back to sign in
+          </Button>
+          <Disclaimer className="mt-8" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid min-h-screen place-items-center bg-background px-4">
