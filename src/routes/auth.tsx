@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Disclaimer } from "@/components/primitives";
+import { trackLogin, trackSignUp } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +20,10 @@ function safeNext(value: unknown): string | undefined {
 }
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>): { next?: string } => {
+  validateSearch: (s: Record<string, unknown>): { next?: string; mode?: "signup" | "signin" } => {
     const next = safeNext(s["next"]);
-    return next ? { next } : {};
+    const mode = s["mode"] === "signup" ? "signup" : s["mode"] === "signin" ? "signin" : undefined;
+    return { ...(next ? { next } : {}), ...(mode ? { mode } : {}) };
   },
   head: () => ({
     meta: [
@@ -37,7 +39,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { next } = Route.useSearch();
+  const { next, mode: initialMode } = Route.useSearch();
   const { session, loading } = useSession();
   // A pending OAuth consent (or any other same-origin destination) wins over
   // the default workspace landing, so an agent connection completes in one go.
@@ -45,7 +47,8 @@ function AuthPage() {
     if (next) window.location.href = next;
     else navigate({ to: "/app" });
   };
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode ?? "signin");
+  const [pendingVerification, setPendingVerification] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -62,6 +65,8 @@ function AuthPage() {
         toast.error(result.error.message ?? "Sign-in failed.");
         return;
       }
+      if (mode === "signup") trackSignUp(provider);
+      else trackLogin(provider);
       afterSignIn();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Sign-in failed.");
@@ -92,15 +97,51 @@ function AuthPage() {
                 : `${window.location.origin}/app`,
             },
           });
-    const { error } = await fn;
+    const { data, error } = await fn;
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    if (mode === "signup") toast.success("Account created. You're signed in.");
+    if (mode === "signup") {
+      trackSignUp("email");
+      if (!data.session) {
+        // Email confirmation is on: there is no session yet, so /app would
+        // bounce straight back here. Tell the visitor what to do instead.
+        setPendingVerification(email);
+        toast.success("Check your inbox to confirm your email.");
+        return;
+      }
+      toast.success("Account created. You're signed in.");
+    } else {
+      trackLogin("email");
+    }
     afterSignIn();
   };
+
+  if (pendingVerification) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-4">
+        <div className="w-full max-w-sm">
+          <BrandLogo size={36} priority />
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">Confirm your email</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We sent a confirmation link to{" "}
+            <span className="text-foreground">{pendingVerification}</span>. Open it and you&apos;ll
+            land straight in your workspace. No email after a minute? Check spam, or try again.
+          </p>
+          <Button
+            variant="outline"
+            className="mt-6 w-full"
+            onClick={() => setPendingVerification(null)}
+          >
+            Back to sign in
+          </Button>
+          <Disclaimer className="mt-8" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid min-h-screen place-items-center bg-background px-4">
