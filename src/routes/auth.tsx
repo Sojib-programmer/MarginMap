@@ -38,7 +38,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { next } = Route.useSearch();
+  const { next, mode: initialMode } = Route.useSearch();
   const { session, loading } = useSession();
   // A pending OAuth consent (or any other same-origin destination) wins over
   // the default workspace landing, so an agent connection completes in one go.
