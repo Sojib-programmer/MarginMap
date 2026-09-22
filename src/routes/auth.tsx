@@ -46,7 +46,8 @@ function AuthPage() {
     if (next) window.location.href = next;
     else navigate({ to: "/app" });
   };
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode ?? "signin");
+  const [pendingVerification, setPendingVerification] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
