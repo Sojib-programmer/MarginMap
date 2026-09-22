@@ -11,8 +11,7 @@ declare global {
 }
 
 const MEASUREMENT_ID = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY"] as
-  | string
-  | undefined;
+  string | undefined;
 
 let initialized = false;
 
