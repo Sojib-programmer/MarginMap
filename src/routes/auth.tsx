@@ -64,6 +64,8 @@ function AuthPage() {
         toast.error(result.error.message ?? "Sign-in failed.");
         return;
       }
+      if (mode === "signup") trackSignUp(provider);
+      else trackLogin(provider);
       afterSignIn();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Sign-in failed.");
