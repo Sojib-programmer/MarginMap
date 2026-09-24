@@ -9,7 +9,6 @@
 
 declare global {
   interface Window {
-    dataLayer: unknown[];
     gtag?: (...args: unknown[]) => void;
   }
 }
@@ -115,12 +114,12 @@ export async function loadGoogleAds() {
   if (typeof window === "undefined") return;
   const allowed = await canTrackAds();
   if (!allowed) return;
-  window.dataLayer = window.dataLayer || [];
+  const dl = (window.dataLayer = window.dataLayer ?? []);
   window.gtag =
     window.gtag ||
     function gtag() {
       // eslint-disable-next-line prefer-rest-params
-      window.dataLayer.push(arguments);
+      dl.push(arguments);
     };
   updateConsent("granted");
   if (document.querySelector("script[data-google-ads]")) return;
@@ -129,7 +128,7 @@ export async function loadGoogleAds() {
   const script = document.createElement("script");
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`;
   script.async = true;
-  script.dataset.googleAds = "";
+  script.dataset["googleAds"] = "";
   document.head.appendChild(script);
 }
 

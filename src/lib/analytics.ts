@@ -4,6 +4,8 @@
  * otherwise, so ad-conversion calls can be placed in the funnel today.
  */
 
+import { reportSignupConversion } from "./consent";
+
 declare global {
   interface Window {
     dataLayer?: unknown[];
@@ -17,8 +19,12 @@ let initialized = false;
 
 function push(args: unknown[]) {
   if (typeof window === "undefined") return;
-  window.dataLayer = window.dataLayer ?? [];
-  window.dataLayer.push(args);
+  if (window.gtag) {
+    window.gtag(...args);
+    return;
+  }
+  const dl = (window.dataLayer = window.dataLayer ?? []);
+  dl.push(args);
 }
 
 export function analyticsConfigured() {
@@ -51,6 +57,7 @@ export function trackEvent(name: string, params: Record<string, unknown> = {}) {
 /** Primary ad conversion: a new account was created. */
 export function trackSignUp(method: "email" | "google" | "apple") {
   trackEvent("sign_up", { method });
+  void reportSignupConversion();
 }
 
 /** Secondary conversion: an existing account returned. */
