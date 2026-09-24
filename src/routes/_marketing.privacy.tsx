@@ -57,9 +57,13 @@ const SECTIONS: { heading: string; body: string[] }[] = [
     ],
   },
   {
-    heading: "Cookies and analytics",
+    heading: "Cookies, analytics and advertising",
     body: [
-      "The application stores an authentication session in browser storage so you stay signed in, and a small preference value for your selected role mode. These are functional, not advertising, and there is no cross-site tracking.",
+      "The application stores an authentication session in browser storage so you stay signed in, and a small preference value for your selected role mode. These are functional.",
+      "Advertising measurement: we use Google Ads to measure whether our ads lead to account sign-ups and to optimise ad delivery. When allowed, the Google tag sets advertising cookies and sends Google a sign-up event (no email, name or workspace data) when you create an account, together with standard device and page information Google collects. The recipient is Google Ads; the purposes are conversion measurement and ad optimisation.",
+      "Consent: visitors in the EEA, UK, Switzerland and Canada see a cookie banner, and no Google Ads tag or event loads until they accept. Rejecting is as easy as accepting. We keep a record in your browser of which choice you made, when, and the notice version shown. Elsewhere, measurement runs without a banner; you can still turn it off.",
+      "Withdrawing: use the Cookie settings link in the site footer at any time to change or withdraw your choice. Withdrawal takes effect immediately and stops further events.",
+      "How Google uses data from sites that use its services: https://business.safety.google/privacy/",
     ],
   },
   {

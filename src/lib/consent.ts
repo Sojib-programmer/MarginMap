@@ -16,6 +16,7 @@ declare global {
 export const GOOGLE_ADS_ID = "AW-18470665560";
 export const SIGNUP_SEND_TO = "AW-18470665560/7GrKCL_q-oIdENj6v-dE";
 
+export const OAUTH_INTENT_KEY = "marginmap.oauth_intent";
 export const STORAGE_KEY = "cookie_consent";
 export const RECORD_KEY = "cookie_consent_record";
 export const NOTICE_VERSION = "2026-09-24";

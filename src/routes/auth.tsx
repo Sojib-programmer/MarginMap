@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Disclaimer } from "@/components/primitives";
 import { trackLogin, trackSignUp } from "@/lib/analytics";
+import { OAUTH_INTENT_KEY } from "@/lib/consent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,17 +57,18 @@ function AuthPage() {
 
   const signInWith = async (provider: "google" | "apple") => {
     setOauthBusy(provider);
+    sessionStorage.setItem(OAUTH_INTENT_KEY, JSON.stringify({ provider, at: Date.now() }));
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: next ? `${window.location.origin}${next}` : window.location.origin,
       });
       if ("redirected" in result && result.redirected) return;
       if (result.error) {
+        sessionStorage.removeItem(OAUTH_INTENT_KEY);
         toast.error(result.error.message ?? "Sign-in failed.");
         return;
       }
-      if (mode === "signup") trackSignUp(provider);
-      else trackLogin(provider);
+      // Popup flow finished in-page: the root listener settles the intent.
       afterSignIn();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Sign-in failed.");
