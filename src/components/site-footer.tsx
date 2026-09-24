@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { CatalogNote, Disclaimer } from "@/components/primitives";
 import { PILLARS } from "@/content/pillars";
+import { openCookieSettings } from "@/lib/consent";
 
 const COLUMNS: { title: string; links: { to: string; label: string }[] }[] = [
   {
@@ -63,6 +64,17 @@ export function SiteFooter() {
                     </Link>
                   </li>
                 ))}
+                {col.title === "Legal" && (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={openCookieSettings}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Cookie settings
+                    </button>
+                  </li>
+                )}
               </ul>
             </nav>
           ))}
