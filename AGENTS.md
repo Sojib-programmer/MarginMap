@@ -105,6 +105,10 @@ MarginMap publishes its own MCP server at `src/routes/mcp.ts` with an OAuth cons
 
 ## Agent workflow rules
 
-- Keep the build green: `bunx tsgo --noEmit` after meaningful edits; never edit `src/routeTree.gen.ts`.
+- Keep the build green: `bunx tsgo --noEmit`, then `bun run check` (typecheck + lint at zero warnings + format + 48 Vitest unit tests + build) after meaningful edits. Never edit `src/routeTree.gen.ts`.
+- Playwright: `tests/e2e/public.spec.ts` runs unauthenticated; `tests/e2e/workspace.spec.ts` fails loudly without auditor credentials rather than silently passing.
+- Runtimes are pinned (Node 20.19.0 / npm 10.9.2); CI lives in `.github/workflows/quality-gates.yml`.
 - Verify fixes with the fastest relevant signal (build, Playwright smoke, console/network) before claiming done.
-- Use semantic tokens, existing components (`FilterBar`, `PlanGate`, `RecommendationBadge`, `ValueCell`, `ProvenanceCell`, `result-table`), and `use-workspace-actions` hooks rather than rebuilding equivalents.
+- Use semantic tokens, existing components (`FilterBar`, `PlanGate`, `RecommendationBadge`, `ValueCell`, `ProvenanceCell`, `result-table`, `ListingLookup`), and `use-workspace-actions` hooks rather than rebuilding equivalents.
+- Security scans: fix only the findings the user names by `internal_id`; mark them via `manage_security_finding`. Do not touch or ignore other findings.
+- Never print, echo or paste secret values or test credentials into chat.
