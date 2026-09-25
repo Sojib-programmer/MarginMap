@@ -121,30 +121,69 @@ export const resolveListing = createServerFn({ method: "POST" })
       retrievedAt: null,
     };
 
+    const { extractListingWithFirecrawl, captureServerEvent, firecrawlConfigured } =
+      await import("@/lib/integrations.server");
+
+    const viaFirecrawl = async (itemId: string | null, fallbackReason: string) => {
+      if (!firecrawlConfigured()) return { ...base, itemId, reason: fallbackReason };
+      try {
+        const x = await extractListingWithFirecrawl(url.toString());
+        if (!x) {
+          void captureServerEvent(context.userId, "listing_lookup", {
+            marketplace: base.marketplace,
+            via: "firecrawl",
+            resolved: false,
+          });
+          return {
+            ...base,
+            itemId,
+            reason: `Could not read a price from that ${base.marketplaceLabel} page. Enter the price and shipping below.`,
+          };
+        }
+        void captureServerEvent(context.userId, "listing_lookup", {
+          marketplace: base.marketplace,
+          via: "firecrawl",
+          resolved: true,
+        });
+        return {
+          ...base,
+          itemId,
+          resolved: true,
+          title: x.title,
+          itemPrice: x.itemPrice,
+          shippingPrice: x.shippingPrice,
+          currencyCode: x.currencyCode,
+          conditionGrade: ebayConditionGrade(x.condition ?? undefined),
+          sellerName: x.sellerName,
+          retrievedAt: new Date().toISOString(),
+          reason: "Read from the public listing page — check the numbers before you commit.",
+        };
+      } catch {
+        return { ...base, itemId, reason: fallbackReason };
+      }
+    };
+
     if (hit?.marketplace !== "ebay") {
-      return {
-        ...base,
-        reason: `Automatic lookup is not available for ${base.marketplaceLabel} yet. Enter the price and shipping below and the evaluation runs the same way.`,
-      };
+      return viaFirecrawl(
+        null,
+        `Automatic lookup is not available for ${base.marketplaceLabel} yet. Enter the price and shipping below and the evaluation runs the same way.`,
+      );
     }
 
     const itemId = ebayItemId(url);
     if (!itemId) {
-      return {
-        ...base,
-        reason:
-          "Could not read an item number from that eBay address. Enter the price and shipping below.",
-      };
+      return viaFirecrawl(
+        null,
+        "Could not read an item number from that eBay address. Enter the price and shipping below.",
+      );
     }
 
     const status = adapterStatus("ebay");
     if (!status.ready) {
-      return {
-        ...base,
+      return viaFirecrawl(
         itemId,
-        reason:
-          "Live eBay lookup is not switched on for this project yet. Enter the price and shipping below and the evaluation runs the same way.",
-      };
+        "Live eBay lookup is not switched on for this project yet. Enter the price and shipping below and the evaluation runs the same way.",
+      );
     }
 
     try {
