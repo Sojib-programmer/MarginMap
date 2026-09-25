@@ -79,9 +79,7 @@ export async function extractListingWithFirecrawl(url: string): Promise<Extracte
     itemPrice: price,
     shippingPrice: num(j["shipping_price"]) ?? 0,
     currencyCode:
-      typeof j["currency"] === "string" && /^[A-Z]{3}$/.test(j["currency"])
-        ? j["currency"]
-        : "USD",
+      typeof j["currency"] === "string" && /^[A-Z]{3}$/.test(j["currency"]) ? j["currency"] : "USD",
     condition: typeof j["condition"] === "string" ? j["condition"].slice(0, 80) : null,
     sellerName: typeof j["seller"] === "string" ? j["seller"].slice(0, 120) : null,
   };
@@ -96,7 +94,9 @@ export async function captureServerEvent(
   const token = process.env["POSTHOG_API_KEY"];
   if (!token) return;
   const host =
-    process.env["POSTHOG_REGION"] === "us" ? "https://us.i.posthog.com" : "https://eu.i.posthog.com";
+    process.env["POSTHOG_REGION"] === "us"
+      ? "https://us.i.posthog.com"
+      : "https://eu.i.posthog.com";
   try {
     const res = await fetch(`${host}/i/v0/e/`, {
       method: "POST",
