@@ -173,3 +173,42 @@ export async function reportSignupConversion() {
 export function openCookieSettings() {
   window.dispatchEvent(new Event(OPEN_SETTINGS_EVENT));
 }
+
+/**
+ * OAuth attribution intent.
+ *
+ * The marker only exists to attribute a *returning* OAuth session to the
+ * provider that started it. It must expire, because an abandoned or failed
+ * sign-in would otherwise sit in sessionStorage and be consumed by an
+ * unrelated later auth event (email sign-in, token refresh, remount) —
+ * emitting a false Google Ads conversion.
+ */
+export const OAUTH_INTENT_TTL_MS = 5 * 60 * 1000;
+
+export type OAuthProvider = "google" | "apple";
+
+export function markOAuthIntent(provider: OAuthProvider) {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(OAUTH_INTENT_KEY, JSON.stringify({ provider, at: Date.now() }));
+}
+
+export function clearOAuthIntent() {
+  if (typeof window === "undefined") return;
+  sessionStorage.removeItem(OAUTH_INTENT_KEY);
+}
+
+/** Reads and removes the intent; returns null when absent, corrupt or expired. */
+export function consumeOAuthIntent(): OAuthProvider | null {
+  if (typeof window === "undefined") return null;
+  const raw = sessionStorage.getItem(OAUTH_INTENT_KEY);
+  if (!raw) return null;
+  sessionStorage.removeItem(OAUTH_INTENT_KEY);
+  try {
+    const parsed = JSON.parse(raw) as { provider?: unknown; at?: unknown };
+    const at = typeof parsed.at === "number" ? parsed.at : 0;
+    if (!at || Date.now() - at > OAUTH_INTENT_TTL_MS) return null;
+    return parsed.provider === "apple" ? "apple" : parsed.provider === "google" ? "google" : null;
+  } catch {
+    return null;
+  }
+}

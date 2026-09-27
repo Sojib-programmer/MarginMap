@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { Disclaimer } from "@/components/primitives";
 import { trackLogin, trackSignUp } from "@/lib/analytics";
-import { OAUTH_INTENT_KEY } from "@/lib/consent";
+import { clearOAuthIntent, markOAuthIntent } from "@/lib/consent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,20 +57,21 @@ function AuthPage() {
 
   const signInWith = async (provider: "google" | "apple") => {
     setOauthBusy(provider);
-    sessionStorage.setItem(OAUTH_INTENT_KEY, JSON.stringify({ provider, at: Date.now() }));
+    markOAuthIntent(provider);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: next ? `${window.location.origin}${next}` : window.location.origin,
       });
       if ("redirected" in result && result.redirected) return;
       if (result.error) {
-        sessionStorage.removeItem(OAUTH_INTENT_KEY);
+        clearOAuthIntent();
         toast.error(result.error.message ?? "Sign-in failed.");
         return;
       }
       // Popup flow finished in-page: the root listener settles the intent.
       afterSignIn();
     } catch (e) {
+      clearOAuthIntent();
       toast.error(e instanceof Error ? e.message : "Sign-in failed.");
     } finally {
       setOauthBusy(null);
@@ -86,6 +87,8 @@ function AuthPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // An email flow must never be attributed to a stale OAuth attempt.
+    clearOAuthIntent();
     setBusy(true);
     const fn =
       mode === "signin"

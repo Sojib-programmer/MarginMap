@@ -11,7 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { initAnalytics, trackLogin, trackPageView, trackSignUp } from "@/lib/analytics";
-import { OAUTH_INTENT_KEY, loadGoogleAds } from "@/lib/consent";
+import { consumeOAuthIntent, loadGoogleAds } from "@/lib/consent";
 import { CookieBanner } from "@/components/cookie-banner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -134,25 +134,24 @@ function RootComponent() {
     void loadGoogleAds();
 
     // OAuth sign-in leaves the page, so completion is detected on return:
-    // a pending intent + a fresh session. A user created in the last 10
-    // minutes counts as a sign-up, otherwise a login.
+    // a fresh, unexpired intent plus a session. The intent is consumed once
+    // and expires after five minutes, so an abandoned or failed attempt can
+    // never be attributed to a later, unrelated auth event.
     const settle = (user: { created_at?: string } | null | undefined) => {
-      const raw = sessionStorage.getItem(OAUTH_INTENT_KEY);
-      if (!raw || !user) return;
-      sessionStorage.removeItem(OAUTH_INTENT_KEY);
-      let provider: "google" | "apple" = "google";
-      try {
-        const p = (JSON.parse(raw) as { provider?: string }).provider;
-        if (p === "apple") provider = "apple";
-      } catch {
-        /* ignore */
-      }
+      if (!user) return;
+      const provider = consumeOAuthIntent();
+      if (!provider) return;
       const created = user.created_at ? Date.parse(user.created_at) : 0;
       if (Date.now() - created < 10 * 60 * 1000) trackSignUp(provider);
       else trackLogin(provider);
     };
     void supabase.auth.getSession().then(({ data }) => settle(data.session?.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => settle(session?.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only a genuine sign-in transition may report a conversion; token
+      // refreshes and remounts must not.
+      if (event !== "SIGNED_IN") return;
+      settle(session?.user);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
