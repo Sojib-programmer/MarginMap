@@ -212,4 +212,3 @@ export function consumeOAuthIntent(): OAuthProvider | null {
     return null;
   }
 }
-
