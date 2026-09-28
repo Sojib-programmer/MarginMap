@@ -12,6 +12,7 @@ import {
 } from "@/components/primitives";
 import { StalenessWarning } from "@/components/freshness";
 import { ListingLookup, type ListingPrefill } from "@/components/listing-lookup";
+import { ListingRiskPanel } from "@/components/listing-risk-panel";
 import { ScoreGauge } from "@/components/score-gauge";
 import { EmptyState, PanelSkeleton, QueryBoundary, RouteError } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -226,6 +227,21 @@ function EvaluatePage() {
           }}
         />
       )}
+
+      <ListingRiskPanel
+        listingUrl={found?.offer.listing_url ?? pasted?.listingUrl ?? undefined}
+        details={{
+          ...(found?.variant.productName ?? pasted?.title
+            ? { title: (found?.variant.productName ?? pasted?.title) as string }
+            : {}),
+          marketplace: input.marketplace,
+          itemPrice: input.purchasePrice,
+          shippingPrice: input.inboundShipping,
+          conditionGrade: input.conditionGrade,
+          ...(stats.medianSold > 0 ? { medianSold: stats.medianSold } : {}),
+          sampleSize: stats.sampleSize,
+        }}
+      />
 
       <QueryBoundary
         isLoading={catalog.isLoading}
