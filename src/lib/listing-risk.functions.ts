@@ -121,9 +121,8 @@ export const screenListing = createServerFn({ method: "POST" })
     let sourceNote = "Screened from the details you entered.";
 
     if (data.listingUrl) {
-      const { extractListingWithFirecrawl, firecrawlConfigured, captureServerEvent } = await import(
-        "@/lib/integrations.server"
-      );
+      const { extractListingWithFirecrawl, firecrawlConfigured, captureServerEvent } =
+        await import("@/lib/integrations.server");
       if (firecrawlConfigured()) {
         try {
           const page = await extractListingWithFirecrawl(data.listingUrl);

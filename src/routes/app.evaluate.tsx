@@ -231,7 +231,7 @@ function EvaluatePage() {
       <ListingRiskPanel
         listingUrl={found?.offer.listing_url ?? pasted?.listingUrl ?? undefined}
         details={{
-          ...(found?.variant.productName ?? pasted?.title
+          ...((found?.variant.productName ?? pasted?.title)
             ? { title: (found?.variant.productName ?? pasted?.title) as string }
             : {}),
           marketplace: input.marketplace,
