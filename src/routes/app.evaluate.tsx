@@ -28,6 +28,7 @@ import {
 import { useSaveEvaluation } from "@/hooks/use-workspace-actions";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogQuery, liquidityOf } from "@/lib/catalog";
+import { LIMITS } from "@/lib/entitlements";
 import { money2, relativeTime } from "@/lib/format";
 import { logActivity, useMembership, useRequireWrite } from "@/lib/membership";
 import { ageInDays, stalenessCaveat } from "@/lib/freshness";
@@ -143,7 +144,9 @@ function EvaluatePage() {
   const addToPipeline = useMutation({
     mutationFn: async () => {
       const ws = requireWrite();
-      if (ws.plan === "free") throw new Error("The pipeline requires the Pro plan. See Billing.");
+      // Entitlement, not plan name: Free has reseller mode during early access.
+      if (!LIMITS[ws.plan].resellerMode)
+        throw new Error("The pipeline requires the Pro plan. See Billing.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
       const { data: row, error } = await supabase
