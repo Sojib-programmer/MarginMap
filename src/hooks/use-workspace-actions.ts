@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { LIMITS } from "@/lib/entitlements";
 import { logActivity, useMembership, type Membership } from "@/lib/membership";
 import { recordSearch } from "@/lib/search.functions";
 import type { RoleMode } from "@/lib/role-mode";
@@ -44,7 +45,9 @@ function useWritableWorkspace() {
 }
 
 function requireResellerPlan(m: Membership) {
-  if (m.plan === "free") {
+  // Mirrors private.tier_limits(): during early access Free workspaces have
+  // reseller_mode enabled, so gate on the entitlement, never on the plan name.
+  if (!LIMITS[m.plan].resellerMode) {
     throw new Error(
       "Saving deal evaluations and pipeline items requires the Pro plan. See Billing.",
     );

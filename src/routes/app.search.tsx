@@ -227,7 +227,7 @@ function SearchPage() {
         empty={
           <EmptyState
             title="Not in the catalogue yet"
-            body="The catalogue is still a small curated set covering cameras, laptops, consoles, collectibles and guitars, so most searches will miss. You do not have to wait for it: paste the listing you are looking at and MarginMap evaluates that item directly."
+            body="The catalogue is still a small curated set covering cameras, laptops, consoles, collectibles and guitars, so most searches will miss. You do not have to wait for it: paste the listing you are looking at and MarginMap resolves the price, works out landed cost and runs an AI sourcing-risk screen on that item directly."
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button asChild size="sm">
