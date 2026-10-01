@@ -44,12 +44,12 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error: raw, reset }: { error: unknown; reset: () => void }) {
-  const error = raw instanceof Error ? raw : new Error(String(raw));
-  console.error(error);
+  console.error(raw);
   const router = useRouter();
   useEffect(() => {
+    const error = raw instanceof Error ? raw : new Error(String(raw));
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+  }, [raw]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
