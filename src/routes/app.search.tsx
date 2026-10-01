@@ -14,7 +14,8 @@ import {
   ValueCell,
 } from "@/components/primitives";
 import { buildRows, ResultTable } from "@/components/result-table";
-import { EmptyState, QueryBoundary, RouteError, TableSkeleton } from "@/components/states";
+import { QueryBoundary, RouteError, TableSkeleton } from "@/components/states";
+import { isListingUrl, SearchFallthrough } from "@/components/search-fallthrough";
 import { Button } from "@/components/ui/button";
 import { useAddToWatchlist, useSaveEvaluation, useSaveSearch } from "@/hooks/use-workspace-actions";
 import {
@@ -222,28 +223,9 @@ function SearchPage() {
       <QueryBoundary
         isLoading={catalog.isLoading}
         error={catalog.error}
-        isEmpty={matches.length === 0}
+        isEmpty={matches.length === 0 || isListingUrl(q)}
         skeleton={<TableSkeleton rows={6} />}
-        empty={
-          <EmptyState
-            title="Not in the catalogue yet"
-            body="The catalogue is still a small curated set covering cameras, laptops, consoles, collectibles and guitars, so most searches will miss. You do not have to wait for it: paste the listing you are looking at and MarginMap resolves the price, works out landed cost and runs an AI sourcing-risk screen on that item directly."
-            action={
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                <Button asChild size="sm">
-                  <Link to="/app/evaluate" search={{ offer: undefined }}>
-                    Evaluate a listing you found
-                  </Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/app/search" search={{ q: "" }}>
-                    Reset search
-                  </Link>
-                </Button>
-              </div>
-            }
-          />
-        }
+        empty={<SearchFallthrough key={q} query={q} />}
       >
         {view === "table" ? (
           <ResultTable
