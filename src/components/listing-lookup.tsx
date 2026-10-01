@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,20 @@ export type ListingPrefill = {
  * arrive from the listing itself; otherwise it says why and hands the user a
  * priced-by-hand path instead of a dead end.
  */
-export function ListingLookup({ onResolved }: { onResolved: (p: ListingPrefill) => void }) {
+export function ListingLookup({
+  onResolved,
+  initialUrl,
+  autoRun = false,
+}: {
+  onResolved: (p: ListingPrefill) => void;
+  initialUrl?: string;
+  autoRun?: boolean;
+}) {
   const { membership } = useMembership();
   const resolve = useServerFn(resolveListing);
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(initialUrl ?? "");
   const [last, setLast] = useState<ResolvedListing | null>(null);
+  const autoRan = useRef(false);
 
   const lookup = useMutation({
     mutationFn: async () => {
@@ -59,6 +68,14 @@ export function ListingLookup({ onResolved }: { onResolved: (p: ListingPrefill) 
     },
     onError: (e: Error) => toast.error(e.message.replace(/^[A-Z_]+:\s*/, "")),
   });
+
+  useEffect(() => {
+    if (autoRun && !autoRan.current && url.trim() && membership?.workspaceId) {
+      autoRan.current = true;
+      lookup.mutate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRun, membership?.workspaceId]);
 
   return (
     <section className="panel space-y-3 p-4">
