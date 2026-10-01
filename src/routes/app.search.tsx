@@ -15,7 +15,8 @@ import {
 } from "@/components/primitives";
 import { buildRows, ResultTable } from "@/components/result-table";
 import { QueryBoundary, RouteError, TableSkeleton } from "@/components/states";
-import { isListingUrl, SearchFallthrough } from "@/components/search-fallthrough";
+import { SearchFallthrough } from "@/components/search-fallthrough";
+import { isListingUrl } from "@/lib/listing-url";
 import { Button } from "@/components/ui/button";
 import { useAddToWatchlist, useSaveEvaluation, useSaveSearch } from "@/hooks/use-workspace-actions";
 import {

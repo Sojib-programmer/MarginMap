@@ -5,15 +5,7 @@ import { ListingLookup, type ListingPrefill } from "@/components/listing-lookup"
 import { ListingRiskPanel } from "@/components/listing-risk-panel";
 import { Button } from "@/components/ui/button";
 import { money2 } from "@/lib/format";
-
-export const isListingUrl = (q: string): boolean => {
-  try {
-    const u = new URL(q.trim());
-    return u.protocol === "https:" || u.protocol === "http:";
-  } catch {
-    return false;
-  }
-};
+import { isListingUrl } from "@/lib/listing-url";
 
 /**
  * Zero-hit / pasted-URL path for search: resolve the listing live, show landed

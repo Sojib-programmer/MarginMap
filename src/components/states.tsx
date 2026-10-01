@@ -77,7 +77,9 @@ export function EmptyState({
   );
 }
 
-export function RouteError({ error, reset }: { error: Error; reset?: () => void }) {
+export function RouteError({ error: raw, reset }: { error: unknown; reset?: () => void }) {
+  const error =
+    raw instanceof Error ? raw : new Error(typeof raw === "string" ? raw : "Unknown error");
   const router = useRouter();
   return (
     <div className="panel p-6">
