@@ -61,3 +61,19 @@ describe("oauth intent", () => {
     expect(consumeOAuthIntent()).toBeNull();
   });
 });
+
+describe("purgeStaleOAuthIntent", () => {
+  it("removes an expired marker but keeps a live one", async () => {
+    const { markOAuthIntent, purgeStaleOAuthIntent, OAUTH_INTENT_KEY, OAUTH_INTENT_TTL_MS } =
+      await mod();
+    markOAuthIntent("google");
+    purgeStaleOAuthIntent();
+    expect(store.has(OAUTH_INTENT_KEY)).toBe(true);
+    store.set(
+      OAUTH_INTENT_KEY,
+      JSON.stringify({ provider: "google", at: Date.now() - OAUTH_INTENT_TTL_MS - 1 }),
+    );
+    purgeStaleOAuthIntent();
+    expect(store.has(OAUTH_INTENT_KEY)).toBe(false);
+  });
+});
