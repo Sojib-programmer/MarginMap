@@ -12,6 +12,7 @@ const PLATFORM = PILLARS.slice(0, 8);
 const SIMPLE_LINKS = [
   { to: "/methodology", label: "Methodology" },
   { to: "/pricing", label: "Pricing" },
+  { to: "/developers", label: "Developers" },
   { to: "/about", label: "About" },
 ];
 

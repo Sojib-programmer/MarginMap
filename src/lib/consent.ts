@@ -197,6 +197,20 @@ export function clearOAuthIntent() {
   sessionStorage.removeItem(OAUTH_INTENT_KEY);
 }
 
+/** Removes an expired or corrupt marker without consuming a live one. */
+export function purgeStaleOAuthIntent() {
+  if (typeof window === "undefined") return;
+  const raw = sessionStorage.getItem(OAUTH_INTENT_KEY);
+  if (!raw) return;
+  try {
+    const at = (JSON.parse(raw) as { at?: unknown }).at;
+    if (typeof at === "number" && Date.now() - at <= OAUTH_INTENT_TTL_MS) return;
+  } catch {
+    /* corrupt → purge */
+  }
+  sessionStorage.removeItem(OAUTH_INTENT_KEY);
+}
+
 /** Reads and removes the intent; returns null when absent, corrupt or expired. */
 export function consumeOAuthIntent(): OAuthProvider | null {
   if (typeof window === "undefined") return null;

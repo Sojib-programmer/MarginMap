@@ -52,7 +52,7 @@ export function SearchFallthrough({ query }: { query: string }) {
             <Stat label="Condition" value={listing.conditionGrade ?? "not stated"} />
             <div className="sm:col-span-4">
               <Button asChild size="sm" variant="outline">
-                <Link to="/app/evaluate" search={{ offer: undefined }}>
+                <Link to="/app/evaluate" search={{ url: listing.listingUrl }}>
                   Open the full deal calculator
                 </Link>
               </Button>
