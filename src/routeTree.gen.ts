@@ -22,6 +22,7 @@ import { Route as MarketingBlogRouteImport } from './routes/_marketing.blog'
 import { Route as MarketingCanonicalProductIdentityRouteImport } from './routes/_marketing.canonical-product-identity'
 import { Route as MarketingConditionGradingRouteImport } from './routes/_marketing.condition-grading'
 import { Route as MarketingContactRouteImport } from './routes/_marketing.contact'
+import { Route as MarketingDevelopersRouteImport } from './routes/_marketing.developers'
 import { Route as MarketingEvidenceAndDataConfidenceRouteImport } from './routes/_marketing.evidence-and-data-confidence'
 import { Route as MarketingFaqRouteImport } from './routes/_marketing.faq'
 import { Route as MarketingFeeCalculatorRouteImport } from './routes/_marketing.fee-calculator'
@@ -117,6 +118,11 @@ const MarketingConditionGradingRoute =
 const MarketingContactRoute = MarketingContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const MarketingDevelopersRoute = MarketingDevelopersRouteImport.update({
+  id: '/developers',
+  path: '/developers',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingEvidenceAndDataConfidenceRoute =
@@ -284,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
   '/contact': typeof MarketingContactRoute
+  '/developers': typeof MarketingDevelopersRoute
   '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
   '/faq': typeof MarketingFaqRoute
   '/fee-calculator': typeof MarketingFeeCalculatorRoute
@@ -325,6 +332,7 @@ export interface FileRoutesByTo {
   '/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/condition-grading': typeof MarketingConditionGradingRoute
   '/contact': typeof MarketingContactRoute
+  '/developers': typeof MarketingDevelopersRoute
   '/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
   '/faq': typeof MarketingFaqRoute
   '/fee-calculator': typeof MarketingFeeCalculatorRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/_marketing/canonical-product-identity': typeof MarketingCanonicalProductIdentityRoute
   '/_marketing/condition-grading': typeof MarketingConditionGradingRoute
   '/_marketing/contact': typeof MarketingContactRoute
+  '/_marketing/developers': typeof MarketingDevelopersRoute
   '/_marketing/evidence-and-data-confidence': typeof MarketingEvidenceAndDataConfidenceRoute
   '/_marketing/faq': typeof MarketingFaqRoute
   '/_marketing/fee-calculator': typeof MarketingFeeCalculatorRoute
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/canonical-product-identity'
     | '/condition-grading'
     | '/contact'
+    | '/developers'
     | '/evidence-and-data-confidence'
     | '/faq'
     | '/fee-calculator'
@@ -457,6 +467,7 @@ export interface FileRouteTypes {
     | '/canonical-product-identity'
     | '/condition-grading'
     | '/contact'
+    | '/developers'
     | '/evidence-and-data-confidence'
     | '/faq'
     | '/fee-calculator'
@@ -501,6 +512,7 @@ export interface FileRouteTypes {
     | '/_marketing/canonical-product-identity'
     | '/_marketing/condition-grading'
     | '/_marketing/contact'
+    | '/_marketing/developers'
     | '/_marketing/evidence-and-data-confidence'
     | '/_marketing/faq'
     | '/_marketing/fee-calculator'
@@ -637,6 +649,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof MarketingContactRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_marketing/developers': {
+      id: '/_marketing/developers'
+      path: '/developers'
+      fullPath: '/developers'
+      preLoaderRoute: typeof MarketingDevelopersRouteImport
       parentRoute: typeof MarketingRoute
     }
     '/_marketing/evidence-and-data-confidence': {
@@ -863,6 +882,7 @@ interface MarketingRouteChildren {
   MarketingCanonicalProductIdentityRoute: typeof MarketingCanonicalProductIdentityRoute
   MarketingConditionGradingRoute: typeof MarketingConditionGradingRoute
   MarketingContactRoute: typeof MarketingContactRoute
+  MarketingDevelopersRoute: typeof MarketingDevelopersRoute
   MarketingEvidenceAndDataConfidenceRoute: typeof MarketingEvidenceAndDataConfidenceRoute
   MarketingFaqRoute: typeof MarketingFaqRoute
   MarketingFeeCalculatorRoute: typeof MarketingFeeCalculatorRoute
@@ -886,6 +906,7 @@ const MarketingRouteChildren: MarketingRouteChildren = {
     MarketingCanonicalProductIdentityRoute,
   MarketingConditionGradingRoute: MarketingConditionGradingRoute,
   MarketingContactRoute: MarketingContactRoute,
+  MarketingDevelopersRoute: MarketingDevelopersRoute,
   MarketingEvidenceAndDataConfidenceRoute:
     MarketingEvidenceAndDataConfidenceRoute,
   MarketingFaqRoute: MarketingFaqRoute,

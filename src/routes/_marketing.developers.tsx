@@ -109,8 +109,8 @@ function DevelopersPage() {
           <h2 className="text-xl font-semibold tracking-tight">Security model</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
             <li>
-              OAuth 2.1 with PKCE. Tokens are issued for your account only; there are no shared
-              API keys.
+              OAuth 2.1 with PKCE. Tokens are issued for your account only; there are no shared API
+              keys.
             </li>
             <li>
               Every query runs under row-level security as you. An agent sees exactly what you see,
@@ -125,9 +125,9 @@ function DevelopersPage() {
         <section>
           <h2 className="text-xl font-semibold tracking-tight">REST API & webhooks</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            A key-based REST API and outbound deal webhooks are not public yet. They are planned
-            for Business (1,000 calls/month) and Enterprise (custom volume, webhooks). If you need
-            them now, tell us what you are building.
+            A key-based REST API and outbound deal webhooks are not public yet. They are planned for
+            Business (1,000 calls/month) and Enterprise (custom volume, webhooks). If you need them
+            now, tell us what you are building.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild size="sm">
@@ -182,7 +182,12 @@ function Snippet({ title, code }: { title: string; code: string }) {
     <div className="panel overflow-hidden">
       <div className="flex items-center justify-between border-b border-border px-3 py-2">
         <p className="label-meta truncate">{title}</p>
-        <Button size="icon" variant="ghost" aria-label="Copy configuration" onClick={() => copy(code)}>
+        <Button
+          size="icon"
+          variant="ghost"
+          aria-label="Copy configuration"
+          onClick={() => copy(code)}
+        >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </Button>
       </div>
