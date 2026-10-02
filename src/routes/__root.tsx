@@ -132,6 +132,7 @@ function RootComponent() {
 
   useEffect(() => {
     initAnalytics();
+    purgeStaleOAuthIntent();
     void loadGoogleAds();
 
     // OAuth sign-in leaves the page, so completion is detected on return:

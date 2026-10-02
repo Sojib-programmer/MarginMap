@@ -44,17 +44,22 @@ import {
 } from "@/lib/scoring";
 import { downloadCsv } from "@/lib/csv";
 import { evaluationsQuery } from "@/lib/workspace";
+import { isListingUrl } from "@/lib/listing-url";
 
 export const Route = createFileRoute("/app/evaluate")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { offer?: string; url?: string } => ({
     offer: typeof search["offer"] === "string" ? (search["offer"] as string) : undefined,
+    url:
+      typeof search["url"] === "string" && isListingUrl(search["url"] as string)
+        ? (search["url"] as string)
+        : undefined,
   }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: EvaluatePage,
 });
 
 function EvaluatePage() {
-  const { offer: offerId } = Route.useSearch();
+  const { offer: offerId, url: handoffUrl } = Route.useSearch();
   const { mode } = useRoleMode();
   const qc = useQueryClient();
   const { membership } = useMembership();
@@ -216,6 +221,9 @@ function EvaluatePage() {
 
       {found ? null : (
         <ListingLookup
+          key={handoffUrl ?? "manual"}
+          {...(handoffUrl ? { initialUrl: handoffUrl } : {})}
+          autoRun={Boolean(handoffUrl)}
           onResolved={(p) => {
             setPasted(p);
             setInput((prev) => ({
