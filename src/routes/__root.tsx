@@ -11,7 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { initAnalytics, trackLogin, trackPageView, trackSignUp } from "@/lib/analytics";
-import { consumeOAuthIntent, loadGoogleAds } from "@/lib/consent";
+import { consumeOAuthIntent, loadGoogleAds, purgeStaleOAuthIntent } from "@/lib/consent";
 import { CookieBanner } from "@/components/cookie-banner";
 import { supabase } from "@/integrations/supabase/client";
 
