@@ -47,7 +47,9 @@ import { evaluationsQuery } from "@/lib/workspace";
 import { isListingUrl } from "@/lib/listing-url";
 
 export const Route = createFileRoute("/app/evaluate")({
-  validateSearch: (search: Record<string, unknown>): { offer?: string; url?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { offer?: string | undefined; url?: string | undefined } => ({
     offer: typeof search["offer"] === "string" ? (search["offer"] as string) : undefined,
     url:
       typeof search["url"] === "string" && isListingUrl(search["url"] as string)
