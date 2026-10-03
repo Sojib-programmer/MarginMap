@@ -30,7 +30,7 @@ const TOOLS = [
     body: "Sourcing pipeline items: stage, cost basis and target resale.",
   },
   {
-    name: "list_evaluations",
+    name: "list_deal_evaluations",
     access: "read",
     body: "Saved deal evaluations with verdict, landed cost, expected resale and ROI.",
   },
