@@ -39,6 +39,7 @@ import { Route as MarketingTermsRouteImport } from './routes/_marketing.terms'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
+import { Route as AppApiRouteImport } from './routes/app.api'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
 import { Route as AppDataSourcesRouteImport } from './routes/app.data-sources'
@@ -213,6 +214,11 @@ const AppAlertsRoute = AppAlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApiRoute = AppApiRouteImport.update({
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppBillingRoute = AppBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -324,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof MarketingTermsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/api': typeof AppApiRoute
   '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
   '/app/data-sources': typeof AppDataSourcesRoute
@@ -369,6 +376,7 @@ export interface FileRoutesByTo {
   '/terms': typeof MarketingTermsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/api': typeof AppApiRoute
   '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
   '/app/data-sources': typeof AppDataSourcesRoute
@@ -418,6 +426,7 @@ export interface FileRoutesById {
   '/_marketing/terms': typeof MarketingTermsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/api': typeof AppApiRoute
   '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
   '/app/data-sources': typeof AppDataSourcesRoute
@@ -468,6 +477,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/activity'
     | '/app/alerts'
+    | '/app/api'
     | '/app/billing'
     | '/app/compare'
     | '/app/data-sources'
@@ -513,6 +523,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/activity'
     | '/app/alerts'
+    | '/app/api'
     | '/app/billing'
     | '/app/compare'
     | '/app/data-sources'
@@ -561,6 +572,7 @@ export interface FileRouteTypes {
     | '/_marketing/terms'
     | '/app/activity'
     | '/app/alerts'
+    | '/app/api'
     | '/app/billing'
     | '/app/compare'
     | '/app/data-sources'
@@ -809,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAlertsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/api': {
+      id: '/app/api'
+      path: '/api'
+      fullPath: '/app/api'
+      preLoaderRoute: typeof AppApiRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/billing': {
       id: '/app/billing'
       path: '/billing'
@@ -991,6 +1010,7 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 interface AppRouteChildren {
   AppActivityRoute: typeof AppActivityRoute
   AppAlertsRoute: typeof AppAlertsRoute
+  AppApiRoute: typeof AppApiRoute
   AppBillingRoute: typeof AppBillingRoute
   AppCompareRoute: typeof AppCompareRoute
   AppDataSourcesRoute: typeof AppDataSourcesRoute
@@ -1006,6 +1026,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppActivityRoute: AppActivityRoute,
   AppAlertsRoute: AppAlertsRoute,
+  AppApiRoute: AppApiRoute,
   AppBillingRoute: AppBillingRoute,
   AppCompareRoute: AppCompareRoute,
   AppDataSourcesRoute: AppDataSourcesRoute,
