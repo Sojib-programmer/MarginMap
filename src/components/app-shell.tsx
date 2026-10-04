@@ -9,6 +9,7 @@ import {
   Database,
   GitCompareArrows,
   History,
+  KeyRound,
   LayoutGrid,
   Lock,
   LogOut,
@@ -57,6 +58,7 @@ const NAV: NavItem[] = [
   { to: "/app/alerts", label: "Alerts", icon: Bell },
   { to: "/app/activity", label: "Activity", icon: History },
   { to: "/app/data-sources", label: "Data sources", icon: Database },
+  { to: "/app/api", label: "API", icon: KeyRound },
   { to: "/app/billing", label: "Billing", icon: CreditCard },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];

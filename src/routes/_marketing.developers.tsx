@@ -123,18 +123,63 @@ function DevelopersPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold tracking-tight">REST API & webhooks</h2>
+          <h2 className="text-xl font-semibold tracking-tight">REST API</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            A key-based REST API and outbound deal webhooks are not public yet. They are planned for
-            Business (1,000 calls/month) and Enterprise (custom volume, webhooks). If you need them
-            now, tell us what you are building.
+            Key-based REST API for Business and Enterprise workspaces. Create keys in the in-app
+            API console; each key is scoped to one workspace and shown once.
+          </p>
+          <div className="mt-4 grid gap-2">
+            <Endpoint label="Base URL" value={`${SITE}/api/public/v1`} />
+            <Endpoint label="GET /v1/usage" value="Plan, burst limit, monthly quota and usage" />
+            <Endpoint label="GET /v1/watchlists" value="Workspace watchlists with item counts" />
+            <Endpoint
+              label="GET /v1/products?q=&limit="
+              value="Catalogue search (curated sample data)"
+            />
+          </div>
+          <div className="mt-4">
+            <Snippet
+              title="curl"
+              code={`curl ${SITE}/api/public/v1/usage \\\n  -H "Authorization: Bearer mm_live_..."`}
+            />
+          </div>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-left text-muted-foreground">
+                <tr>
+                  <th className="py-1">Plan</th>
+                  <th>Monthly calls</th>
+                  <th>Burst</th>
+                  <th>Keys</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-t border-border">
+                  <td className="py-1">Business</td>
+                  <td>1,000</td>
+                  <td>60 / min</td>
+                  <td>10</td>
+                </tr>
+                <tr className="border-t border-border">
+                  <td className="py-1">Enterprise</td>
+                  <td>Unlimited</td>
+                  <td>600 / min</td>
+                  <td>10</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Errors use RFC 7807 problem JSON. 401 invalid or revoked key, 403 plan lacks API
+            access, 429 burst or monthly limit (with Retry-After). Responses carry RateLimit-Policy,
+            X-Quota-Limit and X-Quota-Used headers. Outbound webhooks are not available yet.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild size="sm">
-              <Link to="/contact">Request API access</Link>
+              <Link to="/app/api">Open API console</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link to="/pricing">Compare plans</Link>
+              <Link to="/contact">Talk to sales about Enterprise</Link>
             </Button>
           </div>
         </section>
