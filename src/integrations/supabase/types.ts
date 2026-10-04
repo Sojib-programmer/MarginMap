@@ -112,6 +112,95 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_requests: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: number
+          key_id: string | null
+          latency_ms: number | null
+          status: number
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: never
+          key_id?: string | null
+          latency_ms?: number | null
+          status: number
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: never
+          key_id?: string | null
+          latency_ms?: number | null
+          status?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_requests_key_id_fkey"
+            columns: ["key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "api_requests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           id: string
@@ -1387,8 +1476,26 @@ export type Database = {
         Args: { _invitation_id: string }
         Returns: string
       }
+      api_gateway: {
+        Args: { _endpoint: string; _token: string }
+        Returns: Json
+      }
+      api_list_watchlists: { Args: { _token: string }; Returns: Json }
+      api_log: {
+        Args: {
+          _endpoint: string
+          _latency: number
+          _status: number
+          _token: string
+        }
+        Returns: undefined
+      }
       consume_quota: {
         Args: { _amount?: number; _metric: string; _workspace_id: string }
+        Returns: Json
+      }
+      create_api_key: {
+        Args: { _name: string; _workspace_id: string }
         Returns: Json
       }
       current_tier_limits: { Args: { _workspace_id: string }; Returns: Json }
@@ -1410,6 +1517,7 @@ export type Database = {
         }
         Returns: string
       }
+      revoke_api_key: { Args: { _key_id: string }; Returns: undefined }
       transfer_workspace_ownership: {
         Args: { _new_owner: string; _workspace_id: string }
         Returns: undefined

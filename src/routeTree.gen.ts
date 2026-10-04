@@ -39,6 +39,7 @@ import { Route as MarketingTermsRouteImport } from './routes/_marketing.terms'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppAlertsRouteImport } from './routes/app.alerts'
+import { Route as AppApiRouteImport } from './routes/app.api'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppCompareRouteImport } from './routes/app.compare'
 import { Route as AppDataSourcesRouteImport } from './routes/app.data-sources'
@@ -52,6 +53,9 @@ import { Route as MarketingBlogSlugRouteImport } from './routes/_marketing.blog.
 import { Route as AppVariantIdRouteImport } from './routes/app.variant.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicRefreshSourceRouteImport } from './routes/api/public/refresh.$source'
+import { Route as ApiPublicV1ProductsRouteImport } from './routes/api/public/v1/products'
+import { Route as ApiPublicV1UsageRouteImport } from './routes/api/public/v1/usage'
+import { Route as ApiPublicV1WatchlistsRouteImport } from './routes/api/public/v1/watchlists'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
@@ -210,6 +214,11 @@ const AppAlertsRoute = AppAlertsRouteImport.update({
   path: '/alerts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApiRoute = AppApiRouteImport.update({
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppBillingRoute = AppBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -276,6 +285,21 @@ const ApiPublicRefreshSourceRoute = ApiPublicRefreshSourceRouteImport.update({
   path: '/api/public/refresh/$source',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1ProductsRoute = ApiPublicV1ProductsRouteImport.update({
+  id: '/api/public/v1/products',
+  path: '/api/public/v1/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1UsageRoute = ApiPublicV1UsageRouteImport.update({
+  id: '/api/public/v1/usage',
+  path: '/api/public/v1/usage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1WatchlistsRoute = ApiPublicV1WatchlistsRouteImport.update({
+  id: '/api/public/v1/watchlists',
+  path: '/api/public/v1/watchlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
@@ -306,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof MarketingTermsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/api': typeof AppApiRoute
   '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
   '/app/data-sources': typeof AppDataSourcesRoute
@@ -320,6 +345,9 @@ export interface FileRoutesByFullPath {
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
+  '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
+  '/api/public/v1/watchlists': typeof ApiPublicV1WatchlistsRoute
 }
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
@@ -348,6 +376,7 @@ export interface FileRoutesByTo {
   '/terms': typeof MarketingTermsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/api': typeof AppApiRoute
   '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
   '/app/data-sources': typeof AppDataSourcesRoute
@@ -363,6 +392,9 @@ export interface FileRoutesByTo {
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
+  '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
+  '/api/public/v1/watchlists': typeof ApiPublicV1WatchlistsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -394,6 +426,7 @@ export interface FileRoutesById {
   '/_marketing/terms': typeof MarketingTermsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/alerts': typeof AppAlertsRoute
+  '/app/api': typeof AppApiRoute
   '/app/billing': typeof AppBillingRoute
   '/app/compare': typeof AppCompareRoute
   '/app/data-sources': typeof AppDataSourcesRoute
@@ -409,6 +442,9 @@ export interface FileRoutesById {
   '/app/variant/$id': typeof AppVariantIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/refresh/$source': typeof ApiPublicRefreshSourceRoute
+  '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
+  '/api/public/v1/usage': typeof ApiPublicV1UsageRoute
+  '/api/public/v1/watchlists': typeof ApiPublicV1WatchlistsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -441,6 +477,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/activity'
     | '/app/alerts'
+    | '/app/api'
     | '/app/billing'
     | '/app/compare'
     | '/app/data-sources'
@@ -455,6 +492,9 @@ export interface FileRouteTypes {
     | '/app/variant/$id'
     | '/api/public/payments/webhook'
     | '/api/public/refresh/$source'
+    | '/api/public/v1/products'
+    | '/api/public/v1/usage'
+    | '/api/public/v1/watchlists'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/$'
@@ -483,6 +523,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/activity'
     | '/app/alerts'
+    | '/app/api'
     | '/app/billing'
     | '/app/compare'
     | '/app/data-sources'
@@ -498,6 +539,9 @@ export interface FileRouteTypes {
     | '/app/variant/$id'
     | '/api/public/payments/webhook'
     | '/api/public/refresh/$source'
+    | '/api/public/v1/products'
+    | '/api/public/v1/usage'
+    | '/api/public/v1/watchlists'
   id:
     | '__root__'
     | '/$'
@@ -528,6 +572,7 @@ export interface FileRouteTypes {
     | '/_marketing/terms'
     | '/app/activity'
     | '/app/alerts'
+    | '/app/api'
     | '/app/billing'
     | '/app/compare'
     | '/app/data-sources'
@@ -543,6 +588,9 @@ export interface FileRouteTypes {
     | '/app/variant/$id'
     | '/api/public/payments/webhook'
     | '/api/public/refresh/$source'
+    | '/api/public/v1/products'
+    | '/api/public/v1/usage'
+    | '/api/public/v1/watchlists'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -556,6 +604,9 @@ export interface RootRouteChildren {
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicRefreshSourceRoute: typeof ApiPublicRefreshSourceRoute
+  ApiPublicV1ProductsRoute: typeof ApiPublicV1ProductsRoute
+  ApiPublicV1UsageRoute: typeof ApiPublicV1UsageRoute
+  ApiPublicV1WatchlistsRoute: typeof ApiPublicV1WatchlistsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -770,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAlertsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/api': {
+      id: '/app/api'
+      path: '/api'
+      fullPath: '/app/api'
+      preLoaderRoute: typeof AppApiRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/billing': {
       id: '/app/billing'
       path: '/billing'
@@ -861,6 +919,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRefreshSourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/products': {
+      id: '/api/public/v1/products'
+      path: '/api/public/v1/products'
+      fullPath: '/api/public/v1/products'
+      preLoaderRoute: typeof ApiPublicV1ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/usage': {
+      id: '/api/public/v1/usage'
+      path: '/api/public/v1/usage'
+      fullPath: '/api/public/v1/usage'
+      preLoaderRoute: typeof ApiPublicV1UsageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/watchlists': {
+      id: '/api/public/v1/watchlists'
+      path: '/api/public/v1/watchlists'
+      fullPath: '/api/public/v1/watchlists'
+      preLoaderRoute: typeof ApiPublicV1WatchlistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -931,6 +1010,7 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 interface AppRouteChildren {
   AppActivityRoute: typeof AppActivityRoute
   AppAlertsRoute: typeof AppAlertsRoute
+  AppApiRoute: typeof AppApiRoute
   AppBillingRoute: typeof AppBillingRoute
   AppCompareRoute: typeof AppCompareRoute
   AppDataSourcesRoute: typeof AppDataSourcesRoute
@@ -946,6 +1026,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppActivityRoute: AppActivityRoute,
   AppAlertsRoute: AppAlertsRoute,
+  AppApiRoute: AppApiRoute,
   AppBillingRoute: AppBillingRoute,
   AppCompareRoute: AppCompareRoute,
   AppDataSourcesRoute: AppDataSourcesRoute,
@@ -972,6 +1053,9 @@ const rootRouteChildren: RootRouteChildren = {
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicRefreshSourceRoute: ApiPublicRefreshSourceRoute,
+  ApiPublicV1ProductsRoute: ApiPublicV1ProductsRoute,
+  ApiPublicV1UsageRoute: ApiPublicV1UsageRoute,
+  ApiPublicV1WatchlistsRoute: ApiPublicV1WatchlistsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
