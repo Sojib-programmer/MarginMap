@@ -125,8 +125,8 @@ function DevelopersPage() {
         <section>
           <h2 className="text-xl font-semibold tracking-tight">REST API</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Key-based REST API for Business and Enterprise workspaces. Create keys in the in-app
-            API console; each key is scoped to one workspace and shown once.
+            Key-based REST API for Business and Enterprise workspaces. Create keys in the in-app API
+            console; each key is scoped to one workspace and shown once.
           </p>
           <div className="mt-4 grid gap-2">
             <Endpoint label="Base URL" value={`${SITE_URL}/api/public/v1`} />
@@ -170,8 +170,8 @@ function DevelopersPage() {
             </table>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Errors use RFC 7807 problem JSON. 401 invalid or revoked key, 403 plan lacks API
-            access, 429 burst or monthly limit (with Retry-After). Responses carry RateLimit-Policy,
+            Errors use RFC 7807 problem JSON. 401 invalid or revoked key, 403 plan lacks API access,
+            429 burst or monthly limit (with Retry-After). Responses carry RateLimit-Policy,
             X-Quota-Limit and X-Quota-Used headers. Outbound webhooks are not available yet.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
