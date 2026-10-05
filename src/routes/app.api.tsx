@@ -10,7 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { canManageMembers, hasTier, useMembership } from "@/lib/membership";
 
 export const Route = createFileRoute("/app/api")({
-  head: () => ({ meta: [{ title: "API console — MarginMap" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "API console — MarginMap" }, { name: "robots", content: "noindex" }],
+  }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: ApiConsole,
 });
@@ -88,7 +90,8 @@ function ApiConsole() {
       .map((r) => r.latency_ms)
       .filter((n): n is number => n != null)
       .sort((a, b) => a - b);
-    const p = (q: number) => (lat.length ? lat[Math.min(lat.length - 1, Math.floor(q * lat.length))] : null);
+    const p = (q: number) =>
+      lat.length ? lat[Math.min(lat.length - 1, Math.floor(q * lat.length))] : null;
     const errors = rows.filter((r) => r.status >= 400).length;
     const limited = rows.filter((r) => r.status === 429).length;
     return { total: rows.length, errors, limited, p50: p(0.5), p95: p(0.95) };
@@ -206,7 +209,9 @@ function ApiConsole() {
             </Button>
           </form>
         ) : eligible ? (
-          <p className="mt-2 text-xs text-muted-foreground">Only owners and admins can create keys.</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Only owners and admins can create keys.
+          </p>
         ) : null}
         <ul className="mt-3 divide-y divide-border">
           {(keys.data ?? []).map((k) => (
@@ -236,9 +241,7 @@ function ApiConsole() {
 
       <section className="panel p-4">
         <h2 className="text-sm font-semibold">Recent requests</h2>
-        <p className="text-xs text-muted-foreground">
-          Last 7 days · {stats.limited} rate-limited
-        </p>
+        <p className="text-xs text-muted-foreground">Last 7 days · {stats.limited} rate-limited</p>
         <div className="mt-2 overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="text-left text-muted-foreground">

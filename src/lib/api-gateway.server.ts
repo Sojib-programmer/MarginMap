@@ -52,7 +52,8 @@ function problem(status: number, title: string, extra: Record<string, unknown> =
     "content-type": "application/problem+json",
     "cache-control": "no-store",
   };
-  if (typeof extra["retry_after"] === "number") headers["Retry-After"] = String(extra["retry_after"]);
+  if (typeof extra["retry_after"] === "number")
+    headers["Retry-After"] = String(extra["retry_after"]);
   return new Response(JSON.stringify({ type: "about:blank", title, status, ...extra }), {
     status,
     headers,
@@ -97,7 +98,12 @@ export async function withApiKey(
     const body = await handler({ client, token, gw });
     return new Response(JSON.stringify({ data: body }), {
       status,
-      headers: { ...CORS, ...rateHeaders, "content-type": "application/json", "cache-control": "no-store" },
+      headers: {
+        ...CORS,
+        ...rateHeaders,
+        "content-type": "application/json",
+        "cache-control": "no-store",
+      },
     });
   } catch (e) {
     status = 500;
