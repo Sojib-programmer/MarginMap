@@ -6,6 +6,58 @@ import { Button } from "@/components/ui/button";
 import { PILLARS } from "@/content/pillars";
 import { POSTS } from "@/content/posts";
 import { faqJsonLdScript, organizationJsonLdScript, pageHead } from "@/lib/seo";
+import studioImg from "@/assets/how-it-works-studio.jpg";
+
+function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
+  return (
+    <div className="flex justify-between gap-2">
+      <span className="text-muted-foreground">{k}</span>
+      <span className={strong ? "font-semibold text-primary" : ""}>{v}</span>
+    </div>
+  );
+}
+
+function StepIntent() {
+  return (
+    <>
+      <p className="truncate">&gt; sony a7 iv body under $1,800</p>
+      <div className="mt-2 flex flex-wrap gap-1">
+        {["variant: α7 IV", "ceiling: $1,800", "cond ≥ B", "match 96%"].map((c) => (
+          <span key={c} className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5">
+            {c}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function StepCost() {
+  return (
+    <div className="space-y-1">
+      <Row k="item" v="$1,495.00" />
+      <Row k="shipping" v="$24.00" />
+      <Row k="tax (est.)" v="$104.65" />
+      <div className="border-t border-border pt-1">
+        <Row k="landed" v="$1,623.65" strong />
+      </div>
+      <Row k="sold median" v="$1,840.00" />
+    </div>
+  );
+}
+
+function StepVerdict() {
+  return (
+    <div className="space-y-1">
+      <span className="inline-block rounded bg-primary px-2 py-0.5 font-semibold text-primary-foreground">
+        BUY
+      </span>
+      <Row k="net after fees" v="+$118.40" strong />
+      <Row k="ROI" v="7.3%" />
+      <Row k="days to sell" v="~14" />
+    </div>
+  );
+}
 
 export const HOME_FAQ = [
   {
@@ -144,12 +196,27 @@ function Landing() {
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-2xl font-semibold tracking-tight">How it works</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {STEPS.map((s) => (
-            <article key={s.n} className="panel p-5">
+        <div className="relative mt-6 overflow-hidden rounded-lg border border-border">
+          <img
+            src={studioImg}
+            alt="Reseller sourcing desk with a dark analytics dashboard, a camera and a sneaker box ready to evaluate"
+            width={1920}
+            height={1088}
+            loading="lazy"
+            className="h-64 w-full object-cover sm:h-96"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <p className="label-meta absolute bottom-3 left-4">Illustrative example · not live data</p>
+        </div>
+        <div className="relative z-10 -mt-16 grid gap-4 px-2 md:grid-cols-3 sm:-mt-24">
+          {STEPS.map((s, i) => (
+            <article key={s.n} className="panel bg-card/95 p-5 backdrop-blur">
               <span className="num label-meta">{s.n}</span>
               <h3 className="mt-2 text-sm font-semibold">{s.t}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+              <div className="mt-3 rounded-md border border-border bg-background p-3 font-mono text-xs">
+                {i === 0 ? <StepIntent /> : i === 1 ? <StepCost /> : <StepVerdict />}
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
             </article>
           ))}
         </div>
