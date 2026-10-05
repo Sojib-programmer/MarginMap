@@ -129,7 +129,7 @@ function DevelopersPage() {
             API console; each key is scoped to one workspace and shown once.
           </p>
           <div className="mt-4 grid gap-2">
-            <Endpoint label="Base URL" value={`${SITE}/api/public/v1`} />
+            <Endpoint label="Base URL" value={`${SITE_URL}/api/public/v1`} />
             <Endpoint label="GET /v1/usage" value="Plan, burst limit, monthly quota and usage" />
             <Endpoint label="GET /v1/watchlists" value="Workspace watchlists with item counts" />
             <Endpoint
@@ -140,7 +140,7 @@ function DevelopersPage() {
           <div className="mt-4">
             <Snippet
               title="curl"
-              code={`curl ${SITE}/api/public/v1/usage \\\n  -H "Authorization: Bearer mm_live_..."`}
+              code={`curl ${SITE_URL}/api/public/v1/usage \\\n  -H "Authorization: Bearer mm_live_..."`}
             />
           </div>
           <div className="mt-4 overflow-x-auto">
