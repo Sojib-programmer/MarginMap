@@ -206,7 +206,7 @@ function Landing() {
             className="h-64 w-full object-cover sm:h-96"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-          <p className="label-meta absolute bottom-3 left-4">
+          <p className="label-meta absolute right-4 top-3">
             Illustrative example · not live data
           </p>
         </div>
