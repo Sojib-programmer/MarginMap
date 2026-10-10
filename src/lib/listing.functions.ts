@@ -103,6 +103,20 @@ export const resolveListing = createServerFn({ method: "POST" })
     if (url.protocol !== "https:" && url.protocol !== "http:") {
       throw new Error("That does not look like a listing address.");
     }
+    // SSRF guard: never forward IP literals, internal hosts or odd ports.
+    const host = url.hostname.toLowerCase();
+    if (
+      /^[\d.]+$/.test(host) ||
+      host.includes(":") ||
+      host === "localhost" ||
+      /\.(local|internal|localhost|lan)$/.test(host) ||
+      !host.includes(".") ||
+      (url.port !== "" && url.port !== "443" && url.port !== "80") ||
+      url.username ||
+      url.password
+    ) {
+      throw new Error("That does not look like a public listing address.");
+    }
 
     const hit = MARKETPLACE_BY_HOST.find((m) => m.match.test(url.hostname));
     const base: ResolvedListing = {
