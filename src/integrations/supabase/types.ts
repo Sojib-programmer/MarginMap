@@ -1139,6 +1139,7 @@ export type Database = {
           current_period_start: string | null
           environment: string
           id: string
+          last_event_at: string | null
           plan: Database["public"]["Enums"]["plan_tier"]
           price_id: string
           product_id: string | null
@@ -1157,6 +1158,7 @@ export type Database = {
           current_period_start?: string | null
           environment: string
           id?: string
+          last_event_at?: string | null
           plan: Database["public"]["Enums"]["plan_tier"]
           price_id: string
           product_id?: string | null
@@ -1175,6 +1177,7 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
+          last_event_at?: string | null
           plan?: Database["public"]["Enums"]["plan_tier"]
           price_id?: string
           product_id?: string | null
