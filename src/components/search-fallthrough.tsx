@@ -14,6 +14,7 @@ import { isListingUrl } from "@/lib/listing-url";
 export function SearchFallthrough({ query }: { query: string }) {
   const pastedUrl = isListingUrl(query) ? query.trim() : undefined;
   const [listing, setListing] = useState<ListingPrefill | null>(null);
+  const cur = (listing?.currencyCode ?? "USD").toUpperCase();
 
   return (
     <div className="space-y-4">
@@ -37,9 +38,11 @@ export function SearchFallthrough({ query }: { query: string }) {
 
       {listing ? (
         <>
-          {/* currency of the listing; never silently treated as USD */}
           <section className="panel grid gap-3 p-4 sm:grid-cols-4">
-            <Stat label="Item" value={listing.itemPrice ? money2(listing.itemPrice, cur) : "missing"} />
+            <Stat
+              label="Item"
+              value={listing.itemPrice ? money2(listing.itemPrice, cur) : "missing"}
+            />
             <Stat
               label="Shipping"
               value={listing.itemPrice ? money2(listing.shippingPrice, cur) : "missing"}
@@ -47,7 +50,9 @@ export function SearchFallthrough({ query }: { query: string }) {
             <Stat
               label="Landed (before tax)"
               value={
-                listing.itemPrice ? money2(listing.itemPrice + listing.shippingPrice, cur) : "missing"
+                listing.itemPrice
+                  ? money2(listing.itemPrice + listing.shippingPrice, cur)
+                  : "missing"
               }
             />
             <Stat label="Condition" value={listing.conditionGrade ?? "not stated"} />

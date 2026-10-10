@@ -13,7 +13,12 @@ export function serverPaymentEnv(): StripeEnv {
   return process.env["STRIPE_LIVE_API_KEY"] ? "live" : "sandbox";
 }
 
-const RETURN_HOSTS = [/^marginmap\.assistant\.bd$/, /\.lovable\.app$/, /^localhost$/, /^127\.0\.0\.1$/];
+const RETURN_HOSTS = [
+  /^marginmap\.assistant\.bd$/,
+  /\.lovable\.app$/,
+  /^localhost$/,
+  /^127\.0\.0\.1$/,
+];
 
 /** Rejects return URLs pointing anywhere but this app (open-redirect guard). */
 export function assertSafeReturnUrl(raw: string): string {
@@ -138,7 +143,10 @@ export async function createWorkspaceCheckout(options: {
     });
     return { clientSecret: session.client_secret ?? "" };
   } catch (error) {
-    return { error: error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error) };
+    return {
+      error:
+        error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error),
+    };
   }
 }
 
@@ -172,6 +180,9 @@ export async function createWorkspacePortal(options: {
     });
     return { url: portal.url };
   } catch (error) {
-    return { error: error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error) };
+    return {
+      error:
+        error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error),
+    };
   }
 }

@@ -29,7 +29,12 @@ export type AdapterResult = { rows: NormalizedOffer[]; failedQueries: string[] }
 /** Token-overlap score between a variant title and a listing title (0..1). */
 export function titleMatchConfidence(query: string, title: string): number {
   const tok = (v: string) =>
-    new Set(v.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 1));
+    new Set(
+      v
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter((t) => t.length > 1),
+    );
   const q = tok(query);
   if (q.size === 0) return 0;
   const t = tok(title);
