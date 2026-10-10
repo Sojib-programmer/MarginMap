@@ -20,7 +20,23 @@ export type NormalizedOffer = {
   availability: string;
   listing_url: string;
   match_confidence: number;
+  /** The exact query (variant title) this row was returned for. */
+  query: string;
 };
+
+export type AdapterResult = { rows: NormalizedOffer[]; failedQueries: string[] };
+
+/** Token-overlap score between a variant title and a listing title (0..1). */
+export function titleMatchConfidence(query: string, title: string): number {
+  const tok = (v: string) =>
+    new Set(v.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 1));
+  const q = tok(query);
+  if (q.size === 0) return 0;
+  const t = tok(title);
+  let hit = 0;
+  for (const w of q) if (t.has(w)) hit += 1;
+  return Math.round((hit / q.size) * 100) / 100;
+}
 
 export type AdapterContext = {
   /** Canonical keys / titles of variants the workspace tracks. */
@@ -33,7 +49,7 @@ export type SourceAdapter = {
   label: string;
   /** Env var names that must be present before the adapter can run. */
   requiredSecrets: string[];
-  fetchOffers: (ctx: AdapterContext) => Promise<NormalizedOffer[]>;
+  fetchOffers: (ctx: AdapterContext) => Promise<AdapterResult>;
 };
 
 export class AdapterUnavailableError extends Error {
@@ -118,11 +134,14 @@ const ebayAdapter: SourceAdapter = {
     const token = ((await tokenRes.json()) as { access_token: string }).access_token;
 
     const rows: NormalizedOffer[] = [];
+    const failedQueries: string[] = [];
     for (const q of queries.slice(0, 20)) {
       const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(q)}&limit=${limit}`;
       const res = await fetchWithRetry(url, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) {
-        throw new Error(`eBay search failed [${res.status}]`);
+        // One failed query must not fail (or retire) the whole source.
+        failedQueries.push(q);
+        continue;
       }
       const body = (await res.json()) as {
         itemSummaries?: {
@@ -147,11 +166,15 @@ const ebayAdapter: SourceAdapter = {
           seller_name: it.seller?.username ?? null,
           availability: "in_stock",
           listing_url: it.itemWebUrl,
-          match_confidence: 0.6,
+          match_confidence: titleMatchConfidence(q, it.title),
+          query: q,
         });
       }
     }
-    return rows;
+    if (failedQueries.length === Math.min(queries.length, 20) && queries.length > 0) {
+      throw new Error("eBay search failed for every query");
+    }
+    return { rows, failedQueries };
   },
 };
 
