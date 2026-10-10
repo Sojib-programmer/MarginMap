@@ -206,9 +206,7 @@ function Landing() {
             className="h-64 w-full object-cover sm:h-96"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-          <p className="label-meta absolute right-4 top-3">
-            Illustrative example · not live data
-          </p>
+          <p className="label-meta absolute right-4 top-3">Illustrative example · not live data</p>
         </div>
         <div className="relative z-10 -mt-16 grid gap-4 px-2 md:grid-cols-3 sm:-mt-24">
           {STEPS.map((s, i) => (
