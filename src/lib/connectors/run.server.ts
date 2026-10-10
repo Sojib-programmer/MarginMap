@@ -21,6 +21,9 @@ export function redactError(input: unknown): string {
 /** Offers not seen in this run are retired rather than left to rot as "current". */
 const STALE_AFTER_HOURS = 24;
 
+/** Rows below this title-overlap score are not attached to a variant (or stored). */
+const MIN_MATCH_CONFIDENCE = 0.5;
+
 /**
  * Executes one refresh for a data source and records the attempt.
  *
@@ -94,18 +97,31 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
       .limit(20);
     if (varErr) throw new Error(varErr.message);
 
-    const rows = await adapter.fetchOffers({
-      queries: (variants ?? []).map((v) => v.title),
+    const variantByTitle = new Map((variants ?? []).map((v) => [v.title, v.id]));
+    const { rows, failedQueries } = await adapter.fetchOffers({
+      queries: [...variantByTitle.keys()],
       limit: 10,
     });
+    const failed = new Set(failedQueries);
+    const succeededVariantIds = [...variantByTitle.entries()]
+      .filter(([title]) => !failed.has(title))
+      .map(([, id]) => id);
 
     // Idempotent write: the unique (data_source_id, external_url) index makes a
     // replayed run update the same rows instead of duplicating the catalog.
     const seen = new Set<string>();
     const payloads = rows
-      .filter((r) => r.external_url && !seen.has(r.external_url) && seen.add(r.external_url))
+      .filter(
+        (r) =>
+          r.external_url &&
+          variantByTitle.has(r.query) &&
+          r.match_confidence >= MIN_MATCH_CONFIDENCE &&
+          !seen.has(r.external_url) &&
+          seen.add(r.external_url),
+      )
       .map((r) => ({
         data_source_id: sourceId,
+        variant_id: variantByTitle.get(r.query) ?? null,
         external_url: r.external_url,
         title: r.title,
         condition_grade: r.condition_grade,
@@ -133,13 +149,15 @@ export async function runSourceRefresh(sourceId: string): Promise<RefreshResult>
 
     // Retire listings this source stopped returning.
     let deactivated = 0;
-    if (upserted > 0) {
+    if (upserted > 0 && succeededVariantIds.length > 0) {
       const cutoff = new Date(Date.now() - STALE_AFTER_HOURS * 3_600_000).toISOString();
       const { data: stale, error: staleErr } = await supabaseAdmin
         .from("offers")
         .update({ is_active: false })
         .eq("data_source_id", sourceId)
         .eq("is_active", true)
+        // Only retire listings for variants whose query succeeded this run.
+        .in("variant_id", succeededVariantIds)
         .lt("retrieved_at", cutoff)
         .select("id");
       if (staleErr) throw new Error(staleErr.message);

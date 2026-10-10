@@ -16,7 +16,12 @@ function isoFromUnix(value: unknown) {
   return seconds ? new Date(seconds * 1000).toISOString() : null;
 }
 
-async function processSubscription(object: Json, env: PaymentEnv, eventType: string) {
+async function processSubscription(
+  object: Json,
+  env: PaymentEnv,
+  eventType: string,
+  eventCreated: number | null,
+) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { entitlementForPrice, subscriptionHasAccess } = await import("@/lib/billing");
 
@@ -47,6 +52,28 @@ async function processSubscription(object: Json, env: PaymentEnv, eventType: str
     typeof product === "string" ? product : stringValue((product as Json | null)?.["id"]);
   const cancelAtPeriodEnd = object["cancel_at_period_end"] === true;
 
+  const eventAt = eventCreated ? new Date(eventCreated * 1000).toISOString() : null;
+  // Ordering guard: Stripe does not guarantee delivery order.
+  const { data: prior } = await supabaseAdmin
+    .from("subscriptions")
+    .select("last_event_at")
+    .eq("stripe_subscription_id", subscriptionId)
+    .eq("environment", env)
+    .maybeSingle();
+  if (prior?.last_event_at && eventAt && prior.last_event_at > eventAt) return;
+
+  // Customer binding: once a workspace is linked to a Stripe customer, events
+  // from any other customer may not change its plan, whatever metadata claims.
+  const { data: ws } = await supabaseAdmin
+    .from("workspaces")
+    .select("stripe_customer_id")
+    .eq("id", workspaceId)
+    .maybeSingle();
+  if (!ws) throw new Error("Workspace in subscription metadata does not exist");
+  if (ws.stripe_customer_id && ws.stripe_customer_id !== customerId) {
+    throw new Error("Subscription customer does not match the workspace's customer");
+  }
+
   const { error: subscriptionError } = await supabaseAdmin.from("subscriptions").upsert(
     {
       workspace_id: workspaceId,
@@ -62,11 +89,16 @@ async function processSubscription(object: Json, env: PaymentEnv, eventType: str
       current_period_end: periodEnd,
       cancel_at_period_end: cancelAtPeriodEnd,
       environment: env,
+      last_event_at: eventAt,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "stripe_subscription_id,environment" },
   );
   if (subscriptionError) throw subscriptionError;
+
+  // Sandbox events never change a real workspace's plan once live keys exist:
+  // test cards must not buy production entitlements (shared database).
+  if (env === "sandbox" && process.env["STRIPE_LIVE_API_KEY"]) return;
 
   const active = subscriptionHasAccess({ status, current_period_end: periodEnd });
   const { error: workspaceError } = await supabaseAdmin
@@ -127,7 +159,14 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
               "subscription.canceled",
             ].includes(event.type)
           ) {
-            await processSubscription(event.data.object, rawEnv, event.type);
+            await processSubscription(
+              event.data.object,
+              rawEnv,
+              event.type,
+              typeof (event as { created?: unknown }).created === "number"
+                ? ((event as { created?: number }).created ?? null)
+                : null,
+            );
           }
           return Response.json({ received: true });
         } catch (error) {

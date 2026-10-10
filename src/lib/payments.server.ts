@@ -4,6 +4,42 @@ import type { Database } from "@/integrations/supabase/types";
 import { PRICE_IDS, type BillingInterval, type PaidPlan } from "@/lib/billing";
 import { createStripeClient, getStripeErrorMessage, type StripeEnv } from "@/lib/stripe.server";
 
+/**
+ * The server, not the browser, decides which Stripe environment is active.
+ * Once live keys exist this deployment is live: sandbox checkouts are refused,
+ * so test cards can never buy a real entitlement.
+ */
+export function serverPaymentEnv(): StripeEnv {
+  return process.env["STRIPE_LIVE_API_KEY"] ? "live" : "sandbox";
+}
+
+const RETURN_HOSTS = [
+  /^marginmap\.assistant\.bd$/,
+  /\.lovable\.app$/,
+  /^localhost$/,
+  /^127\.0\.0\.1$/,
+];
+
+/** Rejects return URLs pointing anywhere but this app (open-redirect guard). */
+export function assertSafeReturnUrl(raw: string): string {
+  const url = new URL(raw);
+  const local = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  if (url.protocol !== "https:" && !(local && url.protocol === "http:")) {
+    throw new Error("Return URL must use https.");
+  }
+  if (!RETURN_HOSTS.some((re) => re.test(url.hostname))) {
+    throw new Error("Return URL must point to this app.");
+  }
+  return url.toString().replace(/%7BCHECKOUT_SESSION_ID%7D/g, "{CHECKOUT_SESSION_ID}");
+}
+
+function checkEnv(requested: StripeEnv): string | null {
+  const actual = serverPaymentEnv();
+  return requested === actual
+    ? null
+    : `Payments on this deployment run in ${actual} mode; the ${requested} checkout was refused.`;
+}
+
 export async function requireWorkspaceOwner(
   supabase: SupabaseClient<Database>,
   workspaceId: string,
@@ -58,6 +94,9 @@ export async function createWorkspaceCheckout(options: {
   returnUrl: string;
 }) {
   try {
+    const envError = checkEnv(options.environment);
+    if (envError) return { error: envError };
+    const returnUrl = assertSafeReturnUrl(options.returnUrl);
     const workspace = await requireWorkspaceOwner(
       options.supabase,
       options.workspaceId,
@@ -96,7 +135,7 @@ export async function createWorkspaceCheckout(options: {
       line_items: [{ price: price.id, quantity: 1 }],
       mode: "subscription",
       ui_mode: "embedded_page",
-      return_url: options.returnUrl,
+      return_url: returnUrl,
       customer: customerId,
       automatic_tax: { enabled: true },
       metadata,
@@ -104,7 +143,10 @@ export async function createWorkspaceCheckout(options: {
     });
     return { clientSecret: session.client_secret ?? "" };
   } catch (error) {
-    return { error: getStripeErrorMessage(error) };
+    return {
+      error:
+        error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error),
+    };
   }
 }
 
@@ -116,6 +158,9 @@ export async function createWorkspacePortal(options: {
   returnUrl: string;
 }) {
   try {
+    const envError = checkEnv(options.environment);
+    if (envError) return { error: envError };
+    const returnUrl = assertSafeReturnUrl(options.returnUrl);
     await requireWorkspaceOwner(options.supabase, options.workspaceId, options.userId);
     const { data: subscription, error } = await options.supabase
       .from("subscriptions")
@@ -131,10 +176,13 @@ export async function createWorkspacePortal(options: {
     const stripe = createStripeClient(options.environment);
     const portal = await stripe.billingPortal.sessions.create({
       customer: subscription.stripe_customer_id,
-      return_url: options.returnUrl,
+      return_url: returnUrl,
     });
     return { url: portal.url };
   } catch (error) {
-    return { error: getStripeErrorMessage(error) };
+    return {
+      error:
+        error instanceof Error && !("type" in error) ? error.message : getStripeErrorMessage(error),
+    };
   }
 }

@@ -14,6 +14,7 @@ import { isListingUrl } from "@/lib/listing-url";
 export function SearchFallthrough({ query }: { query: string }) {
   const pastedUrl = isListingUrl(query) ? query.trim() : undefined;
   const [listing, setListing] = useState<ListingPrefill | null>(null);
+  const cur = (listing?.currencyCode ?? "USD").toUpperCase();
 
   return (
     <div className="space-y-4">
@@ -38,18 +39,29 @@ export function SearchFallthrough({ query }: { query: string }) {
       {listing ? (
         <>
           <section className="panel grid gap-3 p-4 sm:grid-cols-4">
-            <Stat label="Item" value={listing.itemPrice ? money2(listing.itemPrice) : "missing"} />
+            <Stat
+              label="Item"
+              value={listing.itemPrice ? money2(listing.itemPrice, cur) : "missing"}
+            />
             <Stat
               label="Shipping"
-              value={listing.itemPrice ? money2(listing.shippingPrice) : "missing"}
+              value={listing.itemPrice ? money2(listing.shippingPrice, cur) : "missing"}
             />
             <Stat
               label="Landed (before tax)"
               value={
-                listing.itemPrice ? money2(listing.itemPrice + listing.shippingPrice) : "missing"
+                listing.itemPrice
+                  ? money2(listing.itemPrice + listing.shippingPrice, cur)
+                  : "missing"
               }
             />
             <Stat label="Condition" value={listing.conditionGrade ?? "not stated"} />
+            {cur !== "USD" ? (
+              <p className="text-xs text-muted-foreground sm:col-span-4">
+                Estimated: this listing is priced in {cur}. Figures are shown in {cur} and are not
+                converted to USD, so compare against USD sold comps with care.
+              </p>
+            ) : null}
             <div className="sm:col-span-4">
               <Button asChild size="sm" variant="outline">
                 <Link to="/app/evaluate" search={{ url: listing.listingUrl }}>
