@@ -62,16 +62,31 @@ async function processSubscription(
     .maybeSingle();
   if (prior?.last_event_at && eventAt && prior.last_event_at > eventAt) return;
 
-  // Customer binding: once a workspace is linked to a Stripe customer, events
-  // from any other customer may not change its plan, whatever metadata claims.
+  // Binding: the metadata user must own the workspace, and within THIS
+  // environment no other customer may hold an active subscription for it.
+  // Sandbox and live issue different customer IDs, so the binding is scoped
+  // per environment (workspaces.stripe_customer_id is shared and not used).
   const { data: ws } = await supabaseAdmin
     .from("workspaces")
-    .select("stripe_customer_id")
+    .select("owner_id")
     .eq("id", workspaceId)
     .maybeSingle();
   if (!ws) throw new Error("Workspace in subscription metadata does not exist");
-  if (ws.stripe_customer_id && ws.stripe_customer_id !== customerId) {
-    throw new Error("Subscription customer does not match the workspace's customer");
+  if (ws.owner_id !== userId) {
+    throw new Error("Subscription user is not the workspace owner");
+  }
+  const { data: rival } = await supabaseAdmin
+    .from("subscriptions")
+    .select("stripe_customer_id")
+    .eq("workspace_id", workspaceId)
+    .eq("environment", env)
+    .neq("stripe_customer_id", customerId)
+    .neq("stripe_subscription_id", subscriptionId)
+    .in("status", ["active", "trialing", "past_due"])
+    .limit(1)
+    .maybeSingle();
+  if (rival) {
+    throw new Error("Another customer already holds an active subscription for this workspace");
   }
 
   const { error: subscriptionError } = await supabaseAdmin.from("subscriptions").upsert(
