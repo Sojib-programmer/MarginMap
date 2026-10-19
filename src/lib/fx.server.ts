@@ -10,7 +10,8 @@ const TTL_MS = 6 * 60 * 60 * 1000;
  */
 export async function usdRate(currency: string): Promise<Rate | null> {
   const code = normalizeCurrency(currency);
-  if (code === "USD") return { usdPerUnit: 1, asOf: new Date().toISOString().slice(0, 10), source: "identity" };
+  if (code === "USD")
+    return { usdPerUnit: 1, asOf: new Date().toISOString().slice(0, 10), source: "identity" };
   const hit = cache.get(code);
   if (hit && Date.now() - hit.at < TTL_MS) return hit.rate;
   try {
