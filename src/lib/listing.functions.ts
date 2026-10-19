@@ -22,12 +22,55 @@ export type ResolvedListing = {
   title: string | null;
   itemPrice: number | null;
   shippingPrice: number | null;
+  /** Always "USD" once resolved — foreign prices are converted server-side. */
   currencyCode: string | null;
   conditionGrade: string | null;
   sellerName: string | null;
   listingUrl: string;
   retrievedAt: string | null;
+  /** Present when the listing was priced in another currency and converted. */
+  fx: {
+    originalCurrency: string;
+    originalItemPrice: number | null;
+    originalShippingPrice: number | null;
+    usdPerUnit: number;
+    asOf: string;
+    source: string;
+  } | null;
 };
+
+/** Converts a resolved listing to USD; fails to manual entry rather than mixing currencies. */
+async function toUsd(r: ResolvedListing): Promise<ResolvedListing> {
+  if (!r.resolved) return r;
+  const { normalizeCurrency, convertToUsd } = await import("@/lib/fx");
+  const cur = normalizeCurrency(r.currencyCode);
+  if (cur === "USD") return { ...r, currencyCode: "USD" };
+  const { usdRate } = await import("@/lib/fx.server");
+  const rate = await usdRate(cur);
+  if (!rate) {
+    return {
+      ...r,
+      resolved: false,
+      itemPrice: null,
+      shippingPrice: null,
+      reason: `This listing is priced in ${cur} and no USD exchange rate was available. Enter the USD price and shipping below.`,
+    };
+  }
+  return {
+    ...r,
+    itemPrice: convertToUsd(r.itemPrice, rate.usdPerUnit),
+    shippingPrice: convertToUsd(r.shippingPrice, rate.usdPerUnit),
+    currencyCode: "USD",
+    fx: {
+      originalCurrency: cur,
+      originalItemPrice: r.itemPrice,
+      originalShippingPrice: r.shippingPrice,
+      usdPerUnit: rate.usdPerUnit,
+      asOf: rate.asOf,
+      source: rate.source,
+    },
+  };
+}
 
 const MARKETPLACE_BY_HOST: { match: RegExp; marketplace: string; label: string }[] = [
   { match: /(^|\.)ebay\./i, marketplace: "ebay", label: "eBay" },
