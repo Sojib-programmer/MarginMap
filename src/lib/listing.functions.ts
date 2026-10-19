@@ -176,6 +176,7 @@ export const resolveListing = createServerFn({ method: "POST" })
       sellerName: null,
       listingUrl: url.toString(),
       retrievedAt: null,
+      fx: null,
     };
 
     const { extractListingWithFirecrawl, captureServerEvent, firecrawlConfigured } =
@@ -202,7 +203,7 @@ export const resolveListing = createServerFn({ method: "POST" })
           via: "firecrawl",
           resolved: true,
         });
-        return {
+        return toUsd({
           ...base,
           itemId,
           resolved: true,
@@ -214,7 +215,7 @@ export const resolveListing = createServerFn({ method: "POST" })
           sellerName: x.sellerName,
           retrievedAt: new Date().toISOString(),
           reason: "Read from the public listing page — check the numbers before you commit.",
-        };
+        });
       } catch {
         return { ...base, itemId, reason: fallbackReason };
       }
@@ -264,7 +265,7 @@ export const resolveListing = createServerFn({ method: "POST" })
         seller?: { username?: string };
         itemWebUrl?: string;
       };
-      return {
+      return toUsd({
         ...base,
         itemId,
         resolved: true,
@@ -276,7 +277,7 @@ export const resolveListing = createServerFn({ method: "POST" })
         sellerName: body.seller?.username ?? null,
         listingUrl: body.itemWebUrl ?? url.toString(),
         retrievedAt: new Date().toISOString(),
-      };
+      });
     } catch {
       return {
         ...base,
