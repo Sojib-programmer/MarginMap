@@ -22,12 +22,55 @@ export type ResolvedListing = {
   title: string | null;
   itemPrice: number | null;
   shippingPrice: number | null;
+  /** Always "USD" once resolved — foreign prices are converted server-side. */
   currencyCode: string | null;
   conditionGrade: string | null;
   sellerName: string | null;
   listingUrl: string;
   retrievedAt: string | null;
+  /** Present when the listing was priced in another currency and converted. */
+  fx: {
+    originalCurrency: string;
+    originalItemPrice: number | null;
+    originalShippingPrice: number | null;
+    usdPerUnit: number;
+    asOf: string;
+    source: string;
+  } | null;
 };
+
+/** Converts a resolved listing to USD; fails to manual entry rather than mixing currencies. */
+async function toUsd(r: ResolvedListing): Promise<ResolvedListing> {
+  if (!r.resolved) return r;
+  const { normalizeCurrency, convertToUsd } = await import("@/lib/fx");
+  const cur = normalizeCurrency(r.currencyCode);
+  if (cur === "USD") return { ...r, currencyCode: "USD" };
+  const { usdRate } = await import("@/lib/fx.server");
+  const rate = await usdRate(cur);
+  if (!rate) {
+    return {
+      ...r,
+      resolved: false,
+      itemPrice: null,
+      shippingPrice: null,
+      reason: `This listing is priced in ${cur} and no USD exchange rate was available. Enter the USD price and shipping below.`,
+    };
+  }
+  return {
+    ...r,
+    itemPrice: convertToUsd(r.itemPrice, rate.usdPerUnit),
+    shippingPrice: convertToUsd(r.shippingPrice, rate.usdPerUnit),
+    currencyCode: "USD",
+    fx: {
+      originalCurrency: cur,
+      originalItemPrice: r.itemPrice,
+      originalShippingPrice: r.shippingPrice,
+      usdPerUnit: rate.usdPerUnit,
+      asOf: rate.asOf,
+      source: rate.source,
+    },
+  };
+}
 
 const MARKETPLACE_BY_HOST: { match: RegExp; marketplace: string; label: string }[] = [
   { match: /(^|\.)ebay\./i, marketplace: "ebay", label: "eBay" },
@@ -133,6 +176,7 @@ export const resolveListing = createServerFn({ method: "POST" })
       sellerName: null,
       listingUrl: url.toString(),
       retrievedAt: null,
+      fx: null,
     };
 
     const { extractListingWithFirecrawl, captureServerEvent, firecrawlConfigured } =
@@ -159,7 +203,7 @@ export const resolveListing = createServerFn({ method: "POST" })
           via: "firecrawl",
           resolved: true,
         });
-        return {
+        return toUsd({
           ...base,
           itemId,
           resolved: true,
@@ -171,7 +215,7 @@ export const resolveListing = createServerFn({ method: "POST" })
           sellerName: x.sellerName,
           retrievedAt: new Date().toISOString(),
           reason: "Read from the public listing page — check the numbers before you commit.",
-        };
+        });
       } catch {
         return { ...base, itemId, reason: fallbackReason };
       }
@@ -221,7 +265,7 @@ export const resolveListing = createServerFn({ method: "POST" })
         seller?: { username?: string };
         itemWebUrl?: string;
       };
-      return {
+      return toUsd({
         ...base,
         itemId,
         resolved: true,
@@ -233,7 +277,7 @@ export const resolveListing = createServerFn({ method: "POST" })
         sellerName: body.seller?.username ?? null,
         listingUrl: body.itemWebUrl ?? url.toString(),
         retrievedAt: new Date().toISOString(),
-      };
+      });
     } catch {
       return {
         ...base,
