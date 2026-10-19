@@ -16,8 +16,10 @@ export type ListingPrefill = {
   conditionGrade: string | null;
   marketplace: string | null;
   listingUrl: string;
-  /** ISO currency of the listing's prices (defaults to USD when unknown). */
+  /** Always USD — foreign listings are converted server-side. */
   currencyCode?: string;
+  /** Original currency + rate when the listing was converted to USD. */
+  fx?: ResolvedListing["fx"];
 };
 
 /**
@@ -55,7 +57,8 @@ export function ListingLookup({
           conditionGrade: res.conditionGrade,
           marketplace: res.marketplace,
           listingUrl: res.listingUrl,
-          currencyCode: res.currencyCode ?? "USD",
+          currencyCode: "USD",
+          fx: res.fx,
         });
         toast.success("Listing loaded into the calculator");
       } else {

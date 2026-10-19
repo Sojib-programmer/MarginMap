@@ -56,10 +56,12 @@ export function SearchFallthrough({ query }: { query: string }) {
               }
             />
             <Stat label="Condition" value={listing.conditionGrade ?? "not stated"} />
-            {cur !== "USD" ? (
+            {listing.fx ? (
               <p className="text-xs text-muted-foreground sm:col-span-4">
-                Estimated: this listing is priced in {cur}. Figures are shown in {cur} and are not
-                converted to USD, so compare against USD sold comps with care.
+                Estimated: converted from {listing.fx.originalCurrency}{" "}
+                {listing.fx.originalItemPrice ?? "—"} at {listing.fx.usdPerUnit.toFixed(4)} USD per{" "}
+                {listing.fx.originalCurrency} ({listing.fx.source}, {listing.fx.asOf}). Card and
+                bank rates may differ slightly.
               </p>
             ) : null}
             <div className="sm:col-span-4">
