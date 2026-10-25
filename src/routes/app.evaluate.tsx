@@ -178,8 +178,12 @@ function EvaluatePage() {
         { type: "inventory_item", id: row.id, metadata: { title } },
       );
     },
-    onSuccess: () => {
-      toast.success("Added to pipeline");
+    onSuccess: (_d, status) => {
+      toast.success(
+        status === "acquired"
+          ? "Logged as bought — finish checkout in the marketplace tab"
+          : "Added to pipeline",
+      );
       qc.invalidateQueries({ queryKey: ["inventory_items"] });
       qc.invalidateQueries({ queryKey: ["activity"] });
     },
@@ -242,6 +246,14 @@ function EvaluatePage() {
           }}
         />
       )}
+
+      {pasted?.fx ? (
+        <p className="panel p-3 text-xs text-muted-foreground">
+          All figures in USD. Converted from {pasted.fx.originalCurrency}{" "}
+          {pasted.fx.originalItemPrice ?? "—"} at {pasted.fx.usdPerUnit.toFixed(4)} USD per{" "}
+          {pasted.fx.originalCurrency} ({pasted.fx.source}, {pasted.fx.asOf}) — estimated.
+        </p>
+      ) : null}
 
       <ListingRiskPanel
         listingUrl={found?.offer.listing_url ?? pasted?.listingUrl ?? undefined}
@@ -546,11 +558,29 @@ function EvaluatePage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => addToPipeline.mutate()}
+                onClick={() => addToPipeline.mutate("source_now")}
                 disabled={addToPipeline.isPending}
               >
                 Add to pipeline
               </Button>
+              {(found?.offer.listing_url ?? pasted?.listingUrl) ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={addToPipeline.isPending}
+                  onClick={() => {
+                    // Open synchronously (popup blockers), then record the buy.
+                    window.open(
+                      (found?.offer.listing_url ?? pasted?.listingUrl) as string,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    addToPipeline.mutate("acquired");
+                  }}
+                >
+                  Buy on marketplace
+                </Button>
+              ) : null}
             </div>
           </aside>
         </div>
