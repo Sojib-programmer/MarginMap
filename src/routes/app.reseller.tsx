@@ -11,10 +11,7 @@ import { inventoryQuery, watchlistItemsQuery, type InventoryRow } from "@/lib/wo
 
 export const Route = createFileRoute("/app/reseller")({
   head: () => ({
-    meta: [
-      { title: "Reseller dashboard — MarginMap" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Reseller dashboard — MarginMap" }, { name: "robots", content: "noindex" }],
   }),
   errorComponent: ({ error, reset }) => <RouteError error={error} reset={reset} />,
   component: ResellerDashboard,
