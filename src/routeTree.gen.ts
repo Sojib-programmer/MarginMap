@@ -45,6 +45,7 @@ import { Route as AppCompareRouteImport } from './routes/app.compare'
 import { Route as AppDataSourcesRouteImport } from './routes/app.data-sources'
 import { Route as AppEvaluateRouteImport } from './routes/app.evaluate'
 import { Route as AppPipelineRouteImport } from './routes/app.pipeline'
+import { Route as AppResellerRouteImport } from './routes/app.reseller'
 import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppWatchlistsRouteImport } from './routes/app.watchlists'
@@ -244,6 +245,11 @@ const AppPipelineRoute = AppPipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => AppRoute,
 } as any)
+const AppResellerRoute = AppResellerRouteImport.update({
+  id: '/reseller',
+  path: '/reseller',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSearchRoute = AppSearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -336,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/app/data-sources': typeof AppDataSourcesRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
+  '/app/reseller': typeof AppResellerRoute
   '/app/search': typeof AppSearchRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
@@ -382,6 +389,7 @@ export interface FileRoutesByTo {
   '/app/data-sources': typeof AppDataSourcesRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
+  '/app/reseller': typeof AppResellerRoute
   '/app/search': typeof AppSearchRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
@@ -432,6 +440,7 @@ export interface FileRoutesById {
   '/app/data-sources': typeof AppDataSourcesRoute
   '/app/evaluate': typeof AppEvaluateRoute
   '/app/pipeline': typeof AppPipelineRoute
+  '/app/reseller': typeof AppResellerRoute
   '/app/search': typeof AppSearchRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/watchlists': typeof AppWatchlistsRoute
@@ -483,6 +492,7 @@ export interface FileRouteTypes {
     | '/app/data-sources'
     | '/app/evaluate'
     | '/app/pipeline'
+    | '/app/reseller'
     | '/app/search'
     | '/app/settings'
     | '/app/watchlists'
@@ -529,6 +539,7 @@ export interface FileRouteTypes {
     | '/app/data-sources'
     | '/app/evaluate'
     | '/app/pipeline'
+    | '/app/reseller'
     | '/app/search'
     | '/app/settings'
     | '/app/watchlists'
@@ -578,6 +589,7 @@ export interface FileRouteTypes {
     | '/app/data-sources'
     | '/app/evaluate'
     | '/app/pipeline'
+    | '/app/reseller'
     | '/app/search'
     | '/app/settings'
     | '/app/watchlists'
@@ -863,6 +875,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPipelineRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/reseller': {
+      id: '/app/reseller'
+      path: '/reseller'
+      fullPath: '/app/reseller'
+      preLoaderRoute: typeof AppResellerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/search': {
       id: '/app/search'
       path: '/search'
@@ -1016,6 +1035,7 @@ interface AppRouteChildren {
   AppDataSourcesRoute: typeof AppDataSourcesRoute
   AppEvaluateRoute: typeof AppEvaluateRoute
   AppPipelineRoute: typeof AppPipelineRoute
+  AppResellerRoute: typeof AppResellerRoute
   AppSearchRoute: typeof AppSearchRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppWatchlistsRoute: typeof AppWatchlistsRoute
@@ -1032,6 +1052,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDataSourcesRoute: AppDataSourcesRoute,
   AppEvaluateRoute: AppEvaluateRoute,
   AppPipelineRoute: AppPipelineRoute,
+  AppResellerRoute: AppResellerRoute,
   AppSearchRoute: AppSearchRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppWatchlistsRoute: AppWatchlistsRoute,

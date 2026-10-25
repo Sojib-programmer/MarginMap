@@ -1,7 +1,7 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 
-import { errorResult, jsonResult, supabaseForUser } from "../supabase";
+import { errorResult, forbidUnlessMember, jsonResult, supabaseForUser } from "../supabase";
 
 export default defineTool({
   name: "create_watchlist",
@@ -23,6 +23,8 @@ export default defineTool({
     if (!clean) return errorResult("A watchlist name is required.");
 
     const supabase = supabaseForUser(ctx);
+    const denied = await forbidUnlessMember(supabase, ctx, workspace_id);
+    if (denied) return denied;
     const { data, error } = await supabase
       .from("watchlists")
       .insert({

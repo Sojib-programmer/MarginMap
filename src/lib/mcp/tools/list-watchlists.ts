@@ -1,7 +1,7 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 
-import { errorResult, jsonResult, supabaseForUser } from "../supabase";
+import { errorResult, forbidUnlessMember, jsonResult, supabaseForUser } from "../supabase";
 
 export default defineTool({
   name: "list_watchlists",
@@ -15,6 +15,8 @@ export default defineTool({
   handler: async ({ workspace_id }, ctx) => {
     if (!ctx.isAuthenticated()) return errorResult("Not authenticated.");
     const supabase = supabaseForUser(ctx);
+    const denied = await forbidUnlessMember(supabase, ctx, workspace_id);
+    if (denied) return denied;
 
     const [lists, items] = await Promise.all([
       supabase

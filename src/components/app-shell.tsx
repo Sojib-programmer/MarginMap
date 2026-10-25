@@ -53,6 +53,7 @@ const NAV: NavItem[] = [
   { to: "/app/search", label: "Search", icon: Search },
   { to: "/app/compare", label: "Compare", icon: GitCompareArrows },
   { to: "/app/watchlists", label: "Watchlists", icon: Star },
+  { to: "/app/reseller", label: "Reseller", icon: Boxes, reseller: true, resellerPlan: true },
   { to: "/app/evaluate", label: "Evaluate", icon: Calculator, reseller: true, resellerPlan: true },
   { to: "/app/pipeline", label: "Pipeline", icon: Boxes, reseller: true, resellerPlan: true },
   { to: "/app/alerts", label: "Alerts", icon: Bell },

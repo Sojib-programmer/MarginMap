@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { PIPELINE_STATUSES } from "@/lib/workspace";
 
-import { errorResult, jsonResult, supabaseForUser } from "../supabase";
+import { errorResult, forbidUnlessMember, jsonResult, supabaseForUser } from "../supabase";
 
 export default defineTool({
   name: "list_pipeline",
@@ -18,6 +18,8 @@ export default defineTool({
   handler: async ({ workspace_id, status }, ctx) => {
     if (!ctx.isAuthenticated()) return errorResult("Not authenticated.");
     const supabase = supabaseForUser(ctx);
+    const denied = await forbidUnlessMember(supabase, ctx, workspace_id);
+    if (denied) return denied;
 
     let query = supabase
       .from("inventory_items")

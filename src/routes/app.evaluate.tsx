@@ -149,35 +149,41 @@ function EvaluatePage() {
     set(k, (Number(e.target.value) || 0) as never);
 
   const addToPipeline = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (status: "source_now" | "acquired" = "source_now") => {
       const ws = requireWrite();
       // Entitlement, not plan name: Free has reseller mode during early access.
       if (!LIMITS[ws.plan].resellerMode)
         throw new Error("The pipeline requires the Pro plan. See Billing.");
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not signed in");
+      const title = found?.variant.productName ?? pasted?.title ?? "Manual candidate";
       const { data: row, error } = await supabase
         .from("inventory_items")
         .insert({
           user_id: auth.user.id,
           workspace_id: ws.workspaceId,
           variant_id: found?.variant.variantId ?? null,
-          title: found?.variant.productName ?? "Manual candidate",
-          status: "source_now",
+          title,
+          status,
           cost_basis: result.allInCost,
           condition_grade: input.conditionGrade,
+          ...(status === "acquired" ? { acquired_at: new Date().toISOString() } : {}),
         })
         .select("id")
         .single();
       if (error) throw new Error(error.message);
-      await logActivity(ws.workspaceId, "pipeline.item_added", {
-        type: "inventory_item",
-        id: row.id,
-        metadata: { title: found?.variant.productName ?? "Manual candidate" },
-      });
+      await logActivity(
+        ws.workspaceId,
+        status === "acquired" ? "pipeline.item_bought" : "pipeline.item_added",
+        { type: "inventory_item", id: row.id, metadata: { title } },
+      );
     },
-    onSuccess: () => {
-      toast.success("Added to pipeline");
+    onSuccess: (_d, status) => {
+      toast.success(
+        status === "acquired"
+          ? "Logged as bought — finish checkout in the marketplace tab"
+          : "Added to pipeline",
+      );
       qc.invalidateQueries({ queryKey: ["inventory_items"] });
       qc.invalidateQueries({ queryKey: ["activity"] });
     },
@@ -240,6 +246,14 @@ function EvaluatePage() {
           }}
         />
       )}
+
+      {pasted?.fx ? (
+        <p className="panel p-3 text-xs text-muted-foreground">
+          All figures in USD. Converted from {pasted.fx.originalCurrency}{" "}
+          {pasted.fx.originalItemPrice ?? "—"} at {pasted.fx.usdPerUnit.toFixed(4)} USD per{" "}
+          {pasted.fx.originalCurrency} ({pasted.fx.source}, {pasted.fx.asOf}) — estimated.
+        </p>
+      ) : null}
 
       <ListingRiskPanel
         listingUrl={found?.offer.listing_url ?? pasted?.listingUrl ?? undefined}
@@ -544,11 +558,29 @@ function EvaluatePage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => addToPipeline.mutate()}
+                onClick={() => addToPipeline.mutate("source_now")}
                 disabled={addToPipeline.isPending}
               >
                 Add to pipeline
               </Button>
+              {(found?.offer.listing_url ?? pasted?.listingUrl) ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={addToPipeline.isPending}
+                  onClick={() => {
+                    // Open synchronously (popup blockers), then record the buy.
+                    window.open(
+                      (found?.offer.listing_url ?? pasted?.listingUrl) as string,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                    addToPipeline.mutate("acquired");
+                  }}
+                >
+                  Buy on marketplace
+                </Button>
+              ) : null}
             </div>
           </aside>
         </div>

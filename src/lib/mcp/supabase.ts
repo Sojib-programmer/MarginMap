@@ -50,6 +50,32 @@ export function supabaseForUser(ctx: ToolContext) {
   });
 }
 
+/**
+ * Explicit membership check: RLS alone would return an empty set for a foreign
+ * workspace, which agents misread as "empty". Returns a 403 result or null.
+ */
+export async function forbidUnlessMember(
+  supabase: ReturnType<typeof supabaseForUser>,
+  ctx: ToolContext,
+  workspaceId: string,
+) {
+  const userId = ctx.getUserId();
+  if (!userId) return errorResult("401 Unauthorized: no verified user on this token.");
+  const { data, error } = await supabase
+    .from("workspace_members")
+    .select("role")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) return errorResult(error.message);
+  if (!data) {
+    return errorResult(
+      `403 Forbidden: you are not a member of workspace ${workspaceId}. Call list_workspaces for valid ids.`,
+    );
+  }
+  return null;
+}
+
 export function errorResult(message: string) {
   return { content: [{ type: "text" as const, text: message }], isError: true as const };
 }
