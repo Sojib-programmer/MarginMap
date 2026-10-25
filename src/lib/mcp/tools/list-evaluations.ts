@@ -1,7 +1,7 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 
-import { errorResult, jsonResult, supabaseForUser } from "../supabase";
+import { errorResult, forbidUnlessMember, jsonResult, supabaseForUser } from "../supabase";
 
 export default defineTool({
   name: "list_deal_evaluations",
@@ -17,6 +17,8 @@ export default defineTool({
     if (!ctx.isAuthenticated()) return errorResult("Not authenticated.");
     const take = Math.min(Math.max(limit ?? 20, 1), 100);
     const supabase = supabaseForUser(ctx);
+    const denied = await forbidUnlessMember(supabase, ctx, workspace_id);
+    if (denied) return denied;
 
     const { data, error } = await supabase
       .from("deal_evaluations")
